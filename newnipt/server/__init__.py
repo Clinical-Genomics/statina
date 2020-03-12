@@ -21,6 +21,7 @@ def create_app(test = False):
         app.client = client
         app.db = client[db_name]
         app.adapter = NiptAdapter(client, db_name = db_name)
+        app.analysis_path = app.config['ANALYSIS_PATH']
         app.register_blueprint(blueprint)
 
         if app.config['DEBUG']==1:

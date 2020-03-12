@@ -18,7 +18,7 @@ def batch(batch_id):
     """Read and load lims data for one sample, all samples or the most recently updated samples."""
         
 
-    load_one_batch(current_app.adapter, batch_id=batch_id)
+    load_one_batch(current_app.adapter, current_app.analysis_path , batch_id=batch_id)
 
 
 

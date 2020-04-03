@@ -19,11 +19,13 @@ oauth.register(
 class User(UserMixin):
     def __init__(self, name, id, active=True):
         self.id = id
-       
+        self.name = name
 
 @blueprint.route('/', methods=['GET', 'POST'])
 def index():
     user = session.get('user')
+    if user:
+        return redirect(url_for('server.batch'))
     return render_template(
         'index.html',
         user=user)

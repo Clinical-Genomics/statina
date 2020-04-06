@@ -25,14 +25,11 @@ class NiptAdapter(MongoAdapter):
         document_id = document_news['_id']
 
         update_result = collection.update_one({'_id': document_id}, 
-                                                         {'$set': document_news}, 
-                                                         upsert=True)
+                                              {'$set': document_news}, 
+                                              upsert=True)
 
         if not update_result.raw_result['updatedExisting']:
-            collection.update_one({'_id': document_id},
-                                               {'$set': {
-                                                   'added': dt.today()
-                                               }})
+            collection.update_one({'_id': document_id}, {'$set': {'added': dt.today()}})
             LOG.info("Added document %s.", document_id)
         elif update_result.modified_count:
             collection.update_one(
@@ -46,3 +43,12 @@ class NiptAdapter(MongoAdapter):
 
     def user(self, email):
         return self.user_collection.find_one({'email': email})
+
+    def batches(self):
+        return self.batch_collection.find() 
+
+    def batch(self, batch_id):
+        return self.batch_collection.find_one({'_id': batch_id})
+
+    def batch_samples(self, batch_id):
+        return self.sample_collection.find({'batch_id': batch_id})

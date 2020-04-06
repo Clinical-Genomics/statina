@@ -25,7 +25,7 @@ class User(UserMixin):
 def index():
     user = session.get('user')
     if user:
-        return redirect(url_for('server.batch'))
+        return redirect(url_for('server.batches'))
     return render_template(
         'index.html',
         user=user)
@@ -65,10 +65,36 @@ def authorized():
         flash('Your email is not on the whitelist, contact an admin.')
         return redirect(url_for('server.index'))
     session['user'] = user
-    return redirect(url_for('server.batch'))
+    return redirect(url_for('server.batches'))
 
 
-@blueprint.route('/NIPT')
+
+
+@blueprint.route('/batches')
 @login_required
-def batch():
-    return render_template('start_page.html')
+def batches():
+    all_batches = list(app.adapter.batches())
+    return render_template('batches.html', 
+            batches=all_batches)
+
+
+@blueprint.route('/batches/<batch_id>/')
+@login_required
+def batch(batch_id):
+    samples = app.adapter.batch_samples(batch_id)
+    batch = app.adapter.batch(batch_id)
+    manualy_classified = 
+    return render_template('batch/batch.html')
+    #,
+       current_user    = current_user,
+    #    ##  Header
+        batch_name      = batch.batch_name,
+        seq_date        = batch.date,
+     #   ##  NCV Table
+       NCV_samples     = samples,
+        man_class       = manualy_classified,
+     #   warnings        = DC.NCV_classified,
+     #   batch_table_data     = DC.NCV_data,
+        ##  Buttons
+        batch_id        = batch._id,
+      #  sample_ids      = ','.join(sample.sample_ID for sample in NCV_db))

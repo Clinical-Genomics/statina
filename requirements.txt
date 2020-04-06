@@ -6,3 +6,7 @@ mongo_adapter
 werkzeug<1.0.0
 coloredlogs
 pyyaml
+flask_login
+flask_debugtoolbar
+authlib
+requests

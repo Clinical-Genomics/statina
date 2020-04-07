@@ -10,3 +10,4 @@ flask_login
 flask_debugtoolbar
 authlib
 requests
+flask_ldap3_login

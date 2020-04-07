@@ -62,7 +62,7 @@ def authorized():
     user = oauth.google.parse_id_token(token)
     authorized_user = app.adapter.user(user.email)
     if authorized_user is None:
-        flash('Your email is not on the whitelist, contact an admin.')
+        flash('Your email is not on the whitelist, contact an admin.', 'warning')
         return redirect(url_for('server.index'))
     session['user'] = user
     return redirect(url_for('server.batch'))

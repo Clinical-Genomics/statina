@@ -6,7 +6,8 @@ from flask import Flask
 from pymongo import MongoClient
 
 from newnipt.adapter.plugin import NiptAdapter
-from newnipt.server.views import blueprint, login_manager
+from newnipt.server.login import login_bp, login_manager
+from newnipt.server.views import server_bp
 from flask_login import  login_required, LoginManager, UserMixin
 
 logging.basicConfig(level=logging.INFO)
@@ -23,10 +24,9 @@ def create_app(test = False):
         app.db = client[db_name]
         app.adapter = NiptAdapter(client, db_name = db_name)
         app.analysis_path = app.config['ANALYSIS_PATH']
-        app.register_blueprint(blueprint)
-        login_manager.init_app(app)
-        #app.register_blueprint(login_manager)
-        
+        app.register_blueprint(login_bp)
+        app.register_blueprint(server_bp)
+        login_manager.init_app(app)        
 
         if app.config['DEBUG']==1:
             from flask_debugtoolbar import DebugToolbarExtension

@@ -2,14 +2,14 @@ from flask import url_for
 from flask_login import current_user
 from flask_ldap3_login.forms import LDAPLoginForm
 from newnipt.server import create_app
-from newnipt.server.login import login_bp, login_manager
-from newnipt.server.views import server_bp
+
 
 app = create_app(test= True)
 app.register_blueprint(login_bp)
 app.register_blueprint(server_bp)
 login_manager.init_app(app)
-
+from newnipt.server.login import login_bp, login_manager
+from newnipt.server.views import server_bp
 
 def test_authorized_login():
     """Test successful authentication against scout database"""

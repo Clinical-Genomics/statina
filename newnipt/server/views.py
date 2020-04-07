@@ -4,6 +4,8 @@ from flask import url_for, redirect, render_template, request, Blueprint, curren
 from flask_login import  login_required, LoginManager, UserMixin
 from authlib.integrations.flask_client import OAuth
 
+from newnipt.server.utils import *
+
 app = current_app
 login_manager = LoginManager()
 blueprint = Blueprint('server', __name__ )
@@ -83,18 +85,31 @@ def batches():
 def batch(batch_id):
     samples = app.adapter.batch_samples(batch_id)
     batch = app.adapter.batch(batch_id)
-    manualy_classified = 
-    return render_template('batch/batch.html')
-    #,
-       current_user    = current_user,
+    sample_info = [get_sample_info(sample) for sample in samples]
+    print(sample_info)
+    return render_template('batch/batch.html',
     #    ##  Header
-        batch_name      = batch.batch_name,
-        seq_date        = batch.date,
+        batch_name = batch.get('batch_name'),
+        seq_date = batch.get('date'),
      #   ##  NCV Table
-       NCV_samples     = samples,
-        man_class       = manualy_classified,
+       NCV_samples = samples,
+       sample_info = sample_info,
      #   warnings        = DC.NCV_classified,
      #   batch_table_data     = DC.NCV_data,
         ##  Buttons
-        batch_id        = batch._id,
-      #  sample_ids      = ','.join(sample.sample_ID for sample in NCV_db))
+        batch_id        = batch.get('_id'),
+        sample_ids      = ','.join(sample.get('_id') for sample in samples)
+      )
+
+
+@blueprint.route('/samples/<sample_id>/')
+@login_required
+def sample(sample_id):
+    return render_template('sample/sample.html')
+
+@blueprint.route('/update', methods=['POST'])
+@login_required
+def update():
+    return redirect(request.referrer)
+
+

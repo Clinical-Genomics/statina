@@ -1,8 +1,10 @@
 #!/usr/bin/env python
 
 from flask import url_for, redirect, request, Blueprint, session, current_app
-from flask_login import LoginManager, UserMixin
+from flask_login import LoginManager
 from authlib.integrations.flask_client import OAuth
+
+from newnipt.server.user import User
 
 app = current_app
 login_manager = LoginManager()
@@ -14,12 +16,6 @@ oauth.register(
     server_metadata_url='https://accounts.google.com/.well-known/openid-configuration',
     client_kwargs={'scope': 'openid email profile'} 
     )
-
-class User(UserMixin):
-    def __init__(self, name, id, active=True):
-        self.id = id
-        self.name = name
-
 
 @login_bp.route('/login')
 def login():

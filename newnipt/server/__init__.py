@@ -7,7 +7,7 @@ from pymongo import MongoClient
 
 from newnipt.adapter.plugin import NiptAdapter
 from newnipt.server.views import blueprint, login_manager
-from flask_login import  login_required, LoginManager, UserMixin
+from flask_login import login_required, LoginManager, UserMixin
 
 logging.basicConfig(level=logging.INFO)
 LOG = logging.getLogger(__name__)

@@ -1,115 +1,172 @@
 #!/usr/bin/env python
 
-from flask import url_for, redirect, render_template, request, Blueprint, current_app, session, flash
-from flask_login import  login_required, LoginManager, UserMixin
-from authlib.integrations.flask_client import OAuth
-
+from flask import (
+    url_for,
+    redirect,
+    render_template,
+    request,
+    Blueprint,
+    current_app,
+    session,
+    flash,
+)
+from flask_login import login_required
+from datetime import datetime
 from newnipt.server.utils import *
-
+from newnipt.server.constants import *
 app = current_app
-login_manager = LoginManager()
-blueprint = Blueprint('server', __name__ )
+server_bp = Blueprint("server", __name__)
 
 
-oauth = OAuth(app)
-oauth.register(
-    name='google',
-    server_metadata_url='https://accounts.google.com/.well-known/openid-configuration',
-    client_kwargs={'scope': 'openid email profile'} 
-    )     
-
-class User(UserMixin):
-    def __init__(self, name, id, active=True):
-        self.id = id
-        self.name = name
-
-@blueprint.route('/', methods=['GET', 'POST'])
+@server_bp.route("/", methods=["GET", "POST"])
 def index():
-    user = session.get('user')
+    user = session.get("user")
     if user:
-        return redirect(url_for('server.batches'))
-    return render_template(
-        'index.html',
-        user=user)
+        return redirect(url_for("server.batches"))
+    return render_template("index.html", user=user)
 
 
-@blueprint.route('/login')
-def login():
-    redirect_uri = url_for('server.authorized', _external=True)
-    return oauth.google.authorize_redirect(redirect_uri)
-
-
-@blueprint.route('/logout')
-def logout():
-    session.pop('user', None)
-    return redirect('/')
-
-
-@login_manager.request_loader
-def request_loader(request):
-    if not session.get('user'):
-        return
-    email = session['user'].get('email')
-    name = session['user'].get('name')
-    if not app.adapter.user(email):
-        return
-
-    user = User(name, email)
-    return user
-
-
-@blueprint.route('/authorized')
-def authorized(): 
-    token = oauth.google.authorize_access_token()
-    user = oauth.google.parse_id_token(token)
-    authorized_user = app.adapter.user(user.email)
-    if authorized_user is None:
-        flash('Your email is not on the whitelist, contact an admin.')
-        return redirect(url_for('server.index'))
-    session['user'] = user
-    return redirect(url_for('server.batches'))
-
-
-
-
-@blueprint.route('/batches')
+@server_bp.route("/batches")
 @login_required
 def batches():
     all_batches = list(app.adapter.batches())
-    return render_template('batches.html', 
-            batches=all_batches)
+    return render_template("batches.html", batches=all_batches)
 
 
-@blueprint.route('/batches/<batch_id>/')
+@server_bp.route("/batches/<batch_id>/")
 @login_required
 def batch(batch_id):
     samples = app.adapter.batch_samples(batch_id)
     batch = app.adapter.batch(batch_id)
-    sample_info = [get_sample_info(sample) for sample in samples]
-    print(sample_info)
-    return render_template('batch/batch.html',
-    #    ##  Header
-        batch_name = batch.get('batch_name'),
-        seq_date = batch.get('date'),
-     #   ##  NCV Table
-       NCV_samples = samples,
-       sample_info = sample_info,
-     #   warnings        = DC.NCV_classified,
-     #   batch_table_data     = DC.NCV_data,
-        ##  Buttons
-        batch_id        = batch.get('_id'),
-        sample_ids      = ','.join(sample.get('_id') for sample in samples)
-      )
+
+    return render_template("batch/batch.html",
+        batch = batch,
+        sample_info = [get_sample_info(sample) for sample in samples],
+        #warnings = ...,
+        sample_ids = ",".join(sample.get("_id") for sample in samples),
+        page_id = "batches",
+    )
 
 
-@blueprint.route('/samples/<sample_id>/')
+@server_bp.route("/samples/<sample_id>/")
 @login_required
 def sample(sample_id):
-    return render_template('sample/sample.html')
+    sample = app.adapter.sample(sample_id)
+    batch = app.adapter.batch(sample.get('Flowcell'))
 
-@blueprint.route('/update', methods=['POST'])
+    return render_template("sample/sample.html",
+        chrom_abnorm = CHROM_ABNORM,
+        sample = sample,
+        status_classes = STATUS_CLASSES,
+        batch = batch)
+
+@server_bp.route("/samples/<sample_id>/tris")
+@login_required
+def sample_tris(sample_id):
+    sample = app.adapter.sample(sample_id)
+    batch = app.adapter.batch(sample.get('Flowcell'))
+
+    return render_template("sample/sample_tris.html",
+        tris_abn_status = get_tris_abn_for_plot(app.adapter),
+        sample = sample,
+        batch = batch,
+        status_colors = STATUS_COLORS,
+        page_id="sample_tris",
+    )
+
+
+@server_bp.route('/NIPT/<batch_id>/<sample_id>/update_trisomi_status', methods=['POST'])
+@login_required
+def update_trisomi_status(batch_id, sample_id):
+    time_stamp = datetime.now().strftime('%Y/%m/%d %H:%M:%S')
+    sample = app.adapter.sample(sample_id)
+    user = app.user
+    for abnormality in CHROM_ABNORM:
+        new_abnormality_status = request.form[abnormality]
+        if sample.get(f"status_{abnormality}") != new_abnormality_status:
+            sample[f"status_{abnormality}"] = new_abnormality_status
+            sample[f"status_change_{abnormality}"] = ' '.join([user.name, time_stamp])
+
+    if user.role == 'RW':
+        app.adapter.add_or_update_document(sample, app.adapter.sample_collection)
+        return redirect(request.referrer)
+    else:
+        return '', 201
+
+@server_bp.route("/update", methods=["POST"])
 @login_required
 def update():
     return redirect(request.referrer)
 
 
+@server_bp.route("/batches/<batch_id>/NCV13")
+@login_required
+def NCV13(batch_id):
+    batch = app.adapter.batch(batch_id)
+
+    return render_template(
+        "batch/NCV13.html",
+        batch=batch,
+        page_id="batches_NCV13",
+    )
+
+
+@server_bp.route("/batches/<batch_id>/NCV18")
+@login_required
+def NCV18(batch_id):
+    batch = app.adapter.batch(batch_id)
+    return render_template(
+        "batch/NCV18.html",
+        batch=batch,
+        page_id="batches_NCV18",
+    )
+
+
+@server_bp.route("/batches/<batch_id>/NCV21")
+@login_required
+def NCV21(batch_id):
+    batch = app.adapter.batch(batch_id)
+    return render_template(
+        "batch/NCV21.html",
+        batch=batch,
+        page_id="batches_NCV21",
+    )
+
+
+@server_bp.route("/batches/<batch_id>/fetal_fraction")
+@login_required
+def fetal_fraction(batch_id):
+    batch = app.adapter.batch(batch_id)
+    return render_template(
+        "batch/fetal_fraction.html",
+        batch=batch,
+        page_id="batches_FF",
+    )
+
+
+@server_bp.route("/batches/<batch_id>/covX_covY")
+@login_required
+def covX_covY(batch_id):
+    batch = app.adapter.batch(batch_id)
+    return render_template(
+        "batch/covX_covY.html",
+        batch=batch,
+        page_id="batches_cov_xy",
+    )
+
+
+@server_bp.route("/batches/<batch_id>/coverage")
+@login_required
+def coverage(batch_id):
+    batch = app.adapter.batch(batch_id)
+    return render_template(
+        "batch/coverage.html",
+        batch=batch,
+        page_id="batches_cov",
+    )
+
+
+@server_bp.route("/batches/<batch_id>/report/<coverage>")
+@login_required
+def report(batch_id, coverage):
+    return render_template("batch/report.html", batch_id=batch_id)

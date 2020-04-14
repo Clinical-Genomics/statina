@@ -50,5 +50,11 @@ class NiptAdapter(MongoAdapter):
     def batch(self, batch_id):
         return self.batch_collection.find_one({'_id': batch_id})
 
+    def sample(self, sample_id):
+        return self.sample_collection.find_one({'_id': sample_id})
+
+    def sample_aggregate(self, pipe: dict):
+        return self.sample_collection.aggregate(pipe)
+
     def batch_samples(self, batch_id):
         return self.sample_collection.find({'Flowcell': batch_id})

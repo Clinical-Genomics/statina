@@ -101,7 +101,7 @@ def get_tris_abn_for_plot(adapter):
             abnormalities[status]['values'] += status_dict.get('values')
             abnormalities[status]['names'] += status_dict.get('names')
             abnormalities[status]['count'] += status_dict.get('count')
-            abnormalities[status]['x_axis'] += 
+            abnormalities[status]['x_axis'] += 5
 
     return abnormalities
 

@@ -42,3 +42,7 @@ class NiptAdapter(MongoAdapter):
             LOG.info("Updated document %s.", document_id)
         else:
             LOG.info("No updates for document %s.", document_id)
+
+
+    def user(self, email):
+        return self.user_collection.find_one({'email': email})

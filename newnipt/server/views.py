@@ -33,26 +33,12 @@ def batches():
     return render_template("batches.html", batches=all_batches)
 
 
-@server_bp.route("/batches/<batch_id>/")
-@login_required
-def batch(batch_id):
-    samples = app.adapter.batch_samples(batch_id)
-    batch = app.adapter.batch(batch_id)
-
-    return render_template("batch/batch.html",
-        batch = batch,
-        sample_info = [get_sample_info(sample) for sample in samples],
-        #warnings = ...,
-        sample_ids = ",".join(sample.get("_id") for sample in samples),
-        page_id = "batches",
-    )
-
 
 @server_bp.route("/samples/<sample_id>/")
 @login_required
 def sample(sample_id):
     sample = app.adapter.sample(sample_id)
-    batch = app.adapter.batch(sample.get('Flowcell'))
+    batch = app.adapter.batch(sample.get('SampleProject'))
 
     return render_template("sample/sample.html",
         chrom_abnorm = CHROM_ABNORM,
@@ -64,72 +50,73 @@ def sample(sample_id):
 @login_required
 def sample_tris(sample_id):
     sample = app.adapter.sample(sample_id)
-    batch = app.adapter.batch(sample.get('Flowcell'))
-
+    batch = app.adapter.batch(sample.get('SampleProject'))
+    abnormal_data, data_per_abnormaliy = get_abn_for_samp_tris_plot(app.adapter)
+    normal_data = get_normal_for_samp_tris_plot(app.adapter)
+    sample_data = get_sample_for_samp_tris_plot(sample)
     return render_template("sample/sample_tris.html",
-        tris_abn_status = get_tris_abn_for_plot(app.adapter),
+        tris_abn = data_per_abnormaliy,
+        normal_data = normal_data,
+        abnormal_data = abnormal_data, 
+        sample_data = sample_data,
         sample = sample,
         batch = batch,
         status_colors = STATUS_COLORS,
         page_id="sample_tris",
     )
 
-
-@server_bp.route('/NIPT/<batch_id>/<sample_id>/update_trisomi_status', methods=['POST'])
+@server_bp.route("/batches/<batch_id>/")
 @login_required
-def update_trisomi_status(batch_id, sample_id):
-    time_stamp = datetime.now().strftime('%Y/%m/%d %H:%M:%S')
-    sample = app.adapter.sample(sample_id)
-    user = app.user
-    for abnormality in CHROM_ABNORM:
-        new_abnormality_status = request.form[abnormality]
-        if sample.get(f"status_{abnormality}") != new_abnormality_status:
-            sample[f"status_{abnormality}"] = new_abnormality_status
-            sample[f"status_change_{abnormality}"] = ' '.join([user.name, time_stamp])
+def batch(batch_id):
 
-    if user.role == 'RW':
-        app.adapter.add_or_update_document(sample, app.adapter.sample_collection)
-        return redirect(request.referrer)
-    else:
-        return '', 201
-
-@server_bp.route("/update", methods=["POST"])
-@login_required
-def update():
-    return redirect(request.referrer)
+    samples = app.adapter.batch_samples(batch_id)
+    batch = app.adapter.batch(batch_id)
+    return render_template("batch/batch.html",
+        batch = batch,
+        sample_info = [get_sample_info(sample) for sample in samples],
+        #warnings = ...,
+        sample_ids = ",".join(sample.get("_id") for sample in samples),
+        page_id = "batches",
+    )
 
 
 @server_bp.route("/batches/<batch_id>/NCV13")
 @login_required
 def NCV13(batch_id):
-    batch = app.adapter.batch(batch_id)
-
     return render_template(
-        "batch/NCV13.html",
-        batch=batch,
-        page_id="batches_NCV13",
+        "batch/NCV.html",
+        batch = app.adapter.batch(batch_id),
+        chrom = '13',
+        cases = get_case_data_for_batch_tris_plot(app.adapter, '13', batch_id),
+        normal_data = get_normal(app.adapter, '13'),
+        abnormal_data = get_abnormal(app.adapter, '13', 0),
+        page_id = "batches_NCV13"
     )
-
 
 @server_bp.route("/batches/<batch_id>/NCV18")
 @login_required
 def NCV18(batch_id):
-    batch = app.adapter.batch(batch_id)
     return render_template(
-        "batch/NCV18.html",
-        batch=batch,
-        page_id="batches_NCV18",
+        "batch/NCV.html",
+        batch = app.adapter.batch(batch_id),
+        chrom = '18',
+        cases = get_case_data_for_batch_tris_plot(app.adapter, '18', batch_id),
+        normal_data = get_normal(app.adapter, '18'),
+        abnormal_data = get_abnormal(app.adapter, '18', 0),
+        page_id = "batches_NCV18"
     )
-
 
 @server_bp.route("/batches/<batch_id>/NCV21")
 @login_required
 def NCV21(batch_id):
-    batch = app.adapter.batch(batch_id)
     return render_template(
-        "batch/NCV21.html",
-        batch=batch,
-        page_id="batches_NCV21",
+        "batch/NCV.html",
+        batch = app.adapter.batch(batch_id),
+        chrom = '21',
+        cases = get_case_data_for_batch_tris_plot(app.adapter, '21', batch_id),
+        normal_data = get_normal(app.adapter, '21'),
+        abnormal_data = get_abnormal(app.adapter, '21', 0),
+        page_id = "batches_NCV21"
     )
 
 
@@ -170,3 +157,56 @@ def coverage(batch_id):
 @login_required
 def report(batch_id, coverage):
     return render_template("batch/report.html", batch_id=batch_id)
+
+
+@server_bp.route('/update', methods=['POST'])
+@login_required
+def update():
+    time_stamp = datetime.now().strftime('%Y/%m/%d %H:%M:%S')
+    user = app.user
+    if user.role != 'RW':
+        return '', 201
+
+    if request.form.get('form_id') == 'set_sample_status':
+        sample_id=request.form['sample_id']
+        sample = app.adapter.sample(sample_id)
+        for abnormality in CHROM_ABNORM:
+            new_abnormality_status = request.form[abnormality]
+            if sample.get(f"status_{abnormality}") != new_abnormality_status:
+                sample[f"status_{abnormality}"] = new_abnormality_status
+                sample[f"status_change_{abnormality}"] = ' '.join([user.name, time_stamp])
+        app.adapter.add_or_update_document(sample, app.adapter.sample_collection)
+            
+    if request.form.get('form_id') == 'set_sample_comment':
+        sample_id=request.form['sample_id']
+        sample = app.adapter.sample(sample_id)
+        if request.form.get('comment') != sample.get('comment'):
+            sample['comment'] = request.form.get('comment')
+        app.adapter.add_or_update_document(sample, app.adapter.sample_collection)
+    
+    if request.form.get('button_id') == 'Save':
+        samples = request.form.getlist('samples')
+        for sample_id in samples:
+            sample = app.adapter.sample(sample_id)
+            comment = request.form.get(f"comment_{sample_id}")
+            include = request.form.get(f"include_{sample_id}")
+            if comment != sample.get('comment'):
+                sample['comment'] = comment
+            if include and sample.get('include', False) == False:
+                sample['include'] = True
+                sample['change_include_date'] = ' '.join([user.name, time_stamp])
+            elif not include and sample.get('include') == True:
+                sample['include'] = False
+            app.adapter.add_or_update_document(sample, app.adapter.sample_collection)
+    
+    if request.form.get('button_id') =='include all samples':
+        samples = request.form.getlist('samples')
+        for sample_id in samples:
+            sample = app.adapter.sample(sample_id)
+            if sample.get('include', False) == False:
+                sample['include'] = True
+                sample['change_include_date'] = ' '.join([user.name, time_stamp])
+                app.adapter.add_or_update_document(sample, app.adapter.sample_collection)
+
+    return redirect(request.referrer)
+

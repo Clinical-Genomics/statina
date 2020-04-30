@@ -1,0 +1,97 @@
+{% extends 'layout/layout.html' %}
+{% block body %}
+{% include 'layout/navigation.html' %}
+<div class="container-fluid">
+    {% include 'batch/header.html' %}
+    <div class="tab-pane active" id='NCV_{{chrom}}'>
+        <div class="panel panel-default">
+            <div class="panel-body">
+                <div id="NCV_plot" style="min-width:400px; height:800px; "></div><br><br>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    $(function chrom_plot() {
+    var data = []
+    var layout = {
+        legend:{hovermode:'closest' },
+        hovermode:'closest',
+        annotations : [],
+        xaxis :{showline: true,
+                ticktext : {{cases['names']|tojson}},
+                tickvals : {{cases['x_axis']}},
+                tickangle : 20,
+                linecolor: '#636363',
+                linewidth: 5,
+                showgrid: true,
+                gridcolor: '#bdbdbd'
+                },
+            
+        yaxis :{range: [-10,],
+                zeroline: false,
+                showline: true,
+                showgrid: false,
+                linecolor: '#636363',
+                linewidth: 5,
+                title : 'NCV{{chrom}}'
+                }};
+
+    var cases = {name: "Current batch (N ="+ "{{cases['count']}}" +")" ,
+                 y: {{cases['values']}},
+                x: {{cases['x_axis']}},
+                text: {{cases['names']|tojson}},
+                mode: 'markers',
+                type: 'scatter',
+                };
+    data.push(cases)
+
+    var box = {
+        y: {{ normal_data['values'] }},
+        pointpos: 30,
+        type: 'box',
+        marker: {
+            color: '#ccccb3'},
+            name: 'Negative (N='+{{normal_data['count']}}+')',
+            hoverinfo:'none'}
+    data.push(box)
+
+    
+
+    {% for status  in abnormal_data.keys() %}
+        var verif = {                                                                  
+            name: "{{status}} T{{chrom}} (N="+{{abnormal_data[status]['count']}}+")",
+            y: {{abnormal_data[status]['values']}},                                        
+            x: {{abnormal_data[status]['x_axis']}} ,
+            text: {{abnormal_data[status]['names']|tojson}},                                       
+            mode: 'markers',                                             
+            type: 'scatter'}; 
+        data.push(verif);
+    {% endfor %}
+
+    
+    Plotly.newPlot('NCV_plot', data, layout);
+    });
+</script>
+
+
+<script>
+$(document).ready(function() {
+    var table = $('#batch_table').DataTable( {
+        lengthChange: false,
+        paging:     false,
+        info: false,
+        searching:  false
+    } );
+} );
+</script>
+
+
+<script>
+var d = new Date();
+document.getElementById("demo").innerHTML = d.toDateString();
+</script>
+{% endblock %}

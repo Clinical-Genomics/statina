@@ -1,12 +1,13 @@
 from newnipt.server.constants import *
 from copy import deepcopy
 
+## Batch view
 
 def get_sample_info(sample):
-    fetal_fraction = float(sample.get("FF_Formatted").rstrip("%").lstrip("<"))
-    z_score_13 = float(sample.get("Zscore_13").replace(",", ".").replace("−", ""))
-    z_score_18 = float(sample.get("Zscore_18").replace(",", ".").replace("−", ""))
-    z_score_21 = float(sample.get("Zscore_21").replace(",", ".").replace("−", ""))
+    fetal_fraction = sample.get("FF_Formatted")
+    z_score_13 = sample.get("Zscore_13")
+    z_score_18 = sample.get("Zscore_18")
+    z_score_21 = sample.get("Zscore_21")
     return {
         "sample_id": sample.get("_id"),
         "FF_Formatted": {
@@ -39,7 +40,7 @@ def _get_status(sample):
     status_list = []
     for key in ["T13", "T18", "T21", "X0", "XXX", "XXY", "XYY"]:
         status = sample.get(f"status_{key}")
-        if status != "Normal":
+        if status and status != "Normal":
             status_list.append(" ".join([status, key]))
     return ", ".join(status_list)
 
@@ -47,7 +48,7 @@ def _get_status(sample):
 def _get_ff_warning(fetal_fraction):
     """Get fetal fraction warning based on preset treshold"""
     try:
-        fetal_fraction = float(fetal_fraction.rstrip("%").lstrip("<"))
+        fetal_fraction = fetal_fraction
     except:
         fetal_fraction = None
     if fetal_fraction and fetal_fraction <= FF_TRESHOLD:
@@ -79,33 +80,101 @@ def _get_tris_warning(z_score: float, fetal_fraction):
 #################sample view
 
 
-def get_tris_abn_for_plot(adapter):
-    abnormalities = {}
-    for status in STATUS_CLASSES:
-        abnormalities[status] = {'values': [],
-                                 'names': [],
-                                 'count': 0,
-                                 'x_axis': []} 
 
-    for abn in ["13", "18", "21"]:
-        pipe = [{"$group": {
-                 "_id": {f"status_T{abn}": f"$status_T{abn}"},
-                 "values": {"$push": f"$Zscore_{abn}"},
+
+def get_abnormal(adapter, chr, x_axis):
+    plot_data = {}
+    
+    pipe = [{'$match': {
+                f'status_T{chr}': {
+                    '$ne': 'Normal', 
+                    '$exists': 'True'
+                    }
+            }},{"$group": {
+                 "_id": {f"status_T{chr}": f"$status_T{chr}"},
+                 "values": {"$push": f"$Zscore_{chr}"},
                  "names": {"$push": "$_id"},
                  "count": {"$sum": 1}
                  }}]
 
-        for status_dict in adapter.sample_aggregate(pipe):
-            status = status_dict['_id'][f'status_{abn}']
-
-            abnormalities[status]['values'] += status_dict.get('values')
-            abnormalities[status]['names'] += status_dict.get('names')
-            abnormalities[status]['count'] += status_dict.get('count')
-            abnormalities[status]['x_axis'] += 5
-
-    return abnormalities
+    for status_dict in adapter.sample_aggregate(pipe):
+        status = status_dict['_id'][f'status_T{chr}']
+        plot_data[status] = {'values': [ value for value in status_dict.get('values')],
+                             'names': status_dict.get('names'),
+                             'count': status_dict.get('count'),
+                             'x_axis': [x_axis]*status_dict.get('count')}
+    return plot_data
 
 
+
+def get_normal(adapter, chr):
+    pipe = [{"$group": {
+             "_id": {f"status_T{chr}": f"$status_T{chr}"},
+             "values": {"$push": f"$Zscore_{chr}"},
+             "names": {"$push": "$_id"},
+             "count": {"$sum": 1}
+             }},
+            {'$match': {f'_id.status_T{chr}': {'$eq': 'Normal'}}
+            }]
+    data = list(adapter.sample_aggregate(pipe))[0]
+    data['values'] = [ value for value in data.get('values')]
+    return data
+
+def get_abn_for_samp_tris_plot(adapter):
+    plot_data = {}
+    data_per_abnormaliy = {}
+    for status in STATUS_CLASSES:
+        plot_data[status] = {'values': [],
+                             'names': [],
+                             'count': 0,
+                             'x_axis': []} 
+    print('hej')
+    print(plot_data)
+    x_axis = 1
+    for abn in ["13", "18", "21"]:
+        data = get_abnormal(adapter, abn, x_axis)
+        data_per_abnormaliy[abn] = data
+        print(data)
+        print(abn)
+        for status, status_dict in data.items():
+            plot_data[status]['values'] += status_dict.get('values', [])
+            plot_data[status]['names'] += status_dict.get('names', [])
+            plot_data[status]['count'] += status_dict.get('count', 0)
+            plot_data[status]['x_axis'] += status_dict.get('x_axis', [])
+        x_axis+=1
+
+    return plot_data, data_per_abnormaliy
+
+def get_normal_for_samp_tris_plot(adapter):
+    data_per_abnormaliy = {}
+    x_axis = 1
+    for abn in ["13", "18", "21"]:
+        data = get_normal(adapter, abn)
+        data['x_axis'] = [x_axis]*data.get('count')
+        data_per_abnormaliy[abn] = data
+        x_axis+=1
+    return data_per_abnormaliy
+
+
+def get_sample_for_samp_tris_plot(sample):
+    return {"13":{'value': sample.get('Zscore_13') ,'x_axis': 1},
+            "18":{'value': sample.get('Zscore_18') ,'x_axis': 2},
+            "21":{'value': sample.get('Zscore_21'),'x_axis': 3}}
+
+
+def get_case_data_for_batch_tris_plot(adapter, chr, batch_id):
+    pipe = [{"$group": {
+             "_id": {f"batch": f"$SampleProject"},
+             "values": {"$push": f"$Zscore_{chr}"},
+             "names": {"$push": "$_id"},
+             "count": {"$sum": 1}
+             }},
+            {'$match': {f'_id.batch': {'$eq': batch_id}}
+            }]
+    data= list(adapter.sample_aggregate(pipe))[0]
+    data['values'] = [ value for value in data.get('values')]
+    data['x_axis'] = list(range(1,data.get('count')+1))
+    return data
 
 # NCV_classified={u'test-2020-07892-06_AHCKMCBCX3': 'T18', u'test-2020-07887-06_AHCKMCBCX3': '', u'test-2020-07897-06_AHCKMCBCX3': '', u'test-2020-07893-06_AHCKMCBCX3': '', u'test-2020-07890-06_AHCKMCBCX3': '', u'test-2020-07886-06_AHCKMCBCX3': '', u'test-2020-07889-06_AHCKMCBCX3': '', u'test-2020-07910-06_AHCKMCBCX3': '', u'pcs-2020-05298-01_AHCKMCBCX3': '', u'test-2020-07885-06_AHCKMCBCX3': '', u'test-2020-07888-06_AHCKMCBCX3': '', u'test-2020-07884-06_AHCKMCBCX3': '', u'test-2020-07896-06_AHCKMCBCX3': '', u'test-2020-07895-06_AHCKMCBCX3': '', u'test-2020-07894-06_AHCKMCBCX3': ''}
 

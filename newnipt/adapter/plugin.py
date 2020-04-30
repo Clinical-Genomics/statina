@@ -57,4 +57,4 @@ class NiptAdapter(MongoAdapter):
         return self.sample_collection.aggregate(pipe)
 
     def batch_samples(self, batch_id):
-        return self.sample_collection.find({'Flowcell': batch_id})
+        return self.sample_collection.find({'SampleProject': batch_id})

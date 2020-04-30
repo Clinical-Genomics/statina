@@ -13,7 +13,8 @@
                     <div class="panel-body">
                         <div class="table-responsive">
                             <form action="{{ url_for('server.update') }}" method="post">
-                                <table id="batch_table" class="table table-bordered table-hover" >
+                                <input type=text name="form_id" value="include_samples" hidden>
+                                <table id="batch_table" class="table table-bordered table-hover table-wrapper-scroll-y" >
                                     <thead>
                                         <tr>
                                             <th>Sample Name</th>
@@ -31,6 +32,7 @@
                                     </thead>
                                     <tbody>
                                         {% for sample in sample_info %}
+                                        <input type=text name="samples" value="{{ sample.sample_id }}" hidden>
                                         <tr>
                                             <td width="20%"> <a href={{ url_for('server.sample', sample_id=sample.sample_id) }}>{{ sample.sample_id }}</a></td>
                                             <td width="4%" class = "{{ sample.Zscore_13.warn}}">{{ sample.Zscore_13.value }}</td>
@@ -41,10 +43,11 @@
                                             <th><p> <small>""</small></p></th>
                                             <th><p> <small>{{ sample.Status }}</small></p></th>
                                             {% if current_user.role=='RW' %}
-                                            <td width="1%" {% if sample.Include %}class="success"{% endif %}> <input type="checkbox" name="{{ sample.sample_id }}" {% if sample.Include %}checked{% endif %}></td>
+                                                
+                                            <td width="1%" {% if sample.Include %}class="success"{% endif %}> <input type="checkbox" name="include_{{ sample.sample_id }}" {% if sample.Include %}checked{% endif %}></td>
                                             <td width="18%">
                                                 <div class="form-group">
-                                                    <textarea class="form-control" rows="1" name = "comment_{{ sample.sample_id }}">{{sample.Comment}}</textarea>
+                                                    <textarea class="form-control" rows="1" name = "comment_{{ sample.sample_id }}" >{{sample.Comment}}</textarea>
                                                 </div>
                                             </td>
                                             {% else %}
@@ -61,14 +64,13 @@
                                         <tr>
                                             {% if current_user.role=='RW' %}
                                             <p align="right">
-                                                <input type="submit" class="btn btn-warning" value="Save checked samples">
-                                                <button type="submit" class="btn btn-warning" name="All samples" value="{{sample_ids}}"> Set all OK</button>
+                                                <input type="submit" class="btn btn-warning" name="button_id" value="Save">
+                                                <button type="submit" class="btn btn-warning" name="button_id" value="include all samples"> Include all and Save</button>
                                             </p>
                                             {% endif %}
                                         </tr>
                                         <tr>
                                             <p>Samples checked in the 'Include' column are added to the validation sample set for comparison. Check the checkboxes for samples to include and save. If all samples are ok, just press 'set all OK'.</p>
-                                            <input type=text name="sample_ids" value="{{sample_ids}}" hidden>
                                             <input type=text name="current_user" value="{{current_user.name}}" hidden>
                                         </tr>
                                     </tbody>

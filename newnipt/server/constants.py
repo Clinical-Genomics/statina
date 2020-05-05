@@ -1,6 +1,7 @@
 STATUS_CLASSES = {"Suspected": "warning", "False Positive":"success", "Verified": "danger", "Probable" :"warning", "False Negative":"danger", "Other":"warning", "Failed":"danger"}
 CHROM_ABNORM = ['T13','T18', 'T21', 'X0', 'XXX','XXY','XYY']
 TRIS_CHROM_ABNORM = ['T13','T18', 'T21']
+SEX_CHROM_ABNORM = ['X0','XXX', 'XXY', 'XYY']
 STATUS_COLORS  = {"Suspected"    :   '#DBA901',
                 'Probable'     :   "#0000FF",
                                      'False Negative':  "#ff6699",

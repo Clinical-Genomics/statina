@@ -33,6 +33,8 @@ def batches():
     return render_template("batches.html", batches=all_batches)
 
 
+### Sample views
+
 
 @server_bp.route("/samples/<sample_id>/")
 @login_required
@@ -75,7 +77,7 @@ def batch(batch_id):
         batch = batch,
         sample_info = [get_sample_info(sample) for sample in samples],
         #warnings = ...,
-        sample_ids = ",".join(sample.get("_id") for sample in samples),
+        #sample_ids = ",".join(sample.get("_id") for sample in samples),
         page_id = "batches",
     )
 
@@ -119,6 +121,22 @@ def NCV21(batch_id):
         page_id = "batches_NCV21"
     )
 
+@server_bp.route("/batches/<batch_id>/fetal_fraction_XY")
+@login_required
+def fetal_fraction_XY(batch_id):
+    batch = app.adapter.batch(batch_id)
+    control = get_ff_control(app.adapter)
+    abnormal = get_ff_abnormal(app.adapter)
+    return render_template(
+        "batch/fetal_fraction_XY.html",
+        control = control,
+        abnormal = abnormal,
+        cases = get_ff_cases(app.adapter, batch_id),
+        max_x = max(control['FFX']) +1,
+        min_x = min(control['FFX']) -1,
+        batch=batch,
+        page_id="batches_FF_XY",
+    )
 
 @server_bp.route("/batches/<batch_id>/fetal_fraction")
 @login_required
@@ -126,19 +144,10 @@ def fetal_fraction(batch_id):
     batch = app.adapter.batch(batch_id)
     return render_template(
         "batch/fetal_fraction.html",
+        control = get_ff_control(app.adapter),
+        cases = get_ff_cases(app.adapter, batch_id),
         batch=batch,
         page_id="batches_FF",
-    )
-
-
-@server_bp.route("/batches/<batch_id>/covX_covY")
-@login_required
-def covX_covY(batch_id):
-    batch = app.adapter.batch(batch_id)
-    return render_template(
-        "batch/covX_covY.html",
-        batch=batch,
-        page_id="batches_cov_xy",
     )
 
 
@@ -146,10 +155,14 @@ def covX_covY(batch_id):
 @login_required
 def coverage(batch_id):
     batch = app.adapter.batch(batch_id)
+    samples = app.adapter.batch_samples(batch_id)
+    data = get_data_for_coverage_plot(samples)
     return render_template(
         "batch/coverage.html",
-        batch=batch,
-        page_id="batches_cov",
+        batch = batch,
+        x_axis = list(range(1,23)),
+        data = data,
+        page_id = "batches_cov",
     )
 
 

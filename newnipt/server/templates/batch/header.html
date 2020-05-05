@@ -8,7 +8,7 @@
         <div class="col-lg-3"></div>
     </div>
     <div class="row">
-            <div class="col-lg-9"><big><em> Sequenced {{batch.date}}</em></big></div>
+            <div class="col-lg-9"><big><em> Sequenced: {{batch.SequencingDate}}</em></big></div>
         <div class="col-lg-3">
             <p>
                 <a href="{{ url_for('server.report', batch_id=batch._id , coverage=0) }}" class="btn btn-primary" role="button"> Report</a>
@@ -64,9 +64,9 @@
     </li>
     <li {% if page_id =='batches_FF' %} class="active" {% endif %}><a href="{{url_for('server.fetal_fraction', batch_id = batch._id)}}">FF</a>
     </li>
-    <li {% if page_id =='batches_cov_xy' %} class="active" {% endif %}><a href="{{url_for('server.covX_covY', batch_id = batch._id)}}">CovX vs CovY</a>
+    <li {% if page_id =='batches_FF_XY' %} class="active" {% endif %}><a href="{{url_for('server.fetal_fraction_XY', batch_id = batch._id)}}">FFXY</a>
     </li>
-    <li {% if page_id =='batches_cov' %} class="active" {% endif %}><a href="{{url_for('server.coverage', batch_id = batch._id)}}">Coverage (Chr 1-22)</a>
+    <li {% if page_id =='batches_cov' %} class="active" {% endif %}><a href="{{url_for('server.coverage', batch_id = batch._id)}}">Ratio (Chr 1-22)</a>
     </li>
 </ul>
 {% endblock %}

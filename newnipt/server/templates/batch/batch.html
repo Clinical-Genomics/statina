@@ -22,7 +22,10 @@
                                             <th>NCV18</th>
                                             <th>NCV21</th>
                                             <th>NCVX</th>
-                                            <th>FF</th>
+                                            <th>FF(%)</th>
+                                            <th>FFX(%)</th>
+                                            <th>FFY(%)</th>
+                                            <th>CNVSegment</th>
                                             <th><a href="#" data-toggle="tooltip" data-placement="bottom" title="Warning for chomosome abnormality. Automatically generated. Based on pre defined NCV trsholds">Warning</a></th>
                                             <th><a href="#" data-toggle="tooltip" data-placement="bottom" title="Chomosome abnormalies. Manually classified by user through the sample page">Status</a></th>
                                             <th>Include</th>
@@ -39,8 +42,11 @@
                                             <td width="4%" class = "{{ sample.Zscore_18.warn}}">{{ sample.Zscore_18.value }}</td>
                                             <td width="4%" class = "{{ sample.Zscore_21.warn}}">{{ sample.Zscore_21.value }}</td>
                                             <td width="4%" class = "{{ sample.Zscore_X.warn}}">{{ sample.Zscore_X.value }}</td>
-                                            <td width="4%" class = "{{sample.FF_Formatted.warn}}">{{sample.FF_Formatted.value}}</td>
-                                            <th><p> <small>""</small></p></th>
+                                            <td width="4%" class = "{{sample.FF.warn}}">{{sample.FF.value}}</td>
+                                            <td width="4%" class = "{{sample.FFX.warn}}">{{sample.FFX.value}}</td>
+                                            <td width="4%" class = "{{sample.FFY.warn}}">{{sample.FFY.value}}</td>
+                                            <td width="4%" class = "{{sample.CNVSegment.warn}}">{{sample.CNVSegment.value}}</td>
+                                            <th><p> <small></small></p></th>
                                             <th><p> <small>{{ sample.Status }}</small></p></th>
                                             {% if current_user.role=='RW' %}
                                                 

@@ -1,10 +1,11 @@
 from newnipt.server.constants import *
-from copy import deepcopy
 
-## Batch view
+
+### Batch views:
 
 def get_sample_info(sample):
-    
+    """Sample info for sample table in batch view."""
+
     z_score_13 = round(sample.get("Zscore_13"), 2)
     z_score_18 = round(sample.get("Zscore_18"), 2)
     z_score_21 = round(sample.get("Zscore_21"), 2)
@@ -54,6 +55,7 @@ def get_sample_info(sample):
 
 def _get_status(sample):
     """Get the manually defined sample status for batch table"""
+
     status_list = []
     for key in TRIS_CHROM_ABNORM + SEX_CHROM_ABNORM:
         status = sample.get(f"status_{key}")
@@ -64,6 +66,7 @@ def _get_status(sample):
 
 def _get_ff_warning(fetal_fraction):
     """Get fetal fraction warning based on preset treshold"""
+
     try:
         fetal_fraction = fetal_fraction
     except:
@@ -94,7 +97,41 @@ def _get_tris_warning(z_score: float, fetal_fraction):
     return warn
 
 
-def get_ff_abnormal(adapter):
+def get_data_for_coverage_plot(samples):
+    """Coverage Ratio data for Coverage Plot."""
+
+    data = {}
+    for sample in samples:
+        sample_id = sample['_id']
+        data[sample_id] = []
+        for i in range(1, 23):
+            data[sample_id].append(sample.get(f'Chr{str(i)}_Ratio', 0)) 
+    return data
+
+
+def get_ff_control_normal(adapter):
+    """Normal Control Samples for fetal fraction plots"""
+
+    pipe = [{
+        '$match': {
+            'FF_Formatted': {'$ne': 'None', '$exists': 'True'}, 
+            'FFY': {'$ne': 'None', '$exists': 'True'}, 
+            'FFX': {'$ne': 'None', '$exists': 'True' }, 
+            'include': {'$eq': True}}
+        }, {
+        '$group': {
+            '_id': 'None', 
+            'FFY': {'$push': '$FFY'}, 
+            'FFX': {'$push': '$FFX'}, 
+            'FF': {'$push': '$FF_Formatted'}, 
+            'names': {'$push': '$_id'}, 
+            'count': {'$sum': 1}}
+        }]
+    return list(adapter.sample_aggregate(pipe))[0]
+
+
+def get_ff_control_abnormal(adapter):
+    """Abnormal Control Samples for fetal_fraction_XY plot"""
     plot_data = {}
     for abn in SEX_CHROM_ABNORM:
         plot_data[abn] = {}
@@ -118,26 +155,9 @@ def get_ff_abnormal(adapter):
     return plot_data
 
 
-def get_ff_control(adapter):
-    pipe = [{
-        '$match': {
-            'FF_Formatted': {'$ne': 'None', '$exists': 'True'}, 
-            'FFY': {'$ne': 'None', '$exists': 'True'}, 
-            'FFX': {'$ne': 'None', '$exists': 'True' }, 
-            'include': {'$eq': True}}
-        }, {
-        '$group': {
-            '_id': 'None', 
-            'FFY': {'$push': '$FFY'}, 
-            'FFX': {'$push': '$FFX'}, 
-            'FF': {'$push': '$FF_Formatted'}, 
-            'names': {'$push': '$_id'}, 
-            'count': {'$sum': 1}}
-        }]
-    return list(adapter.sample_aggregate(pipe))[0]
-
-
 def get_ff_cases(adapter, batch_id):
+    """Cases for fetal fraction plot"""
+
     pipe = [{
         '$match': {
             'SampleProject': {'$eq': batch_id},
@@ -162,8 +182,56 @@ def get_ff_cases(adapter, batch_id):
     return massaged_data
 
 
+def get_tris_control_normal(adapter, chr):
+    """Normal Control Samples for trisomi plots"""
 
-def get_case_data_for_batch_tris_plot(adapter, chr, batch_id):
+    pipe = [{'$match': {
+                f'status_T{chr}': {'$eq': 'Normal'}, 
+                'include': {'$eq': True}}
+            },
+            {"$group": {
+                "_id": {f"status_T{chr}": f"$status_T{chr}"},
+                "values": {"$push": f"$Zscore_{chr}"},
+                "names": {"$push": "$_id"},
+                "count": {"$sum": 1}
+            }}]
+    if not list(adapter.sample_aggregate(pipe)):
+        return {}
+    data = list(adapter.sample_aggregate(pipe))[0]
+    data['values'] = [ value for value in data.get('values', [])]
+    return data
+
+
+def get_tris_control_abnormal(adapter, chr, x_axis):
+    """Abnormal Control Samples for trisomi plots"""
+
+    plot_data = {}
+    
+    pipe = [{'$match': {
+                f'status_T{chr}': {
+                    '$ne': 'Normal', 
+                    '$exists': 'True'
+                    }, 
+                'include': {'$eq': True}
+            }},{"$group": {
+                 "_id": {f"status_T{chr}": f"$status_T{chr}"},
+                 "values": {"$push": f"$Zscore_{chr}"},
+                 "names": {"$push": "$_id"},
+                 "count": {"$sum": 1}
+                 }}]
+
+    for status_dict in adapter.sample_aggregate(pipe):
+        status = status_dict['_id'][f'status_T{chr}']
+        plot_data[status] = {'values': [ value for value in status_dict.get('values')],
+                             'names': status_dict.get('names'),
+                             'count': status_dict.get('count'),
+                             'x_axis': [x_axis]*status_dict.get('count')}
+    return plot_data
+
+
+def get_tris_cases(adapter, chr, batch_id):
+    """Cases for trisomi plots."""
+    
     pipe = [{'$match': 
                 {'SampleProject': {'$eq': batch_id},
                 'include': {'$eq': True}}
@@ -184,12 +252,48 @@ def get_case_data_for_batch_tris_plot(adapter, chr, batch_id):
     data['x_axis'] = list(range(1,data.get('count')+1))
     return data
 
+### Sample Trisomi Plot:
 
-def get_data_for_coverage_plot(samples):
-    data = {}
-    for sample in samples:
-        sample_id = sample['_id']
-        data[sample_id] = []
-        for i in range(1, 23):
-            data[sample_id].append(sample.get(f'Chr{str(i)}_Ratio', 0)) 
-    return data
+def get_abn_for_samp_tris_plot(adapter):
+    """Format abnormal Control Samples for Sample trisomi plot"""
+
+    plot_data = {}
+    data_per_abnormaliy = {}
+    for status in STATUS_CLASSES:
+        plot_data[status] = {'values': [],
+                             'names': [],
+                             'count': 0,
+                             'x_axis': []} 
+    x_axis = 1
+    for abn in ["13", "18", "21"]:
+        data = get_tris_control_abnormal(adapter, abn, x_axis)
+        data_per_abnormaliy[abn] = data
+
+        for status, status_dict in data.items():
+            plot_data[status]['values'] += status_dict.get('values', [])
+            plot_data[status]['names'] += status_dict.get('names', [])
+            plot_data[status]['count'] += status_dict.get('count', 0)
+            plot_data[status]['x_axis'] += status_dict.get('x_axis', [])
+        x_axis+=1
+
+    return plot_data, data_per_abnormaliy
+
+def get_normal_for_samp_tris_plot(adapter):
+    """Format normal Control Samples for Sample trisomi plot"""
+
+    data_per_abnormaliy = {}
+    x_axis = 1
+    for abn in ["13", "18", "21"]:
+        data = get_tris_control_normal(adapter, abn)
+        data['x_axis'] = [x_axis]*data.get('count', 0)
+        data_per_abnormaliy[abn] = data
+        x_axis+=1
+    return data_per_abnormaliy
+
+
+def get_sample_for_samp_tris_plot(sample):
+    """Case data for Sample trisomi plot"""
+
+    return {"13":{'value': sample.get('Zscore_13') ,'x_axis': 1},
+            "18":{'value': sample.get('Zscore_18') ,'x_axis': 2},
+            "21":{'value': sample.get('Zscore_21'),'x_axis': 3}}

@@ -14,12 +14,14 @@ from flask_login import login_required
 from datetime import datetime
 from newnipt.server.utils import *
 from newnipt.server.constants import *
+
 app = current_app
 server_bp = Blueprint("server", __name__)
 
 
 @server_bp.route("/", methods=["GET", "POST"])
 def index():
+    """Log in view."""
     user = session.get("user")
     if user:
         return redirect(url_for("server.batches"))
@@ -29,16 +31,130 @@ def index():
 @server_bp.route("/batches")
 @login_required
 def batches():
+    """List of all batches"""
     all_batches = list(app.adapter.batches())
     return render_template("batches.html", batches=all_batches)
 
 
-### Sample views
+### Batch Views
 
+@server_bp.route("/batches/<batch_id>/")
+@login_required
+def batch(batch_id):
+    """Batch view with table of all samples in the batch."""
+    samples = app.adapter.batch_samples(batch_id)
+    batch = app.adapter.batch(batch_id)
+    return render_template("batch/batch.html",
+        batch = batch,
+        sample_info = [get_sample_info(sample) for sample in samples],
+        #warnings = ...,
+        #sample_ids = ",".join(sample.get("_id") for sample in samples),
+        page_id = "batches",
+    )
+
+
+@server_bp.route("/batches/<batch_id>/NCV13")
+@login_required
+def NCV13(batch_id):
+    """Batch view with with NCV-13 plot"""
+    return render_template(
+        "batch/NCV.html",
+        batch = app.adapter.batch(batch_id),
+        chrom = '13',
+        cases = get_tris_cases(app.adapter, '13', batch_id),
+        normal_data = get_tris_control_normal(app.adapter, '13'),
+        abnormal_data = get_tris_control_abnormal(app.adapter, '13', 0),
+        page_id = "batches_NCV13"
+    )
+
+@server_bp.route("/batches/<batch_id>/NCV18")
+@login_required
+def NCV18(batch_id):
+    """Batch view with with NCV-18 plot"""
+    return render_template(
+        "batch/NCV.html",
+        batch = app.adapter.batch(batch_id),
+        chrom = '18',
+        cases = get_tris_cases(app.adapter, '18', batch_id),
+        normal_data = get_tris_control_normal(app.adapter, '18'),
+        abnormal_data = get_tris_control_abnormal(app.adapter, '18', 0),
+        page_id = "batches_NCV18"
+    )
+
+@server_bp.route("/batches/<batch_id>/NCV21")
+@login_required
+def NCV21(batch_id):
+    """Batch view with NCV-21 plot"""
+    return render_template(
+        "batch/NCV.html",
+        batch = app.adapter.batch(batch_id),
+        chrom = '21',
+        cases = get_tris_cases(app.adapter, '21', batch_id),
+        normal_data = get_tris_control_normal(app.adapter, '21'),
+        abnormal_data = get_tris_control_abnormal(app.adapter, '21', 0),
+        page_id = "batches_NCV21"
+    )
+
+@server_bp.route("/batches/<batch_id>/fetal_fraction_XY")
+@login_required
+def fetal_fraction_XY(batch_id):
+    """Batch view with fetal fraction (X against Y) plot"""
+    batch = app.adapter.batch(batch_id)
+    control = get_ff_control_normal(app.adapter)
+    abnormal = get_ff_control_abnormal(app.adapter)
+    return render_template(
+        "batch/fetal_fraction_XY.html",
+        control = control,
+        abnormal = abnormal,
+        cases = get_ff_cases(app.adapter, batch_id),
+        max_x = max(control['FFX']) +1,
+        min_x = min(control['FFX']) -1,
+        batch=batch,
+        page_id="batches_FF_XY",
+    )
+
+@server_bp.route("/batches/<batch_id>/fetal_fraction")
+@login_required
+def fetal_fraction(batch_id):
+    """Batch view with fetal fraction plot"""
+    batch = app.adapter.batch(batch_id)
+    return render_template(
+        "batch/fetal_fraction.html",
+        control = get_ff_control_normal(app.adapter),
+        cases = get_ff_cases(app.adapter, batch_id),
+        batch=batch,
+        page_id="batches_FF",
+    )
+
+@server_bp.route("/batches/<batch_id>/coverage")
+@login_required
+def coverage(batch_id):
+    """Batch view with coverage plot"""
+    batch = app.adapter.batch(batch_id)
+    samples = app.adapter.batch_samples(batch_id)
+    data = get_data_for_coverage_plot(samples)
+    return render_template(
+        "batch/coverage.html",
+        batch = batch,
+        x_axis = list(range(1,23)),
+        data = data,
+        page_id = "batches_cov",
+    )
+
+
+@server_bp.route("/batches/<batch_id>/report/<coverage>")
+@login_required
+def report(batch_id, coverage):
+    """Report view, collecting all tables and plots from one batch."""
+    return render_template("batch/report.html", batch_id=batch_id)
+
+
+### Sample Views
 
 @server_bp.route("/samples/<sample_id>/")
 @login_required
 def sample(sample_id):
+    """Sample view with sample information."""
     sample = app.adapter.sample(sample_id)
     batch = app.adapter.batch(sample.get('SampleProject'))
 
@@ -51,6 +167,7 @@ def sample(sample_id):
 @server_bp.route("/samples/<sample_id>/tris")
 @login_required
 def sample_tris(sample_id):
+    """Sample view with trisomi plot."""
     sample = app.adapter.sample(sample_id)
     batch = app.adapter.batch(sample.get('SampleProject'))
     abnormal_data, data_per_abnormaliy = get_abn_for_samp_tris_plot(app.adapter)
@@ -67,114 +184,13 @@ def sample_tris(sample_id):
         page_id="sample_tris",
     )
 
-@server_bp.route("/batches/<batch_id>/")
-@login_required
-def batch(batch_id):
 
-    samples = app.adapter.batch_samples(batch_id)
-    batch = app.adapter.batch(batch_id)
-    return render_template("batch/batch.html",
-        batch = batch,
-        sample_info = [get_sample_info(sample) for sample in samples],
-        #warnings = ...,
-        #sample_ids = ",".join(sample.get("_id") for sample in samples),
-        page_id = "batches",
-    )
-
-
-@server_bp.route("/batches/<batch_id>/NCV13")
-@login_required
-def NCV13(batch_id):
-    return render_template(
-        "batch/NCV.html",
-        batch = app.adapter.batch(batch_id),
-        chrom = '13',
-        cases = get_case_data_for_batch_tris_plot(app.adapter, '13', batch_id),
-        normal_data = get_normal(app.adapter, '13'),
-        abnormal_data = get_abnormal(app.adapter, '13', 0),
-        page_id = "batches_NCV13"
-    )
-
-@server_bp.route("/batches/<batch_id>/NCV18")
-@login_required
-def NCV18(batch_id):
-    return render_template(
-        "batch/NCV.html",
-        batch = app.adapter.batch(batch_id),
-        chrom = '18',
-        cases = get_case_data_for_batch_tris_plot(app.adapter, '18', batch_id),
-        normal_data = get_normal(app.adapter, '18'),
-        abnormal_data = get_abnormal(app.adapter, '18', 0),
-        page_id = "batches_NCV18"
-    )
-
-@server_bp.route("/batches/<batch_id>/NCV21")
-@login_required
-def NCV21(batch_id):
-    return render_template(
-        "batch/NCV.html",
-        batch = app.adapter.batch(batch_id),
-        chrom = '21',
-        cases = get_case_data_for_batch_tris_plot(app.adapter, '21', batch_id),
-        normal_data = get_normal(app.adapter, '21'),
-        abnormal_data = get_abnormal(app.adapter, '21', 0),
-        page_id = "batches_NCV21"
-    )
-
-@server_bp.route("/batches/<batch_id>/fetal_fraction_XY")
-@login_required
-def fetal_fraction_XY(batch_id):
-    batch = app.adapter.batch(batch_id)
-    control = get_ff_control(app.adapter)
-    abnormal = get_ff_abnormal(app.adapter)
-    return render_template(
-        "batch/fetal_fraction_XY.html",
-        control = control,
-        abnormal = abnormal,
-        cases = get_ff_cases(app.adapter, batch_id),
-        max_x = max(control['FFX']) +1,
-        min_x = min(control['FFX']) -1,
-        batch=batch,
-        page_id="batches_FF_XY",
-    )
-
-@server_bp.route("/batches/<batch_id>/fetal_fraction")
-@login_required
-def fetal_fraction(batch_id):
-    batch = app.adapter.batch(batch_id)
-    return render_template(
-        "batch/fetal_fraction.html",
-        control = get_ff_control(app.adapter),
-        cases = get_ff_cases(app.adapter, batch_id),
-        batch=batch,
-        page_id="batches_FF",
-    )
-
-
-@server_bp.route("/batches/<batch_id>/coverage")
-@login_required
-def coverage(batch_id):
-    batch = app.adapter.batch(batch_id)
-    samples = app.adapter.batch_samples(batch_id)
-    data = get_data_for_coverage_plot(samples)
-    return render_template(
-        "batch/coverage.html",
-        batch = batch,
-        x_axis = list(range(1,23)),
-        data = data,
-        page_id = "batches_cov",
-    )
-
-
-@server_bp.route("/batches/<batch_id>/report/<coverage>")
-@login_required
-def report(batch_id, coverage):
-    return render_template("batch/report.html", batch_id=batch_id)
-
+### Udate
 
 @server_bp.route('/update', methods=['POST'])
 @login_required
 def update():
+    """Update the database"""
     time_stamp = datetime.now().strftime('%Y/%m/%d %H:%M:%S')
     user = app.user
     if user.role != 'RW':

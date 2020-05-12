@@ -55,9 +55,9 @@ class NiptAdapter(MongoAdapter):
         """Find one sample from the sample collection"""
         return self.sample_collection.find_one({'_id': sample_id})
 
-    def sample_aggregate(self, pipe: dict):
-        """Aggregates a pipe on the sample collection"""
-        return self.sample_collection.aggregate(pipe)
+    def sample_aggregate(self, pipeline: list):
+        """Aggregates a pipeline on the sample collection"""
+        return self.sample_collection.aggregate(pipeline)
 
     def batch_samples(self, batch_id):
         """All samples within the batch"""

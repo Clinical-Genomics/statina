@@ -1,7 +1,7 @@
 import logging
-from newnipt.build.sample import build_sample
-from newnipt.build.batch import build_batch
-from newnipt.parse.batch import parse_batch_file
+from NIPTool.build.sample import build_sample
+from NIPTool.build.batch import build_batch
+from NIPTool.parse.batch import parse_batch_file
 
 LOG = logging.getLogger(__name__)
 

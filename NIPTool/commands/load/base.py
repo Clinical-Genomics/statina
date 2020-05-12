@@ -4,16 +4,16 @@ import logging
 import click
 
 from mongo_adapter import get_client
-from newnipt.adapter import NiptAdapter
+from NIPTool.adapter import NiptAdapter
 
 LOG = logging.getLogger(__name__)
 
 # commands
-from newnipt.commands.load.batch import batch as batch_command
+from NIPTool.commands.load.batch import batch as batch_command
 
 # Get version and doc decorator
-from newnipt import __version__
-from newnipt.tools.cli_utils import add_doc as doc
+from NIPTool import __version__
+from NIPTool.tools.cli_utils import add_doc as doc
 
 
 @click.group()

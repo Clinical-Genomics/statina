@@ -1,6 +1,6 @@
 import logging
 import click
-from newnipt.load.batch import load_one_batch
+from NIPTool.load.batch import load_one_batch
 from flask.cli import with_appcontext, current_app
 from datetime import date, timedelta
 

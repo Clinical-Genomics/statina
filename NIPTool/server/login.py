@@ -4,7 +4,7 @@ from flask import url_for, redirect, request, Blueprint, session, current_app, f
 from flask_login import LoginManager
 from authlib.integrations.flask_client import OAuth
 
-from newnipt.server.user import User
+from NIPTool.server.user import User
 
 app = current_app
 login_manager = LoginManager()

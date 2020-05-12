@@ -1,6 +1,6 @@
 from werkzeug.contrib.fixers import ProxyFix
 
-from newnipt.server import create_app
+from NIPTool.server import create_app
 
 app = create_app()
 

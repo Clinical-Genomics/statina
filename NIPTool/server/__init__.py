@@ -4,9 +4,9 @@ import logging
 from flask import Flask
 from pymongo import MongoClient
 
-from newnipt.adapter.plugin import NiptAdapter
-from newnipt.server.login import login_bp, login_manager
-from newnipt.server.views import server_bp
+from NIPTool.adapter.plugin import NiptAdapter
+from NIPTool.server.login import login_bp, login_manager
+from NIPTool.server.views import server_bp
 
 logging.basicConfig(level=logging.INFO)
 LOG = logging.getLogger(__name__)

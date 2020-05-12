@@ -10,5 +10,6 @@ This change log will document the notable changes to this project in this file a
 ### Fixed
 
 ### Changed
+- Changed name of package to NIPTool
 
 

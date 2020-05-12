@@ -14,4 +14,3 @@ def load_one_batch(adapter, analysis_path, batch_id=None):
         adapter.add_or_update_document(mongo_sample, adapter.sample_collection)
     mongo_batch = build_batch(batch_data[0])
     adapter.add_or_update_document(mongo_batch, adapter.batch_collection)
-

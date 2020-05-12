@@ -15,6 +15,7 @@ from NIPTool.commands.load.batch import batch as batch_command
 from NIPTool import __version__
 from NIPTool.tools.cli_utils import add_doc as doc
 
+
 @click.group()
 @click.version_option(version=__version__)
 def load():
@@ -23,5 +24,3 @@ def load():
 
 
 load.add_command(batch_command)
-
-

@@ -15,6 +15,7 @@ from newnipt.commands.load.batch import batch as batch_command
 from newnipt import __version__
 from newnipt.tools.cli_utils import add_doc as doc
 
+
 @click.group()
 @click.version_option(version=__version__)
 def load():
@@ -23,5 +24,3 @@ def load():
 
 
 load.add_command(batch_command)
-
-

@@ -23,7 +23,6 @@ class NiptAdapter(MongoAdapter):
         """Adds/updates a document in the database"""
 
         document_id = document_news['_id']
-
         update_result = collection.update_one({'_id': document_id}, 
                                               {'$set': document_news}, 
                                               upsert=True)
@@ -40,21 +39,26 @@ class NiptAdapter(MongoAdapter):
         else:
             LOG.info("No updates for document %s.", document_id)
 
-
     def user(self, email):
+        """Find user from user collection"""
         return self.user_collection.find_one({'email': email})
 
     def batches(self):
+        """Return all batches from the batch collection"""
         return self.batch_collection.find() 
 
     def batch(self, batch_id):
+        """Find one batch from the batch collection"""
         return self.batch_collection.find_one({'_id': batch_id})
 
     def sample(self, sample_id):
+        """Find one sample from the sample collection"""
         return self.sample_collection.find_one({'_id': sample_id})
 
     def sample_aggregate(self, pipe: dict):
+        """Aggregates a pipe on the sample collection"""
         return self.sample_collection.aggregate(pipe)
 
     def batch_samples(self, batch_id):
+        """All samples within the batch"""
         return self.sample_collection.find({'SampleProject': batch_id})

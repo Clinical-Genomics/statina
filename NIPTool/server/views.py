@@ -12,8 +12,8 @@ from flask import (
 )
 from flask_login import login_required
 from datetime import datetime
-from newnipt.server.utils import *
-from newnipt.server.constants import *
+from NIPTool.server.utils import *
+from NIPTool.server.constants import *
 
 app = current_app
 server_bp = Blueprint("server", __name__)

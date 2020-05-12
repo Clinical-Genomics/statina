@@ -1,4 +1,4 @@
-from newnipt.constants.constants import SAMPLE_KEYS
+from NIPTool.constants.constants import SAMPLE_KEYS
 
 def build_sample(sample_data: dict):
     sample = {'_id': sample_data.get('SampleID')}

@@ -8,11 +8,11 @@ from flask.cli import FlaskGroup, with_appcontext
 from flask import current_app
 
 # commands
-from newnipt.server import create_app
+from NIPTool.server import create_app
 
 # Get version and doc decorator
-from newnipt import __version__
-from newnipt.tools.cli_utils import add_doc as doc
+from NIPTool import __version__
+from NIPTool.tools.cli_utils import add_doc as doc
 from .load import load
 
 LOG_LEVELS = ['DEBUG', 'INFO', 'WARNING', 'ERROR', 'CRITICAL']

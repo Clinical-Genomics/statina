@@ -1,4 +1,4 @@
-from newnipt import __version__ as version
+from NIPTool import __version__ as version
 from setuptools import setup, find_packages
 
 try:
@@ -8,9 +8,9 @@ except IOError:
     install_requires = []
 
 setup(
-    name="nipt",
+    name="NIPTool",
     version=version,
-    url="https://github.com/Clinical-Genomics/newnipt",
+    url="https://github.com/Clinical-Genomics/NIPTool",
     author="Maya Brandi",
     author_email='maya.brandi@scilifelab.se',
     install_requires=install_requires,
@@ -18,6 +18,6 @@ setup(
     include_package_data=True,
     zip_safe=False,
     entry_points={
-        'console_scripts': ['newnipt=newnipt.commands:cli'],
+        'console_scripts': ['nipt=NIPTool.commands:cli'],
     },
 )

@@ -1,4 +1,4 @@
-from newnipt.constants.constants import BATCH_KEYS
+from NIPTool.constants.constants import BATCH_KEYS
 
 
 def build_batch(batch_data: dict):

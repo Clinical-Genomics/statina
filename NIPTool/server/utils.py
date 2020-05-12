@@ -1,4 +1,4 @@
-from newnipt.server.constants import *
+from NIPTool.server.constants import *
 
 
 ### Batch views:

@@ -1,16 +1,17 @@
-
 import logging
-import csv
+import pandas as pd
 import glob
 
 LOG = logging.getLogger(__name__)
 
-def parse_batch_file(flowcell_id: str, analysis_path: str) -> list:
-    nipt_results_path = f"{analysis_path}*{flowcell_id}*/*NIPT_RESULTS.csv"
+
+def parse_batch_file(batch_id: str, analysis_path: str) -> list:
+    nipt_results_path = f"{analysis_path}*{batch_id}*/*NIPT_RESULTS.csv"
     if not glob.glob(nipt_results_path):
-        LOG.exception('Results file missing')
+        LOG.exception("Results file missing")
         return {}
 
     nipt_results = glob.glob(nipt_results_path)[0]
-    reader = csv.DictReader(open(nipt_results))
-    return list(reader)
+    df = pd.read_csv(nipt_results, na_filter=False)
+    result = df.to_dict(orient="records")
+    return result

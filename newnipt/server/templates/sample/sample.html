@@ -1,0 +1,84 @@
+{% extends 'layout/layout.html' %}
+{% block body %}
+{% include 'layout/navigation.html' %}
+<div class="container-fluid">
+    {% include 'sample/header.html' %}
+    <ul class="nav nav-tabs" id="myTab">
+        <li class="active"><a href="{{url_for('server.sample', sample_id = sample._id)}}">Status table</a>
+        </li>
+        <li><a href="{{url_for('server.sample_tris', sample_id = sample._id)}}">131821-Plot</a>
+        </li>
+    </ul>
+    <div class="tab-content">
+        <div class="tab-pane fade in active" id='table'>
+            <div class="row">
+                <div class="col-lg-12">
+                    <div class="panel panel-default"><br><br>
+                        <!-- /.panel-heading -->
+                        <div class="panel-body">
+                            <div class="table-responsive">
+                                <form action="{{ url_for('server.update') }}" method="post">
+                                    <input type=text name="form_id" value="set_sample_status" hidden>
+                                    <input type=text name="sample_id" value="{{sample._id}}" hidden>
+                                    <table class="table table-bordered table-hover" >
+                                        <thead>
+                                            <tr>
+                                                <th>Chromosome abnormality</th>
+                                                <th>Status</th>
+                                                <th>Latest change</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {% for abn in chrom_abnorm %}
+                                            <tr>
+                                                <td width=10% ><strong>{{ abn }}</strong></td>
+                                                {% if current_user.role=='RW' %}
+                                                <td width=10% class={{ status_classes[sample['status_'+abn]] }} >
+                                                    <select  name="{{abn}}" >
+                                                    <option {% if sample['status_'+abn] == "Normal" %} selected {% endif %} value="Normal">Normal</option>
+                                                    <option {% if sample['status_'+abn] == "Suspected" %} selected {% endif %} value="Suspected">Suspected</option>
+                                                    <option {% if sample['status_'+abn] == "Probable" %} selected {% endif %} value="Probable">Probable</option>
+                                                    <option {% if sample['status_'+abn] == "Verified" %} selected {% endif %} value="Verified">Verified</option>
+                                                    <option {% if sample['status_'+abn] == "False Positive" %} selected {% endif %} value="False Positive">False Positive</option>
+                                                    <option {% if sample['status_'+abn] == "False Negative" %} selected {% endif %} value="False Negative">False Negative</option>          
+                                                    <option {% if sample['status_'+abn] == "Other" %} selected {% endif %} value="Other">Other</option>
+                                                    <option {% if sample['status_'+abn] == "Failed" %} selected {% endif %} value="Failed">Failed</option>  
+                                                    </select>
+                                                </td>
+                                                {% else %}
+                                                <td width=10% class = "{{ status_classes[sample['status_'+abn]] }}" >
+                                                    {{sample['status_'+abn]}}
+                                                </td>
+                                                {% endif %}
+                                                <td width=10%> {{sample['status_change_'+abn]}} </td>
+                                            </tr>
+                                            {% endfor %}
+                                        </tbody>
+                                    </table>
+                                    <table>
+                                    <tr>
+                                        <td>
+                                            <input type=text name="current_user" value="{{current_user.name}}" hidden>
+                                        </td>
+                                        <td>
+                                        </td>
+                                        <p align="right"> 
+                                            {% if current_user.role=='RW' %}
+                                            <button type="submit" class="btn btn-warning" name="trisomi status" value="ff"  > Save</button>     
+                                            {% endif %}     
+                                        </p>
+                                    </td>
+                                    </td>
+                                    </tr>
+                                    </table>
+                                </form>    
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

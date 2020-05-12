@@ -15,16 +15,18 @@ from newnipt import __version__
 from newnipt.tools.cli_utils import add_doc as doc
 from .load import load
 
-LOG_LEVELS = ['DEBUG', 'INFO', 'WARNING', 'ERROR', 'CRITICAL']
+LOG_LEVELS = ["DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL"]
 LOG = logging.getLogger(__name__)
 
 
 @click.version_option(__version__)
-@click.group(cls=FlaskGroup,
-             create_app=create_app,
-             add_default_commands=True,
-             invoke_without_command=False,
-             add_version_option=False)
+@click.group(
+    cls=FlaskGroup,
+    create_app=create_app,
+    add_default_commands=True,
+    invoke_without_command=False,
+    add_version_option=False,
+)
 def cli(**_):
     """ Main entry point """
     pass

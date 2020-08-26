@@ -13,21 +13,37 @@ LOG = logging.getLogger(__name__)
 
 
 def create_app(test=False):
-    app = Flask(__name__, instance_relative_config=True)
-    if not test:
-        app.config.from_object(f"{__name__}.config")
-        client = MongoClient(app.config["DB_URI"])
-        db_name = app.config["DB_NAME"]
-        app.client = client
-        app.db = client[db_name]
-        app.adapter = NiptAdapter(client, db_name=db_name)
-        app.analysis_path = app.config["ANALYSIS_PATH"]
-        app.register_blueprint(login_bp)
-        app.register_blueprint(server_bp)
-        login_manager.init_app(app)
+    app = Flask(__name__)
+    app.test = test
+    if test:
+        return app
 
-        if app.config["DEBUG"] == 1:
-            from flask_debugtoolbar import DebugToolbarExtension
+    try:
+        app.config.from_envvar('NIPT_CONFIG')
+        configure_app(app)
+    except:
+        pass
 
-            toolbar = DebugToolbarExtension(app)
+    return app
+
+
+def configure_app(app, config=None):
+
+    if config:
+        app.config = {**app.config, **yaml.safe_load(config)}
+
+    client = MongoClient(app.config['DB_URI'])
+    db_name = app.config['DB_NAME']
+    app.client = client
+    app.db = client[db_name]
+    app.adapter = NiptAdapter(client, db_name = db_name)
+    app.analysis_path = app.config["ANALYSIS_PATH"]
+    app.register_blueprint(login_bp)
+    app.register_blueprint(server_bp)
+    login_manager.init_app(app)
+
+    if app.config['DEBUG']==1:
+        from flask_debugtoolbar import DebugToolbarExtension
+        toolbar = DebugToolbarExtension(app)
+
     return app

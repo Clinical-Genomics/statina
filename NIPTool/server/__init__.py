@@ -3,6 +3,7 @@ import logging
 
 from flask import Flask
 from pymongo import MongoClient
+import yaml
 
 from NIPTool.adapter.plugin import NiptAdapter
 from NIPTool.server.login import login_bp, login_manager

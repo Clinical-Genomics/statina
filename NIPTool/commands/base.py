@@ -8,7 +8,7 @@ from flask.cli import FlaskGroup, with_appcontext
 from flask import current_app
 
 # commands
-from NIPTool.server import create_app
+from NIPTool.server import create_app, configure_app
 
 # Get version and doc decorator
 from NIPTool import __version__
@@ -25,10 +25,14 @@ LOG = logging.getLogger(__name__)
     create_app=create_app,
     add_default_commands=True,
     invoke_without_command=False,
-    add_version_option=False,
-)
-def cli(**_):
+    add_version_option=False)
+@click.option("-c", "--config", type=click.File(), help="Path to config yaml file")
+@with_appcontext
+def cli(config):
     """ Main entry point """
+    if current_app.test:
+        return
+    configure_app(current_app, config)
     pass
 
 

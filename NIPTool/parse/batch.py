@@ -5,8 +5,7 @@ import glob
 LOG = logging.getLogger(__name__)
 
 
-def parse_batch_file(batch_id: str, analysis_path: str) -> list:
-    nipt_results_path = f"{analysis_path}*{batch_id}*/*NIPT_RESULTS.csv"
+def parse_batch_file(nipt_results_path: str) -> list:
     if not glob.glob(nipt_results_path):
         LOG.exception("Results file missing")
         return {}

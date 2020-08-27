@@ -6,9 +6,10 @@ from NIPTool.parse.batch import parse_batch_file
 LOG = logging.getLogger(__name__)
 
 
-def load_one_batch(adapter, analysis_path, batch_id=None):
+def load_one_batch(adapter, nipt_results_path:str):
     """Function to load one lims sample into the database"""
-    batch_data = parse_batch_file(batch_id, analysis_path)
+    
+    batch_data = parse_batch_file(nipt_results_path)
     for sample in batch_data:
         mongo_sample = build_sample(sample)
         adapter.add_or_update_document(mongo_sample, adapter.sample_collection)

@@ -7,6 +7,6 @@ def build_batch(batch_data: dict):
     batch_document = {'_id': str(batch_data.get('SampleProject'))}
     for key in BATCH_KEYS:
         if batch_data.get(key) is not None:
-            batch[key] = batch_data.get(key)
+            batch_document[key] = batch_data.get(key)
             
     return batch_document

@@ -1,4 +1,5 @@
-# NIPTool
+# NIPTool  [![Coverage Status](https://coveralls.io/repos/github/Clinical-Genomics/NIPTool/badge.svg?branch=master)](https://coveralls.io/github/Clinical-Genomics/NIPTool?branch=master) [![Build Status](https://travis-ci.org/Clinical-Genomics/NIPTool.svg?branch=master)](https://travis-ci.org/Clinical-Genomics/NIPTool) ![Latest Release](https://img.shields.io/github/v/release/clinical-genomics/NIPTool)
+
 
 NIPTool is a visualisation tool for NIPT data.
 
@@ -12,7 +13,7 @@ pip install -r requirements.txt -e .
 ```
 
 ## Release model
-NIPTool development is organised on a flexible Git "Release Flow" branching system. This more or less means that we make releases in release branches which corresponds to stable versions of Vogue.
+NIPTool development is organised on a flexible Git "Release Flow" branching system. This more or less means that we make releases in release branches which corresponds to stable versions of NIPTool.
 
 ### Steps to make a new release:
 

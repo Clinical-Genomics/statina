@@ -3,6 +3,7 @@ import click
 from NIPTool.load.batch import load_one_batch
 from flask.cli import with_appcontext, current_app
 from datetime import date, timedelta
+from NIPTool.exeptions import MissingrResultsError
 
 
 LOG = logging.getLogger(__name__)
@@ -14,4 +15,10 @@ LOG = logging.getLogger(__name__)
 def batch(batch_path):
     """Read and load lims data for one sample, all samples or the most recently updated samples."""
 
-    load_one_batch(current_app.adapter, batch_path )
+    try:
+        load_one_batch(current_app.adapter, batch_path )
+    except (MissingrResultsError, TypeError) :
+        LOG.error("Missing result!")
+        raise click.Abort()
+
+

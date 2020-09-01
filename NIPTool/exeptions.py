@@ -1,0 +1,3 @@
+
+class MissingrResultsError(Exception):
+    pass

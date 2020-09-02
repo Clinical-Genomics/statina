@@ -4,6 +4,8 @@ import logging
 from flask import Flask
 from pymongo import MongoClient
 import yaml
+from uuid import uuid4
+
 
 from NIPTool.adapter.plugin import NiptAdapter
 from NIPTool.server.login import login_bp, login_manager
@@ -32,7 +34,7 @@ def configure_app(app, config=None):
 
     if config:
         app.config = {**app.config, **yaml.safe_load(config)}
-
+    app.config['SECRET_KEY'] = str(uuid4())
     client = MongoClient(app.config['DB_URI'])
     db_name = app.config['DB_NAME']
     app.client = client

@@ -9,8 +9,7 @@ LOG = logging.getLogger(__name__)
 
 def parse_batch_file(nipt_results_path: dict) -> list:
     if not glob.glob(nipt_results_path):
-        LOG.exception("Results file missing")
-        raise MissingResultsError
+        raise MissingResultsError("Results file missing.")
 
     nipt_results = glob.glob(nipt_results_path)[0]
     df = pd.read_csv(nipt_results, na_filter=False)
@@ -21,7 +20,7 @@ def parse_batch_file(nipt_results_path: dict) -> list:
         LOG.warning(err)
 
     if errors:
-        raise FileValidationError
+        raise FileValidationError("Invalid file content.")
 
     result = df.to_dict(orient="records")
     return result

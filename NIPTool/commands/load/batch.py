@@ -3,7 +3,7 @@ import click
 from NIPTool.load.batch import load_one_batch
 from flask.cli import with_appcontext, current_app
 from datetime import date, timedelta
-from NIPTool.exeptions import MissingResultsError, FileValidationError
+from NIPTool.exeptions import NIPToolError
 
 
 LOG = logging.getLogger(__name__)
@@ -17,6 +17,6 @@ def batch(batch_path):
 
     try:
         load_one_batch(current_app.adapter, batch_path)
-    except (MissingResultsError, FileValidationError):
-        LOG.error("Missing or unvalid file!")
+    except NIPToolError as e:
+        LOG.error(e.message)
         raise click.Abort()

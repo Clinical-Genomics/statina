@@ -1,3 +1,7 @@
 
-class MissingrResultsError(Exception):
+class MissingResultsError(Exception):
+    pass
+
+
+class FileValidationError(Exception):
     pass

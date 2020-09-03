@@ -7,7 +7,9 @@ LOG = logging.getLogger(__name__)
 
 
 def load_one_batch(adapter, nipt_results_path:str):
-    """Function to load one lims sample into the database"""
+    """Function to load one lims sample into the database. 
+    Raises:
+        MissingResultsError: when parsing file that is empty"""
     
     batch_data = parse_batch_file(nipt_results_path)
     for sample in batch_data:

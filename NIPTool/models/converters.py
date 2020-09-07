@@ -9,4 +9,28 @@ def empty_str(x):
     return x
 
 
-CONVERTERS = {str: ["SampleProject"], empty_str: ["SampleType", "Description"]}
+CONVERTERS = {
+    str: ["SampleProject"],
+    empty_str: [
+        "SampleType",
+        "Description",
+        "Library_nM",
+        "Index1",
+        "Index2",
+        "CNVSegment",
+        "Flowcell",
+        "QCFlag",
+    ],
+}
+
+def convert(key, value):
+    """Convert values according to the converter model"""
+
+    if value is None:
+        return value
+
+    for function, keys in CONVERTERS.items():
+        if key in keys:
+            return function(value)
+
+    return value

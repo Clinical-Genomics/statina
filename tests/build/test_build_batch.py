@@ -1,4 +1,4 @@
-from NIPTool.build.batch import build_batch
+from NIPTool.build.document import build_batch
 import pytest
 
 

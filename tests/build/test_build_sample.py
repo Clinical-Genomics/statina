@@ -1,4 +1,4 @@
-from NIPTool.build.sample import build_sample
+from NIPTool.build.document import build_sample
 import pytest
 
 

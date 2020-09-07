@@ -7,7 +7,7 @@ from NIPTool.models.validation_schema import nipt_results_schema
 LOG = logging.getLogger(__name__)
 
 
-def parse_batch_file(nipt_results_path: dict) -> list:
+def parse_batch_file(nipt_results_path: str) -> list:
     if not glob.glob(nipt_results_path):
         raise MissingResultsError("Results file missing.")
 

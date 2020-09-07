@@ -2,7 +2,7 @@ import logging
 import pandas as pd
 import glob
 from NIPTool.exeptions import MissingResultsError, FileValidationError
-from NIPTool.models.nipt_results import nipt_results_schema
+from NIPTool.models.validation_schema import nipt_results_schema
 
 LOG = logging.getLogger(__name__)
 

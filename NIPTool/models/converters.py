@@ -27,7 +27,7 @@ def convert(key, value):
     """Convert values according to the converter model"""
 
     if value is None:
-        return value
+        return None
 
     for function, keys in CONVERTERS.items():
         if key in keys:

@@ -1,14 +1,23 @@
 from NIPTool.models.constants import SAMPLE_KEYS, BATCH_KEYS
-from NIPTool.models.converters import convert
+from typing import Optional
+
+def empty_str_to_none(x: str) -> Optional[str]:
+    """Convert empty string to None"""
+
+    x = x.strip()
+    if not x:
+        return None
+    return x
 
 
 def build_document(csv_data: dict, document_keys: list) -> dict:
-    """Build a general document based on convert models"""
+    """Build a general document"""
 
     document = {}
     for key in document_keys:
         value = csv_data.get(key)
-        value = convert(key, value)
+        if isinstance(value, str):
+            value = empty_str_to_none(value)
         if value is None:
             continue
         document[key] = value
@@ -20,6 +29,8 @@ def build_sample(sample_data: dict) -> dict:
     """Builds a document for the sample collection"""
 
     sample = build_document(sample_data, SAMPLE_KEYS)
+    if sample.get("SampleProject"):
+        sample["SampleProject"] = str(sample["SampleProject"])
     sample["_id"] = sample_data.get("SampleID")
 
     return sample

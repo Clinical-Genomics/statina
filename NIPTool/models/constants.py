@@ -1,5 +1,4 @@
 SAMPLE_KEYS = [
-    "SampleID",
     "SampleType",
     "Description",
     "SampleProject",

@@ -31,7 +31,7 @@ def build_sample(sample_data: dict) -> dict:
     sample = build_document(sample_data, SAMPLE_KEYS)
     if sample.get("SampleProject"):
         sample["SampleProject"] = str(sample["SampleProject"])
-    sample["_id"] = sample_data.get("SampleID")
+    sample["_id"] = sample_data["SampleID"]
 
     return sample
 

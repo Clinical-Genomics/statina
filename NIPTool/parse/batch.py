@@ -2,12 +2,12 @@ import logging
 import pandas as pd
 import glob
 from NIPTool.exeptions import MissingResultsError, FileValidationError
-from NIPTool.models.nipt_results import nipt_results_schema
+from NIPTool.models.validation_schema import nipt_results_schema
 
 LOG = logging.getLogger(__name__)
 
 
-def parse_batch_file(nipt_results_path: dict) -> list:
+def parse_batch_file(nipt_results_path: str) -> list:
     if not glob.glob(nipt_results_path):
         raise MissingResultsError("Results file missing.")
 

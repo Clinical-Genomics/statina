@@ -1,6 +1,5 @@
 import logging
-from NIPTool.build.sample import build_sample
-from NIPTool.build.batch import build_batch
+from NIPTool.build.document import build_sample, build_batch
 from NIPTool.parse.batch import parse_batch_file
 
 LOG = logging.getLogger(__name__)

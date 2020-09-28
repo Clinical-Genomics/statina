@@ -34,7 +34,7 @@ def configure_app(app, config=None):
 
     if config:
         app.config = {**app.config, **yaml.safe_load(config)}
-    app.config['SECRET_KEY'] = str(uuid4())
+    app.config['SECRET_KEY'] = app.config['SECRET_KEY']
     client = MongoClient(app.config['DB_URI'])
     db_name = app.config['DB_NAME']
     app.client = client

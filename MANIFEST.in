@@ -1,1 +1,2 @@
 include NIPTool/server/templates/*.html
+include NIPTool/server/templates/*/*.html

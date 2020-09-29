@@ -313,12 +313,14 @@ def get_last_batches(adapter, nr: int) -> list:
 
 
 def get_statistics_for_scatter_plot(batches: list, fields: list)-> dict:
-    scatter_plot_data = {
-        'batch_ids':[batch.get('_id') for batch in batches],
-        'dates':[batch.get('SequencingDate') for batch in batches]}
-    for field in fields:
-        scatter_plot_data[field] = [batch.get(field) for batch in batches]
-        
+    scatter_plot_data = {}
+    for batch in batches:
+        batch_id = batch.get('_id')
+        scatter_plot_data[batch_id] = {
+            'date': batch.get('SequencingDate')}
+        for field in fields:
+            scatter_plot_data[batch_id][field] = batch.get(field)
+
     return scatter_plot_data
 
 

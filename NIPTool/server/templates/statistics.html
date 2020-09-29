@@ -37,7 +37,7 @@
 {% block scripts %}
 
 <script>
-    
+
     ////////////////// Box Plots //////////////////
     {% for plot_name in box_plots %}
     var XY_plot = document.getElementById('')
@@ -97,7 +97,8 @@
             margin: { b: 100 },
             xaxis: {
                 showline: true,
-                ticktext: {{ scatter_stat['batch_ids'] | tojson }},
+                tickvals: {{ ticks }},
+                ticktext: {{ batch_ids| tojson }},
                 tickangle: 40,
                 zeroline: false,
                 linecolor: '#636363',
@@ -113,13 +114,20 @@
                 }
 
 
-    var data = {
-            y: {{ scatter_stat[plot_name] }},
-        type: 'scatter',
-        mode: 'markers',
-        showlegend: false}
+    {% for batch_id in scatter_stat %}
+        var batch = {
+            y: [{{ scatter_stat[batch_id][plot_name] }}],
+            x: [{{ loop.index  }}],
+            type: 'scatter',
+            mode: 'markers',
+            showlegend: false,
+            name: "{{batch_id}}",
+            text: "Date Run: {{scatter_stat[batch_id]['date']}}"};                          
+        data.push(batch);
+    {% endfor %}
 
     Plotly.newPlot("{{plot_name}}", data, layout);
     {% endfor %}
 </script>
+
 {% endblock %}

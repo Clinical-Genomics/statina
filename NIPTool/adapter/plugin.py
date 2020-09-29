@@ -59,6 +59,10 @@ class NiptAdapter(MongoAdapter):
         """Aggregates a query pipeline on the sample collection"""
         return self.sample_collection.aggregate(pipe)
 
+    def batch_aggregate(self, pipe: list):
+        """Aggregates a query pipeline on the sample collection"""
+        return self.batch_collection.aggregate(pipe)
+
     def batch_samples(self, batch_id):
         """All samples within the batch"""
         return self.sample_collection.find({"SampleProject": batch_id})

@@ -25,4 +25,4 @@ def load():
 
 
 load.add_command(batch_command)
-load.add_command(user_command)
+load.add_command(load_user_cmd)

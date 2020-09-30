@@ -27,7 +27,6 @@ def database(request, pymongo_client):
     return database
 
 
-@pytest.fixture(scope="function")
 def batch(
     batch_id = "201860",
     sequencing_date = "2022-03-10",
@@ -37,7 +36,7 @@ def batch(
 ):
     """A batch mock"""
 
-    batch= {
+    return {
         "_id": batch_id,
         "SequencingDate": sequencing_date,
         "Median_13": 0.994623404680424,
@@ -51,13 +50,11 @@ def batch(
         "Stdev_X": 0.029800076293786,
         "Stdev_Y": 0.0000653186791196846,
     }
-    return batch
 
 
-@pytest.fixture(scope="function")
 def sample(
     batch_id: str = "201860",
-    _id: str = "2020-07452-02",
+    sample_id: str = "2020-07452-02",
     ratio_13: float = 0.97,
     ratio_18: float = 0.87,
     fetal_fraction: float = 11.5,
@@ -65,8 +62,8 @@ def sample(
     """A sample mock"""
 
     return {
-        "_id": _id,
-        "SampleID": _id,
+        "_id": sample_id,
+        "SampleID": sample_id,
         "SampleType": "",
         "Description": "",
         "SampleProject": batch_id,
@@ -74,10 +71,10 @@ def sample(
         "Index2": "CTCGACAG",
         "Library_nM": "",
         "QCFlag": "",
-        "Zscore_13": -10.1836097044367,
+        "Zscore_13": 10.1836097044367,
         "Zscore_18": 14.2869756828577,
         "Zscore_21": 2.71403500910501,
-        "Zscore_X": -31.293635764028803,
+        "Zscore_X": 31.293635764028803,
         "Ratio_13": ratio_13,
         "Ratio_18": ratio_18,
         "Ratio_21": 1.0105402184799999,
@@ -136,9 +133,7 @@ def sample(
         "Bin2BinVariance": 0.054260164076747,
         "UnfilteredCNVcalls": 44,
         "CNVSegment": "Found",
-        "added": {"$date": "2020-04-29T15:33:20.516Z"},
         "comment": "None",
-        "updated": {"$date": "2020-04-30T10:39:16.464Z"},
     }
 
 

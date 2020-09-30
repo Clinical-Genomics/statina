@@ -348,6 +348,7 @@ def get_statistics_for_box_plot(adapter, batches: list, fields: list):
     pipe = [match, lookup, unwind, group]
             #maybe add a fina sort to the pipe
     box_plot_data = list(adapter.sample_aggregate(pipe))
+    
     return box_plot_data
 
 

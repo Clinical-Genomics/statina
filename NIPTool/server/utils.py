@@ -304,6 +304,8 @@ def get_sample_for_samp_tris_plot(sample):
 
 
 def get_last_batches(adapter, nr: int) -> list:
+    """geting the <nr> last batches based on SequencingDate"""
+
     batch_sort_aggregation = [{'$sort': {'SequencingDate': -1}}]
     sorted_batches = list(adapter.batch_aggregate(batch_sort_aggregation))
     if len(sorted_batches) > nr:
@@ -313,6 +315,8 @@ def get_last_batches(adapter, nr: int) -> list:
 
 
 def get_statistics_for_scatter_plot(batches: list, fields: list)-> dict:
+    """Formating data for scatter plot"""
+
     scatter_plot_data = {}
     for batch in batches:
         batch_id = batch.get('_id')
@@ -325,6 +329,8 @@ def get_statistics_for_scatter_plot(batches: list, fields: list)-> dict:
 
 
 def get_statistics_for_box_plot(adapter, batches: list, fields: list):
+    """Getting and formating data for box plot"""
+
     match = {'$match': {'SampleProject': {'$in': batches}}}
     lookup = {'$lookup': {
                 'from': 'batch', 

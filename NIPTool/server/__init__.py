@@ -49,3 +49,4 @@ def configure_app(app, config=None):
         toolbar = DebugToolbarExtension(app)
 
     return app
+

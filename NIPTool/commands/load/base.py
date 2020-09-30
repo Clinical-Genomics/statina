@@ -10,6 +10,7 @@ LOG = logging.getLogger(__name__)
 
 # commands
 from NIPTool.commands.load.batch import batch as batch_command
+from NIPTool.commands.load.user import user as user_command
 
 # Get version and doc decorator
 from NIPTool import __version__
@@ -24,3 +25,4 @@ def load():
 
 
 load.add_command(batch_command)
+load.add_command(user_command)

@@ -11,7 +11,7 @@ LOG = logging.getLogger(__name__)
 @click.command("user", short_help="load a user into db.")
 @click.option("-n", "--name", help="User name")
 @click.option("-r", "--role", help="User role")
-@click.option("-e", "--email", help="User name")
+@click.option("-e", "--email", help="User email")
 @with_appcontext
 def user(name, role, email):
     """Loading new user to db."""

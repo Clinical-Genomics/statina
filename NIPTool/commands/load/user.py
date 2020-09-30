@@ -8,7 +8,7 @@ from NIPTool.exeptions import NIPToolError
 LOG = logging.getLogger(__name__)
 
 
-@click.command("user", short_help="load batch into db.")
+@click.command("user", short_help="load a user into db.")
 @click.option("-n", "--name", help="User name")
 @click.option("-r", "--role", help="User name")
 @click.option("-e", "--email", help="User name")

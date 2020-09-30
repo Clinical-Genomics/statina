@@ -1,20 +1,12 @@
 #!/usr/bin/env python
-import logging
-
 import click
-
-from mongo_adapter import get_client
-from NIPTool.adapter import NiptAdapter
-
-LOG = logging.getLogger(__name__)
 
 # commands
 from NIPTool.commands.load.batch import batch as load_batch_cmd
 from NIPTool.commands.load.user import user as load_user_cmd
 
-# Get version and doc decorator
+# Get version
 from NIPTool import __version__
-from NIPTool.tools.cli_utils import add_doc as doc
 
 
 @click.group()

@@ -12,6 +12,25 @@ cd NIPTool
 pip install -r requirements.txt -e .
 ```
 
+## Usage
+
+### Demo
+
+Once installed, you can setup NIPTool by running a few commands using the included command line interface. Given you have a MongoDB server listening on the default port (27017), this is how you would setup a fully working NIPYool demo:
+
+```bash
+nipt -c NIPTool/tests/fixtures/nipt_config.yaml load batch -b NIPTool/tests/fixtures/valid_fluffy.csv
+nipt -c NIPTool/tests/fixtures/nipt_config.yaml load user -n <mane> -r RW -e <mail>
+```
+
+This will setup an instance of NIPTool with a database called `nipt-demo`. Now run
+
+```bash
+nipt run
+```
+And play around with the interface.
+
+
 ## Release model
 NIPTool development is organised on a flexible Git "Release Flow" branching system. This more or less means that we make releases in release branches which corresponds to stable versions of NIPTool.
 

@@ -16,7 +16,7 @@ pip install -r requirements.txt -e .
 
 ### Demo
 
-Once installed, you can setup NIPTool by running a few commands using the included command line interface. Given you have a MongoDB server listening on the default port (27017), this is how you would setup a fully working NIPYool demo:
+Once installed, you can setup NIPTool by running a few commands using the included command line interface. Given you have a MongoDB server listening on the default port (27017), this is how you would setup a fully working NIPTool demo:
 
 ```bash
 nipt -c NIPTool/tests/fixtures/nipt_config.yaml load batch -b NIPTool/tests/fixtures/valid_fluffy.csv

@@ -7,17 +7,28 @@ try:
 except IOError:
     install_requires = []
 
+
+with open("README.md", "r") as fh:
+    long_description = fh.read()
+
 setup(
     name="NIPTool",
     version=version,
+    description="NIPT data storage and visualisation",
+    long_description=long_description,
+    long_description_content_type="text/markdown",
     url="https://github.com/Clinical-Genomics/NIPTool",
     author="Maya Brandi",
-    author_email='maya.brandi@scilifelab.se',
+    author_email="maya.brandi@scilifelab.se",
     install_requires=install_requires,
     packages=find_packages(),
     include_package_data=True,
     zip_safe=False,
-    entry_points={
-        'console_scripts': ['nipt=NIPTool.commands:cli'],
-    },
+    entry_points={"console_scripts": ["nipt=NIPTool.commands:cli"],},
+    classifiers=[
+        "Programming Language :: Python :: 3",
+        "License :: OSI Approved :: MIT License",
+        "Operating System :: OS Independent",
+    ],
+    python_requires=">=3.6",
 )

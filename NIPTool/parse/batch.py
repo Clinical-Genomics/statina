@@ -1,30 +1,30 @@
 import logging
 import pandas as pd
 import glob
+from typing import Optional, List
+
 from NIPTool.exeptions import MissingResultsError, FileValidationError
-from NIPTool.models.validation import ints, floats , strings, requiered_fields, exceptions
+from NIPTool.models.validation import (
+    ints,
+    floats,
+    strings,
+    exceptions,
+)
 
 LOG = logging.getLogger(__name__)
 
 
-def check_requiered_fields(document):
-    """"""
-
-    if not set(requiered_fields).issubset(set(document.keys())):
-        LOG.info(f"Could not add document {document}. Requiered fields missing.")
-        return False
-    return True
-
-def form(val, function):
-    """"""
+def form(val: Optional, function) -> Optional:
+    """Returning formated value or None"""
 
     try:
         return function(val)
     except:
         return None
 
-def validate(key, val):
-    """"""
+
+def validate(key: str, val: Optional) -> Optional:
+    """Formating value according to defined models."""
 
     if val in exceptions:
         formated_value = None
@@ -39,9 +39,10 @@ def validate(key, val):
     return formated_value
 
 
-def parse_batch_file(nipt_results_path: str) -> list:
-    """"""
-    
+def parse_batch_file(nipt_results_path: str) -> List[dict]:
+    """Parsing file content. Formating values. Ignoring values 
+    that could not be formatted according to defined models"""
+
     if not glob.glob(nipt_results_path):
         raise MissingResultsError("Results file missing.")
 

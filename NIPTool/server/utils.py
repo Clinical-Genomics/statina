@@ -7,13 +7,21 @@ from NIPTool.server.constants import *
 def get_sample_info(sample):
     """Sample info for sample table in batch view."""
 
-    z_score_13 = round(sample.get("Zscore_13"), 2)
-    z_score_18 = round(sample.get("Zscore_18"), 2)
-    z_score_21 = round(sample.get("Zscore_21"), 2)
+    sample_info_keys = ["Zscore_13", "Zscore_18", "Zscore_21", "CNVSegment", "FF_Formatted", "FFX", "FFY", "Zscore_X"]
+    for key in sample_info_keys:
+        val = sample.get(key)
+        if isinstance(val,(float,int)):
+            sample[key] = round(val, 2)
+        else:
+            sample[key] = ""
+        
+    z_score_13 = sample.get("Zscore_13")
+    z_score_18 = sample.get("Zscore_18")
+    z_score_21 = sample.get("Zscore_21")
     CNVSegment = sample.get("CNVSegment")
-    FF = round(sample.get("FF_Formatted"), 2)
-    FFX = round(sample.get("FFX"), 2)
-    FFY = round(sample.get("FFY"), 2)
+    FF = sample.get("FF_Formatted")
+    FFX = sample.get("FFX")
+    FFY = sample.get("FFY")
 
     return {
         "sample_id": sample.get("_id"),
@@ -24,7 +32,7 @@ def get_sample_info(sample):
         "Zscore_13": {"value": z_score_13, "warn": _get_tris_warning(z_score_13, FF),},
         "Zscore_18": {"value": z_score_18, "warn": _get_tris_warning(z_score_18, FF),},
         "Zscore_21": {"value": z_score_21, "warn": _get_tris_warning(z_score_21, FF),},
-        "Zscore_X": {"value": round(sample.get("Zscore_X"), 2)},
+        "Zscore_X": {"value": sample.get("Zscore_X")},
         #'Warning': 'value': _get_warnings(sample),
         "Status": _get_status(sample),
         "Include": sample.get("include"),
@@ -46,6 +54,8 @@ def _get_status(sample):
 
 def _get_ff_warning(fetal_fraction):
     """Get fetal fraction warning based on preset treshold"""
+    if fetal_fraction is "":
+        return "default"
 
     try:
         fetal_fraction = fetal_fraction
@@ -59,6 +69,8 @@ def _get_ff_warning(fetal_fraction):
 
 def _get_tris_warning(z_score: float, fetal_fraction):
     """Get automated trisomi warning, based on preset Zscore thresholds"""
+    if fetal_fraction is "":
+        return "default"
 
     if fetal_fraction <= 5:
         smax = TRISOMI_TRESHOLDS["soft_max_ff"]["NCV"]
@@ -149,7 +161,7 @@ def get_ff_cases(adapter, batch_id):
     pipe = [
         {
             "$match": {
-                "SampleProject": {"$eq": batch_id},
+                "Flowcell": {"$eq": batch_id},
                 "FF_Formatted": {"$ne": "None", "$exists": "True"},
                 "FFY": {"$ne": "None", "$exists": "True"},
                 "FFX": {"$ne": "None", "$exists": "True"},
@@ -235,10 +247,10 @@ def get_tris_cases(adapter, chr, batch_id):
     """Cases for trisomi plots."""
 
     pipe = [
-        {"$match": {"SampleProject": {"$eq": batch_id}, "include": {"$eq": True}}},
+        {"$match": {"Flowcell": {"$eq": batch_id}, "include": {"$eq": True}}},
         {
             "$group": {
-                "_id": {"batch": "$SampleProject"},
+                "_id": {"batch": "$Flowcell"},
                 "values": {"$push": f"$Zscore_{chr}"},
                 "names": {"$push": "$_id"},
                 "count": {"$sum": 1},
@@ -331,15 +343,15 @@ def get_statistics_for_scatter_plot(batches: list, fields: list)-> dict:
 def get_statistics_for_box_plot(adapter, batches: list, fields: list):
     """Getting and formating data for box plot"""
 
-    match = {'$match': {'SampleProject': {'$in': batches}}}
+    match = {'$match': {'Flowcell': {'$in': batches}}}
     lookup = {'$lookup': {
                 'from': 'batch', 
-                'localField': 'SampleProject', 
+                'localField': 'Flowcell', 
                 'foreignField': '_id', 
                 'as': 'batch'}} 
     unwind = {'$unwind': {'path': '$batch'}}
     group = {'$group': {'_id': {
-                            'batch': '$SampleProject', 
+                            'batch': '$Flowcell', 
                             'date': '$batch.SequencingDate'}}}
 
     for field in fields:

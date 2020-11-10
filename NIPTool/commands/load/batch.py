@@ -10,7 +10,7 @@ LOG = logging.getLogger(__name__)
 
 
 @click.command("batch", short_help="load batch into db.")
-@click.option("-b", "--batch-path", help="path to nipt analysis results csv file")
+@click.option("-b", "--batch-path", help="path to batch load config")
 @with_appcontext
 def batch(batch_path):
     """Read and load lims data for one sample, all samples or the most recently updated samples."""

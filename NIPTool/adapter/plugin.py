@@ -65,4 +65,4 @@ class NiptAdapter(MongoAdapter):
 
     def batch_samples(self, batch_id):
         """All samples within the batch"""
-        return self.sample_collection.find({"SampleProject": batch_id})
+        return self.sample_collection.find({"Flowcell": batch_id})

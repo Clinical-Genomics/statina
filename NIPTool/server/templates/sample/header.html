@@ -19,7 +19,7 @@
                                 <table class="table table-bordered ">
                                     <tr>
                                         <td><strong>Batch:</strong></td>
-                                        <td><a href={{ url_for('server.batch', batch_id=batch._id) }}>{{ batch._id }}</a></td>
+                                        <td><a href={{ url_for('server.batch', batch_id=batch.Flowcell) }}>{{ batch.SampleProject }}</a></td>
                                         <td><strong># QCFlags:</strong></td>
                                         <td>{{ sample.QCFlag}}</td>
                                     </tr>

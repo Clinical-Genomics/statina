@@ -163,13 +163,15 @@ def fetal_fraction(batch_id):
 def coverage(batch_id):
     """Batch view with coverage plot"""
     batch = app.adapter.batch(batch_id)
-    samples = app.adapter.batch_samples(batch_id)
-    data = get_data_for_coverage_plot(samples)
+    samples = list(app.adapter.batch_samples(batch_id))
+    scatter_data = get_scatter_data_for_coverage_plot(samples)
+    box_data = get_box_data_for_coverage_plot(samples)
     return render_template(
         "batch/coverage.html",
         batch=batch,
         x_axis=list(range(1, 23)),
-        data=data,
+        scatter_data=scatter_data,
+        box_data = box_data,
         page_id="batches_cov",
     )
 

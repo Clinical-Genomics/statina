@@ -350,6 +350,8 @@ def get_last_batches(adapter, nr: int) -> list:
     return(sorted_batches)
 
 
+# Statistics
+
 def get_statistics_for_scatter_plot(batches: list, fields: list)-> dict:
     """Formating data for scatter plot"""
 

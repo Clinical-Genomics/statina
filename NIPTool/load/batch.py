@@ -16,23 +16,27 @@ def check_requiered_fields(document):
     return True
 
 
-def load_result_file(adapter, batch_data: list) -> None:
+def load_result_file(adapter, batch_data: list, project_name: str) -> None:
     """Function to load data from fluffy result file. 
     Raises:
         MissingResultsError: when parsing file that is empty"""
 
     batch_data = parse_batch_file(batch_data)
 
+    mongo_batch = build_batch(batch_data[0])
+    mongo_batch['_id'] = project_name
+    adapter.add_or_update_document(mongo_batch, adapter.batch_collection)
+    
+
     for sample in batch_data:
         if not check_requiered_fields(sample):
             continue
         mongo_sample = build_sample(sample)
+        mongo_sample['SampleProject'] = project_name
         adapter.add_or_update_document(mongo_sample, adapter.sample_collection)
 
     if not check_requiered_fields(batch_data[0]):
         return
-    mongo_batch = build_batch(batch_data[0])
-    adapter.add_or_update_document(mongo_batch, adapter.batch_collection)
 
 
 def load_concentrastions(adapter, concentrations: dict) -> None:
@@ -43,11 +47,4 @@ def load_concentrastions(adapter, concentrations: dict) -> None:
         mongo_sample["concentration"] = concentration
         adapter.add_or_update_document(mongo_sample, adapter.sample_collection)
 
-
-def load_project_name(adapter, project_name: str, flowcell: str) -> None:
-    """Function to load batch name"""
-
-    mongo_batch = adapter.batch(flowcell)
-    mongo_batch["SampleProject"] = project_name
-    adapter.add_or_update_document(mongo_batch, adapter.batch_collection)
 

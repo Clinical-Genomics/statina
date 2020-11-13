@@ -161,7 +161,7 @@ def get_ff_cases(adapter, batch_id):
     pipe = [
         {
             "$match": {
-                "Flowcell": {"$eq": batch_id},
+                "SampleProject": {"$eq": batch_id},
                 "FF_Formatted": {"$ne": "None", "$exists": "True"},
                 "FFY": {"$ne": "None", "$exists": "True"},
                 "FFX": {"$ne": "None", "$exists": "True"},
@@ -247,10 +247,10 @@ def get_tris_cases(adapter, chr, batch_id):
     """Cases for trisomi plots."""
 
     pipe = [
-        {"$match": {"Flowcell": {"$eq": batch_id}, "include": {"$eq": True}}},
+        {"$match": {"SampleProject": {"$eq": batch_id}, "include": {"$eq": True}}},
         {
             "$group": {
-                "_id": {"batch": "$Flowcell"},
+                "_id": {"batch": "$SampleProject"},
                 "values": {"$push": f"$Zscore_{chr}"},
                 "names": {"$push": "$_id"},
                 "count": {"$sum": 1},
@@ -343,15 +343,15 @@ def get_statistics_for_scatter_plot(batches: list, fields: list)-> dict:
 def get_statistics_for_box_plot(adapter, batches: list, fields: list):
     """Getting and formating data for box plot"""
 
-    match = {'$match': {'Flowcell': {'$in': batches}}}
+    match = {'$match': {'SampleProject': {'$in': batches}}}
     lookup = {'$lookup': {
                 'from': 'batch', 
-                'localField': 'Flowcell', 
+                'localField': 'SampleProject', 
                 'foreignField': '_id', 
                 'as': 'batch'}} 
     unwind = {'$unwind': {'path': '$batch'}}
     group = {'$group': {'_id': {
-                            'batch': '$Flowcell', 
+                            'batch': '$SampleProject', 
                             'date': '$batch.SequencingDate'}}}
 
     for field in fields:

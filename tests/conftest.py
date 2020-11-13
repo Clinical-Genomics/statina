@@ -52,3 +52,18 @@ def invalid_csv():
     """Get file path to invalid csv"""
 
     return "tests/fixtures/not_a_valid_fluffy.csv"
+
+
+@pytest.fixture
+def valid_load_config():
+    """Get file path to valid csv"""
+
+    return "tests/fixtures/valid_load_config.yaml"
+
+
+@pytest.fixture
+def invalid_load_config():
+    """Get file path to invalid csv"""
+
+    return "tests/fixtures/not_valid_load_config.yaml"
+

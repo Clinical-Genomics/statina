@@ -1,0 +1,6 @@
+{
+  "concentrations":
+    { "2020-07547-02": 12, "2020-07649-02": 12, "2020-07455-02": 12 },
+  "result_file": "tests/fixtures/valid_fluffy.csv",
+  "project_name": "testprojet"
+}

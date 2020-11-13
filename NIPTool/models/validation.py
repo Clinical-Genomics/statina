@@ -1,4 +1,4 @@
-requiered_fields = ["SampleID", "Flowcell"]
+requiered_fields = ["SampleID"]
 
 strings = [
     "SampleID",

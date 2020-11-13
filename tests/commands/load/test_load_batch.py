@@ -7,7 +7,7 @@ from NIPTool.adapter.plugin import NiptAdapter
 app = create_app(test=True)
 
 
-def test_batch_valid_file(database, valid_csv):
+def test_batch_valid_file(database, valid_load_config):
     app.db = database
     app.adapter = NiptAdapter(database.client, db_name=database.name)
 
@@ -15,14 +15,14 @@ def test_batch_valid_file(database, valid_csv):
 
     # WHEN loading the batch file with correct foramted input string
     runner = app.test_cli_runner()
-    result = runner.invoke(cli, ["load", "batch", "-b", valid_csv])
+    runner.invoke(cli, ["load", "batch", "-b", valid_load_config])
 
     # THEN assert the new apptags should be added to the colleciton
     assert app.adapter.sample_collection.estimated_document_count() == 3
     assert app.adapter.batch_collection.estimated_document_count() == 1
 
 
-def test_batch_invalid_file(database, invalid_csv):
+def test_batch_invalid_file(database, invalid_load_config):
     app.db = database
     app.adapter = NiptAdapter(database.client, db_name=database.name)
 
@@ -30,7 +30,7 @@ def test_batch_invalid_file(database, invalid_csv):
 
     # WHEN loading the batch file with correct foramted input string
     runner = app.test_cli_runner()
-    result = runner.invoke(cli, ["load", "batch", "-b", invalid_csv])
+    result = runner.invoke(cli, ["load", "batch", "-b", invalid_load_config])
 
     # THEN assert nothing added to sample or batch collections
     # THEN assert Badly formated csv! Can not load. Exiting.

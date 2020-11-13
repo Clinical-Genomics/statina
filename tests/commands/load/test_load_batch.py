@@ -17,7 +17,8 @@ def test_batch_valid_file(database, valid_load_config):
     runner = app.test_cli_runner()
     runner.invoke(cli, ["load", "batch", "-b", valid_load_config])
 
-    # THEN assert the new apptags should be added to the colleciton
+    # THEN assert the samples should be added to the sample colleciton
+    # and the batch should be added to the batch colleciton
     assert app.adapter.sample_collection.estimated_document_count() == 3
     assert app.adapter.batch_collection.estimated_document_count() == 1
 

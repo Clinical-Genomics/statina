@@ -43,7 +43,7 @@ def statistics():
 
     nr_batches = 3
     scatter_plots = ['Stdev_13', 'Stdev_18', 'Stdev_21']
-    box_plots = ['Chr13_Ratio', 'Chr18_Ratio', 'Chr21_Ratio','FF_Formatted', 
+    box_plots = ['chr13_Ratio', 'chr18_Ratio', 'chr21_Ratio','FF_Formatted', 
                 'DuplicationRate', 'MappedReads', 'GC_Dropout']
 
     batches = get_last_batches(adapter=app.adapter, nr=nr_batches)
@@ -191,7 +191,7 @@ def report(batch_id, coverage):
 def sample(sample_id):
     """Sample view with sample information."""
     sample = app.adapter.sample(sample_id)
-    batch = app.adapter.batch(sample.get("Flowcell"))
+    batch = app.adapter.batch(sample.get("SampleProject"))
 
     return render_template(
         "sample/sample.html",
@@ -207,7 +207,7 @@ def sample(sample_id):
 def sample_tris(sample_id):
     """Sample view with trisomi plot."""
     sample = app.adapter.sample(sample_id)
-    batch = app.adapter.batch(sample.get("Flowcell"))
+    batch = app.adapter.batch(sample.get("SampleProject"))
     abnormal_data, data_per_abnormaliy = get_abn_for_samp_tris_plot(app.adapter)
     normal_data = get_normal_for_samp_tris_plot(app.adapter)
     sample_data = get_sample_for_samp_tris_plot(sample)

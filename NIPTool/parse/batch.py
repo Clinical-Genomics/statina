@@ -1,6 +1,7 @@
 import logging
 import pandas as pd
-import glob
+from pathlib import Path
+
 from typing import Optional, List
 
 from NIPTool.exeptions import MissingResultsError, FileValidationError
@@ -43,12 +44,14 @@ def parse_batch_file(nipt_results_path: str) -> List[dict]:
     """Parsing file content. Formating values. Ignoring values 
     that could not be formatted according to defined models"""
 
-    if not glob.glob(nipt_results_path):
+    file = Path(nipt_results_path)
+
+    if not file.exists():
         raise MissingResultsError("Results file missing.")
 
-    nipt_results = glob.glob(nipt_results_path)[0]
-    df = pd.read_csv(nipt_results, na_filter=False)
-    results = df.to_dict(orient="records")
+    with open(file) as nipt_results_path:
+        df = pd.read_csv(file, na_filter=False)
+        results = df.to_dict(orient="records")
 
     samples = []
     for sample in results:

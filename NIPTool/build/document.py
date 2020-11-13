@@ -27,6 +27,5 @@ def build_batch(batch_data: dict) -> dict:
     """Builds a document for the batch collection"""
 
     batch = build_document(batch_data, BATCH_KEYS)
-    batch["_id"] = str(batch_data["Flowcell"])
 
     return batch

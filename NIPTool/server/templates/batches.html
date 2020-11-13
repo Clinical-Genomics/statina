@@ -30,10 +30,10 @@
                                     {% for batch in batches %}
                                     <tr>
                                         <td><a
-                                                href={{ url_for('server.batch', batch_id=batch._id) }}>{{batch.SampleProject if batch.SampleProject else "No Batch Name"}}</a>
+                                                href={{ url_for('server.batch', batch_id=batch._id) }}>{{batch._id if batch._id else "No Batch Name"}}</a>
                                         </td>
                                         <td class="Date"> {{batch.date }}</td>
-                                        <td class="Batch id">{{ batch._id}}</td>
+                                        <td class="Batch id">{{ batch.Flowcell}}</td>
                                     </tr>
                                     {% endfor %}
                                 </tbody>

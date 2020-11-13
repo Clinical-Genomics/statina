@@ -44,7 +44,11 @@ def load_concentrastions(adapter, concentrations: dict) -> None:
 
     for sample, concentration in concentrations.items():
         mongo_sample = adapter.sample(sample)
+        if not mongo_sample:
+            LOG.warning(f"Trying to add concentration to sample {sample} but it doesnt exist in the databse.")
+            return
         mongo_sample["concentration"] = concentration
+
         adapter.add_or_update_document(mongo_sample, adapter.sample_collection)
 
 

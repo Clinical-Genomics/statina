@@ -105,7 +105,7 @@ def get_scatter_data_for_coverage_plot(samples):
         sample_id = sample["_id"]
         data[sample_id] = {"x": [], "y": []}
         for chr in range(1, 23):
-            ratio = sample.get(f"chr{str(chr)}_Ratio")
+            ratio = sample.get(f"Chr{str(chr)}_Ratio")
             if ratio is None:
                 continue
             data[sample_id]["y"].append(ratio)
@@ -118,7 +118,7 @@ def get_box_data_for_coverage_plot(samples):
     for chr in range(1, 23):
         data[chr] = []
         for sample in samples:
-            ratio = sample.get(f"chr{str(chr)}_Ratio")
+            ratio = sample.get(f"Chr{str(chr)}_Ratio")
             if ratio is None:
                 continue
             data[chr].append(ratio)

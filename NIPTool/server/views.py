@@ -43,7 +43,7 @@ def statistics():
 
     nr_batches = 3
     scatter_plots = ['Stdev_13', 'Stdev_18', 'Stdev_21']
-    box_plots = ['chr13_Ratio', 'chr18_Ratio', 'chr21_Ratio','FF_Formatted', 
+    box_plots = ['Chr13_Ratio', 'Chr18_Ratio', 'Chr21_Ratio','FF_Formatted', 
                 'DuplicationRate', 'MappedReads', 'GC_Dropout']
 
     batches = get_last_batches(adapter=app.adapter, nr=nr_batches)

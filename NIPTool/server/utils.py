@@ -7,6 +7,8 @@ from NIPTool.server.constants import *
 def get_sample_info(sample):
     """Sample info for sample table in batch view."""
 
+    sample_warnings = get_sample_warnings(sample)
+
     sample_info_keys = ["Zscore_13", "Zscore_18", "Zscore_21", "CNVSegment", "FF_Formatted", "FFX", "FFY", "Zscore_X"]
     for key in sample_info_keys:
         val = sample.get(key)
@@ -15,25 +17,16 @@ def get_sample_info(sample):
         else:
             sample[key] = ""
         
-    z_score_13 = sample.get("Zscore_13")
-    z_score_18 = sample.get("Zscore_18")
-    z_score_21 = sample.get("Zscore_21")
-    CNVSegment = sample.get("CNVSegment")
-    FF = sample.get("FF_Formatted")
-    FFX = sample.get("FFX")
-    FFY = sample.get("FFY")
-
     return {
         "sample_id": sample.get("_id"),
-        "FF": {"value": FF, "warn": _get_ff_warning(FF),},
-        "CNVSegment": {"value": CNVSegment, "warn": "default",},
-        "FFX": {"value": FFX, "warn": "default",},
-        "FFY": {"value": FFY, "warn": "default",},
-        "Zscore_13": {"value": z_score_13, "warn": _get_tris_warning(z_score_13, FF),},
-        "Zscore_18": {"value": z_score_18, "warn": _get_tris_warning(z_score_18, FF),},
-        "Zscore_21": {"value": z_score_21, "warn": _get_tris_warning(z_score_21, FF),},
+        "FF": {"value": sample.get("FF_Formatted"), "warn": sample_warnings.get("FF_Formatted")},
+        "CNVSegment": {"value": sample.get("CNVSegment"), "warn": "default",},
+        "FFX": {"value": sample.get("FFX"), "warn": "default",},
+        "FFY": {"value": sample.get("FFY"), "warn": "default",},
+        "Zscore_13": {"value": sample.get("Zscore_13"), "warn": sample_warnings.get("Zscore_13")},
+        "Zscore_18": {"value": sample.get("Zscore_18"), "warn": sample_warnings.get("Zscore_18")},
+        "Zscore_21": {"value": sample.get("Zscore_21"), "warn": sample_warnings.get("Zscore_21")},
         "Zscore_X": {"value": sample.get("Zscore_X")},
-        #'Warning': 'value': _get_warnings(sample),
         "Status": _get_status(sample),
         "Include": sample.get("include"),
         "Comment": sample.get("comment", ""),
@@ -66,10 +59,21 @@ def _get_ff_warning(fetal_fraction):
     else:
         return "default"
 
+def get_sample_warnings(sample):
+    sample_warnings = {}
+    fetal_fraction = sample.get('FF_Formatted')
+    sample_warnings["FF_Formatted"] = _get_ff_warning(fetal_fraction)
+    for key in ["Zscore_13", "Zscore_18", "Zscore_21"]:
+        z_score = sample.get(key)
+        sample_warnings[key] = _get_tris_warning(z_score, fetal_fraction)
+    
+    return sample_warnings
+
+
 
 def _get_tris_warning(z_score: float, fetal_fraction):
     """Get automated trisomi warning, based on preset Zscore thresholds"""
-    if fetal_fraction is "":
+    if fetal_fraction is None or z_score is None:
         return "default"
 
     if fetal_fraction <= 5:
@@ -89,15 +93,35 @@ def _get_tris_warning(z_score: float, fetal_fraction):
     return warn
 
 
-def get_data_for_coverage_plot(samples):
+def get_scatter_data_for_coverage_plot(samples):
     """Coverage Ratio data for Coverage Plot."""
 
     data = {}
     for sample in samples:
+        warnings = get_sample_warnings(sample)
+        warnings.pop('FF_Formatted')
+        if set(warnings.values()) == {'default'}:
+            continue
         sample_id = sample["_id"]
-        data[sample_id] = []
-        for i in range(1, 23):
-            data[sample_id].append(sample.get(f"Chr{str(i)}_Ratio", 0))
+        data[sample_id] = {"x": [], "y": []}
+        for chr in range(1, 23):
+            ratio = sample.get(f"Chr{str(chr)}_Ratio")
+            if ratio is None:
+                continue
+            data[sample_id]["y"].append(ratio)
+            data[sample_id]["x"].append(chr)
+    return data
+
+def get_box_data_for_coverage_plot(samples):
+    """Coverage Ratio data for Coverage Plot."""
+    data = {}
+    for chr in range(1, 23):
+        data[chr] = []
+        for sample in samples:
+            ratio = sample.get(f"Chr{str(chr)}_Ratio")
+            if ratio is None:
+                continue
+            data[chr].append(ratio)
     return data
 
 

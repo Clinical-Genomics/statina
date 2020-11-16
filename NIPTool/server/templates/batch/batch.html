@@ -11,9 +11,25 @@
             <div class="col-lg-16">
                 <div class="panel panel-default">
                     <div class="panel-body">
+                        <form action="{{ url_for('server.update') }}" method="post">
+                            <input type=text name="form_id" value="include_samples" hidden>
+                        <table>
+                            <tbody>
+                                <tr>
+                                    {% if current_user.role=='RW' %}
+                                    <p align="right">
+                                        <button type="submit" class="btn btn-light" name="button_id" value="include all samples"> Include all and Save</button>
+                                        <input type="submit" class="btn btn-light" name="button_id" value="Save">
+                                    </p>
+                                    {% endif %}
+                                </tr>
+                                <tr>
+                                    <input type=text name="current_user" value="{{current_user.name}}" hidden>
+                                </tr>
+                            </tbody>
+                        </table>
                         <div class="table-responsive">
-                            <form action="{{ url_for('server.update') }}" method="post">
-                                <input type=text name="form_id" value="include_samples" hidden>
+                            
                                 <table id="batch_table" class="table table-bordered table-hover table-wrapper-scroll-y" >
                                     <thead>
                                         <tr>
@@ -28,7 +44,7 @@
                                             <th>CNVSegment</th>
                                             <th><a href="#" data-toggle="tooltip" data-placement="bottom" title="Warning for chomosome abnormality. Automatically generated. Based on pre defined NCV trsholds">Warning</a></th>
                                             <th><a href="#" data-toggle="tooltip" data-placement="bottom" title="Chomosome abnormalies. Manually classified by user through the sample page">Status</a></th>
-                                            <th>Include</th>
+                                            <th><a href="#" data-toggle="tooltip" data-placement="bottom" title="Samples checked in the 'Include' column are added to the validation sample set for comparison. Check the checkboxes for samples to include and save. If all samples are ok, just press 'set all OK'.">Include</a></th>
                                             <th>Comment</th>
                                             <th>Last Change</th>
                                         </tr>
@@ -63,22 +79,6 @@
                                             <td ><small>{{sample.Last_Change}}</small></td>
                                         </tr>
                                         {% endfor %}
-                                    </tbody>
-                                </table>
-                                <table>
-                                    <tbody>
-                                        <tr>
-                                            {% if current_user.role=='RW' %}
-                                            <p align="right">
-                                                <input type="submit" class="btn btn-warning" name="button_id" value="Save">
-                                                <button type="submit" class="btn btn-warning" name="button_id" value="include all samples"> Include all and Save</button>
-                                            </p>
-                                            {% endif %}
-                                        </tr>
-                                        <tr>
-                                            <p>Samples checked in the 'Include' column are added to the validation sample set for comparison. Check the checkboxes for samples to include and save. If all samples are ok, just press 'set all OK'.</p>
-                                            <input type=text name="current_user" value="{{current_user.name}}" hidden>
-                                        </tr>
                                     </tbody>
                                 </table>
                             </form>

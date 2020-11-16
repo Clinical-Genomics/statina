@@ -23,21 +23,27 @@ class NiptAdapter(MongoAdapter):
     def add_or_update_document(self, document_news: dict, collection):
         """Adds/updates a document in the database"""
 
-        document_id = document_news["_id"]
-        update_result = collection.update_one(
-            {"_id": document_id}, {"$set": document_news}, upsert=True
-        )
-
-        if not update_result.raw_result["updatedExisting"]:
-            collection.update_one({"_id": document_id}, {"$set": {"added": dt.today()}})
+        document_id = document_news.get("_id")
+        if not document_id:
+            document_id = collection.insert(document_news)
             LOG.info("Added document %s.", document_id)
-        elif update_result.modified_count:
-            collection.update_one(
-                {"_id": document_id}, {"$set": {"updated": dt.today()}}
-            )
-            LOG.info("Updated document %s.", document_id)
         else:
-            LOG.info("No updates for document %s.", document_id)
+            update_result = collection.update_one(
+                {"_id": document_id}, {"$set": document_news}, upsert=True
+            )
+            if not update_result.raw_result["updatedExisting"]:
+                collection.update_one(
+                    {"_id": document_id}, {"$set": {"added": dt.today()}}
+                )
+                LOG.info("Added document %s.", document_id)
+            elif update_result.modified_count:
+                collection.update_one(
+                    {"_id": document_id}, {"$set": {"updated": dt.today()}}
+                )
+                LOG.info("Updated document %s.", document_id)
+            else:
+                LOG.info("No updates for document %s.", document_id)
+        return document_id
 
     def user(self, email):
         """Find user from user collection"""

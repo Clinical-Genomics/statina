@@ -43,14 +43,13 @@ def statistics():
 
     nr_batches = 3
     scatter_plots = ['Stdev_13', 'Stdev_18', 'Stdev_21']
-    box_plots = ['Ratio_13', 'Ratio_18', 'Ratio_21','FetalFraction', 
+    box_plots = ['Chr13_Ratio', 'Chr18_Ratio', 'Chr21_Ratio','FF_Formatted', 
                 'DuplicationRate', 'MappedReads', 'GC_Dropout']
 
     batches = get_last_batches(adapter=app.adapter, nr=nr_batches)
     batch_ids = [batch.get('_id') for batch in batches]
     box_stat = get_statistics_for_box_plot(adapter=app.adapter, batches=batch_ids, fields=box_plots)
     scatter_stat = get_statistics_for_scatter_plot(batches=batches, fields=scatter_plots)
-    print(scatter_stat)
     return render_template("statistics.html",
         ticks = list(range(1, nr_batches+1)),
         nr_batches = nr_batches,
@@ -71,10 +70,9 @@ def statistics():
 def batch(batch_id):
     """Batch view with table of all samples in the batch."""
     samples = app.adapter.batch_samples(batch_id)
-    batch = app.adapter.batch(batch_id)
     return render_template(
         "batch/batch.html",
-        batch=batch,
+        batch = app.adapter.batch(batch_id),
         sample_info=[get_sample_info(sample) for sample in samples],
         # warnings = ...,
         # sample_ids = ",".join(sample.get("_id") for sample in samples),

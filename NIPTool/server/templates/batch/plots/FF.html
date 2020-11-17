@@ -1,26 +1,3 @@
-{% extends 'layout/layout.html' %}
-
-
-
-{% block body %}
-{% include 'layout/navigation.html' %}
-<div class="container-fluid">
-    {% include 'batch/header.html' %}
-    <div class="tab-content">
-        <div class="tab-pane active" id='NCV_XY'>
-            <div class="panel panel-default">
-                <div class="panel-body">
-                    <div id="FFY" style="min-width:400px; height:800px; ">
-                    </div>
-                    <div id="FFX" style="min-width:400px; height:800px; ">
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
-{% endblock %}
-
 {% block scripts %}
 <script>
     var XY_plot = document.getElementById('FFY')

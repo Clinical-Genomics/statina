@@ -16,6 +16,7 @@ from NIPTool.server.utils import *
 from NIPTool.server.constants import *
 from NIPTool.load.batch import load_result_file, load_concentrastions
 from NIPTool.exeptions import NIPToolError
+from NIPTool.parse.batch import parse_batch_file
 import json
 import io
 import logging
@@ -303,14 +304,24 @@ def update():
     return redirect(request.referrer)
 
 
-@server_bp.route("/load-config", methods=["POST"])
-def load_config():
+@server_bp.route("/load", methods=["POST"])
+def load():
     """Funcion to load data into the database with rest"""
 
-    file = request.files["load_config"]
-    data = io.BytesIO(file.read())
-    data = json.load(data)
-    load_result_file(current_app.adapter, data["result_file"], data["project_name"])
-    load_concentrastions(current_app.adapter, data["concentrations"])
+    files = request.files
 
-    return file.read(), 200
+    project_name = request.form["project_name"]
+    fluffy_result_file = files["result_file"]
+    fluffy_result_file = io.BytesIO(fluffy_result_file.read())
+    fluffy_results = parse_batch_file(fluffy_result_file)
+    load_result_file(current_app.adapter, fluffy_results, project_name)
+
+    concentrations = files["concentrations"]
+    concentrations = io.BytesIO(concentrations.read())
+    concentrations = json.load(concentrations)
+    load_concentrastions(current_app.adapter, concentrations)
+
+    multiqc_report = files["multiqc_report"]
+    segmental_calls = files["segmental_calls"]
+
+    return redirect(request.referrer)

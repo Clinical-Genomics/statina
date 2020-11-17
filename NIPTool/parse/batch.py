@@ -40,18 +40,12 @@ def validate(key: str, val: Optional) -> Optional:
     return formated_value
 
 
-def parse_batch_file(nipt_results_path: str) -> List[dict]:
+def parse_batch_file(file: str) -> List[dict]:
     """Parsing file content. Formating values. Ignoring values 
     that could not be formatted according to defined models"""
 
-    file = Path(nipt_results_path)
-
-    if not file.exists():
-        raise MissingResultsError("Results file missing.")
-
-    with open(file) as nipt_results_path:
-        df = pd.read_csv(file, na_filter=False)
-        results = df.to_dict(orient="records")
+    df = pd.read_csv(file, na_filter=False)
+    results = df.to_dict(orient="records")
 
     samples = []
     for sample in results:

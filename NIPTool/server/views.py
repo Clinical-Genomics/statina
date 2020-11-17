@@ -14,6 +14,14 @@ from flask_login import login_required
 from datetime import datetime
 from NIPTool.server.utils import *
 from NIPTool.server.constants import *
+from NIPTool.load.batch import load_result_file, load_concentrastions
+from NIPTool.exeptions import NIPToolError
+import json
+import io
+import logging
+
+LOG = logging.getLogger(__name__)
+
 
 app = current_app
 server_bp = Blueprint("server", __name__)
@@ -42,24 +50,35 @@ def statistics():
     """Statistics view."""
 
     nr_batches = 3
-    scatter_plots = ['Stdev_13', 'Stdev_18', 'Stdev_21']
-    box_plots = ['Chr13_Ratio', 'Chr18_Ratio', 'Chr21_Ratio','FF_Formatted', 
-                'DuplicationRate', 'MappedReads', 'GC_Dropout']
+    scatter_plots = ["Stdev_13", "Stdev_18", "Stdev_21"]
+    box_plots = [
+        "Chr13_Ratio",
+        "Chr18_Ratio",
+        "Chr21_Ratio",
+        "FF_Formatted",
+        "DuplicationRate",
+        "MappedReads",
+        "GC_Dropout",
+    ]
 
     batches = get_last_batches(adapter=app.adapter, nr=nr_batches)
-    batch_ids = [batch.get('_id') for batch in batches]
-    box_stat = get_statistics_for_box_plot(adapter=app.adapter, batches=batch_ids, fields=box_plots)
-    scatter_stat = get_statistics_for_scatter_plot(batches=batches, fields=scatter_plots)
-    return render_template("statistics.html",
-        ticks = list(range(1, nr_batches+1)),
-        nr_batches = nr_batches,
-        batch_ids = batch_ids,
-        box_stat = box_stat,
-        box_plots = box_plots,
-        scatter_stat = scatter_stat,
-        scatter_plots = scatter_plots
-        )
-
+    batch_ids = [batch.get("_id") for batch in batches]
+    box_stat = get_statistics_for_box_plot(
+        adapter=app.adapter, batches=batch_ids, fields=box_plots
+    )
+    scatter_stat = get_statistics_for_scatter_plot(
+        batches=batches, fields=scatter_plots
+    )
+    return render_template(
+        "statistics.html",
+        ticks=list(range(1, nr_batches + 1)),
+        nr_batches=nr_batches,
+        batch_ids=batch_ids,
+        box_stat=box_stat,
+        box_plots=box_plots,
+        scatter_stat=scatter_stat,
+        scatter_plots=scatter_plots,
+    )
 
 
 ### Batch Views
@@ -72,7 +91,7 @@ def batch(batch_id):
     samples = app.adapter.batch_samples(batch_id)
     return render_template(
         "batch/batch.html",
-        batch = app.adapter.batch(batch_id),
+        batch=app.adapter.batch(batch_id),
         sample_info=[get_sample_info(sample) for sample in samples],
         # warnings = ...,
         # sample_ids = ",".join(sample.get("_id") for sample in samples),
@@ -171,7 +190,7 @@ def coverage(batch_id):
         batch=batch,
         x_axis=list(range(1, 23)),
         scatter_data=scatter_data,
-        box_data = box_data,
+        box_data=box_data,
         page_id="batches_cov",
     )
 
@@ -282,3 +301,16 @@ def update():
                 )
 
     return redirect(request.referrer)
+
+
+@server_bp.route("/load-config", methods=["POST"])
+def load_config():
+    """Funcion to load data into the database with rest"""
+
+    file = request.files["load_config"]
+    data = io.BytesIO(file.read())
+    data = json.load(data)
+    load_result_file(current_app.adapter, data["result_file"], data["project_name"])
+    load_concentrastions(current_app.adapter, data["concentrations"])
+
+    return file.read(), 200

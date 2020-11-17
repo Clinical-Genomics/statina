@@ -3,10 +3,9 @@ import click
 from NIPTool.load.batch import load_result_file, load_concentrastions
 from flask.cli import with_appcontext, current_app
 from datetime import date, timedelta
-from NIPTool.exeptions import NIPToolError
+from NIPTool.exeptions import NIPToolError, MissingResultsError
 import json
 from pathlib import Path
-from NIPTool.exeptions import MissingResultsError
 
 
 LOG = logging.getLogger(__name__)

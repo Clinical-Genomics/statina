@@ -47,7 +47,7 @@ def _get_status(sample):
 
 def _get_ff_warning(fetal_fraction):
     """Get fetal fraction warning based on preset treshold"""
-    if fetal_fraction is "":
+    if fetal_fraction == "":
         return "default"
 
     try:

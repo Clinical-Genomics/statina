@@ -1,6 +1,6 @@
 import logging
 import click
-from NIPTool.load.batch import load_result_file, load_concentrastions
+from NIPTool.load.batch import load_result_file, load_concentrations
 from flask.cli import with_appcontext, current_app
 from datetime import date, timedelta
 from NIPTool.exeptions import NIPToolError, MissingResultsError
@@ -35,7 +35,7 @@ def batch(load_config: dict) -> None:
         load_result_file(
             current_app.adapter, config_data["result_file"], config_data["project_name"]
         )
-        load_concentrastions(current_app.adapter, config_data["concentrations"])
+        load_concentrations(current_app.adapter, config_data["concentrations"])
     except NIPToolError as e:
         LOG.error(e.message)
         raise click.Abort()

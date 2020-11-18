@@ -2,7 +2,6 @@
 import click
 
 # commands
-from NIPTool.commands.load.batch import batch as load_batch_cmd
 from NIPTool.commands.load.user import user as load_user_cmd
 
 # Get version
@@ -16,5 +15,4 @@ def load():
     pass
 
 
-load.add_command(load_batch_cmd)
 load.add_command(load_user_cmd)

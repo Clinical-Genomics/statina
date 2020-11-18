@@ -14,11 +14,9 @@ from flask_login import login_required
 from datetime import datetime
 from NIPTool.server.utils import *
 from NIPTool.server.constants import *
-from NIPTool.load.batch import load_result_file, load_concentrastions
-from NIPTool.exeptions import NIPToolError
 from NIPTool.parse.batch import parse_batch_file
-import json
-import io
+from NIPTool.load.batch import load_batch, load_samples, load_concentrations
+
 import logging
 
 LOG = logging.getLogger(__name__)
@@ -306,22 +304,14 @@ def update():
 
 @server_bp.route("/load", methods=["POST"])
 def load():
-    """Funcion to load data into the database with rest"""
+    """Function to load data into the database with rest"""
 
-    files = request.files
+    request_data = request.form
 
-    project_name = request.form["project_name"]
-    fluffy_result_file = files["result_file"]
-    fluffy_result_file = io.BytesIO(fluffy_result_file.read())
-    fluffy_results = parse_batch_file(fluffy_result_file)
-    load_result_file(current_app.adapter, fluffy_results, project_name)
+    batch_data = parse_batch_file(request_data['result_file'])
+    load_batch(current_app.adapter, batch_data[0], request_data)
+    load_samples(current_app.adapter, batch_data, request_data['project_name'])
+    load_concentrations(current_app.adapter, request_data["concentrations"])
 
-    concentrations = files["concentrations"]
-    concentrations = io.BytesIO(concentrations.read())
-    concentrations = json.load(concentrations)
-    load_concentrastions(current_app.adapter, concentrations)
-
-    multiqc_report = files["multiqc_report"]
-    segmental_calls = files["segmental_calls"]
 
     return redirect(request.referrer)

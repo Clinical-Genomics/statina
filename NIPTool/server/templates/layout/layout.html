@@ -50,7 +50,9 @@
 
 <body>
 <div id="wrapper">
-  {% block body %}{% endblock %}
+  {% include 'layout/navigation.html' %}
+  {% block body %}
+  {% endblock %}
 </div>  <!--wrapper-->
 
 

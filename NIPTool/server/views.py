@@ -38,34 +38,7 @@ def batches():
     return render_template("batches.html", batches=all_batches)
 
 
-@server_bp.route("/statistics")
-@login_required
-def statistics():
-    """Statistics view."""
-
-    nr_batches = 3
-    scatter_plots = ['Stdev_13', 'Stdev_18', 'Stdev_21']
-    box_plots = ['Chr13_Ratio', 'Chr18_Ratio', 'Chr21_Ratio','FF_Formatted', 
-                'DuplicationRate', 'MappedReads', 'GC_Dropout']
-
-    batches = get_last_batches(adapter=app.adapter, nr=nr_batches)
-    batch_ids = [batch.get('_id') for batch in batches]
-    box_stat = get_statistics_for_box_plot(adapter=app.adapter, batches=batch_ids, fields=box_plots)
-    scatter_stat = get_statistics_for_scatter_plot(batches=batches, fields=scatter_plots)
-    return render_template("statistics.html",
-        ticks = list(range(1, nr_batches+1)),
-        nr_batches = nr_batches,
-        batch_ids = batch_ids,
-        box_stat = box_stat,
-        box_plots = box_plots,
-        scatter_stat = scatter_stat,
-        scatter_plots = scatter_plots
-        )
-
-
-
-### Batch Views
-
+### Batch tabs
 
 @server_bp.route("/batches/<batch_id>/")
 @login_required
@@ -73,11 +46,9 @@ def batch(batch_id):
     """Batch view with table of all samples in the batch."""
     samples = app.adapter.batch_samples(batch_id)
     return render_template(
-        "batch/batch.html",
-        batch = app.adapter.batch(batch_id),
+        "batch/tabs/table.html",
+        batch=app.adapter.batch(batch_id),
         sample_info=[get_sample_info(sample) for sample in samples],
-        # warnings = ...,
-        # sample_ids = ",".join(sample.get("_id") for sample in samples),
         page_id="batches",
     )
 
@@ -87,10 +58,10 @@ def batch(batch_id):
 def NCV13(batch_id):
     """Batch view with with NCV-13 plot"""
     return render_template(
-        "batch/NCV.html",
+        "batch/tabs/NCV.html",
         batch=app.adapter.batch(batch_id),
-        chrom="13",
-        cases=get_tris_cases(app.adapter, "13", batch_id),
+        chr="13",
+        ncv_chrom_data={"13": get_tris_cases(app.adapter, "13", batch_id)},
         normal_data=get_tris_control_normal(app.adapter, "13"),
         abnormal_data=get_tris_control_abnormal(app.adapter, "13", 0),
         page_id="batches_NCV13",
@@ -102,10 +73,10 @@ def NCV13(batch_id):
 def NCV18(batch_id):
     """Batch view with with NCV-18 plot"""
     return render_template(
-        "batch/NCV.html",
+        "batch/tabs/NCV.html",
         batch=app.adapter.batch(batch_id),
-        chrom="18",
-        cases=get_tris_cases(app.adapter, "18", batch_id),
+        chr="18",
+        ncv_chrom_data={"18": get_tris_cases(app.adapter, "18", batch_id)},
         normal_data=get_tris_control_normal(app.adapter, "18"),
         abnormal_data=get_tris_control_abnormal(app.adapter, "18", 0),
         page_id="batches_NCV18",
@@ -117,10 +88,10 @@ def NCV18(batch_id):
 def NCV21(batch_id):
     """Batch view with NCV-21 plot"""
     return render_template(
-        "batch/NCV.html",
+        "batch/tabs/NCV.html",
         batch=app.adapter.batch(batch_id),
-        chrom="21",
-        cases=get_tris_cases(app.adapter, "21", batch_id),
+        chr="21",
+        ncv_chrom_data={"21": get_tris_cases(app.adapter, "21", batch_id)},
         normal_data=get_tris_control_normal(app.adapter, "21"),
         abnormal_data=get_tris_control_abnormal(app.adapter, "21", 0),
         page_id="batches_NCV21",
@@ -135,7 +106,7 @@ def fetal_fraction_XY(batch_id):
     control = get_ff_control_normal(app.adapter)
     abnormal = get_ff_control_abnormal(app.adapter)
     return render_template(
-        "batch/fetal_fraction_XY.html",
+        "batch/tabs/FF_XY.html",
         control=control,
         abnormal=abnormal,
         cases=get_ff_cases(app.adapter, batch_id),
@@ -152,7 +123,7 @@ def fetal_fraction(batch_id):
     """Batch view with fetal fraction plot"""
     batch = app.adapter.batch(batch_id)
     return render_template(
-        "batch/fetal_fraction.html",
+        "batch/tabs/FF.html",
         control=get_ff_control_normal(app.adapter),
         cases=get_ff_cases(app.adapter, batch_id),
         batch=batch,
@@ -169,20 +140,52 @@ def coverage(batch_id):
     scatter_data = get_scatter_data_for_coverage_plot(samples)
     box_data = get_box_data_for_coverage_plot(samples)
     return render_template(
-        "batch/coverage.html",
+        "batch/tabs/coverage.html",
         batch=batch,
         x_axis=list(range(1, 23)),
         scatter_data=scatter_data,
-        box_data = box_data,
+        box_data=box_data,
         page_id="batches_cov",
     )
 
+
+# Report
 
 @server_bp.route("/batches/<batch_id>/report/<coverage>")
 @login_required
 def report(batch_id, coverage):
     """Report view, collecting all tables and plots from one batch."""
-    return render_template("batch/report.html", batch_id=batch_id)
+
+    batch = app.adapter.batch(batch_id)
+    samples = list(app.adapter.batch_samples(batch_id))
+    scatter_data = get_scatter_data_for_coverage_plot(samples)
+    box_data = get_box_data_for_coverage_plot(samples)
+    control = get_ff_control_normal(app.adapter)
+    return render_template(
+        "batch/report.html",
+        batch=batch,
+        # NCV
+        ncv_chrom_data={
+            "13": get_tris_cases(app.adapter, "13", batch_id),
+            "18": get_tris_cases(app.adapter, "18", batch_id),
+            "21": get_tris_cases(app.adapter, "21", batch_id),
+        },
+        normal_data=get_tris_control_normal(app.adapter, "21"),
+        abnormal_data=get_tris_control_abnormal(app.adapter, "21", 0),
+        # FF
+        control=control,
+        cases=get_ff_cases(app.adapter, batch_id),
+        abnormal=get_ff_control_abnormal(app.adapter),
+        max_x=max(control["FFX"]) + 1,
+        min_x=min(control["FFX"]) - 1,
+        # table
+        sample_info=[get_sample_info(sample) for sample in samples],
+        # coverage
+        x_axis=list(range(1, 23)),
+        scatter_data=scatter_data,
+        box_data=box_data,
+        page_id="batches",
+    )
 
 
 ### Sample Views
@@ -240,6 +243,46 @@ def download(batch_id, file_id):
 
     return send_from_directory(str(file.parent), file.name, as_attachment=True)
 
+
+
+# Statistics
+
+
+@server_bp.route("/statistics")
+@login_required
+def statistics():
+    """Statistics view."""
+
+    nr_batches = 3
+    scatter_plots = ["Stdev_13", "Stdev_18", "Stdev_21"]
+    box_plots = [
+        "Chr13_Ratio",
+        "Chr18_Ratio",
+        "Chr21_Ratio",
+        "FF_Formatted",
+        "DuplicationRate",
+        "MappedReads",
+        "GC_Dropout",
+    ]
+
+    batches = get_last_batches(adapter=app.adapter, nr=nr_batches)
+    batch_ids = [batch.get("_id") for batch in batches]
+    box_stat = get_statistics_for_box_plot(
+        adapter=app.adapter, batches=batch_ids, fields=box_plots
+    )
+    scatter_stat = get_statistics_for_scatter_plot(
+        batches=batches, fields=scatter_plots
+    )
+    return render_template(
+        "statistics.html",
+        ticks=list(range(1, nr_batches + 1)),
+        nr_batches=nr_batches,
+        batch_ids=batch_ids,
+        box_stat=box_stat,
+        box_plots=box_plots,
+        scatter_stat=scatter_stat,
+        scatter_plots=scatter_plots,
+    )
 
 
 ### Udate

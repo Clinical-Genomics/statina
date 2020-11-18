@@ -233,7 +233,7 @@ import tempfile
 @server_bp.route("/download/<batch_id>/<file_id>")
 @login_required
 def download(batch_id, file_id):
-    """Sample view with sample information."""
+    """View for downloads"""
     batch = app.adapter.batch(batch_id)
     file = Path(batch[file_id])
     if not file.exists():

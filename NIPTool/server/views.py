@@ -238,7 +238,6 @@ def download(batch_id, file_id):
     file = Path(batch[file_id])
     if not file.exists():
         # warn
-        print(batch[file_id])
         return redirect(request.referrer)
 
     return send_from_directory(str(file.parent), file.name, as_attachment=True)

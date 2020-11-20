@@ -15,6 +15,7 @@ from NIPTool.models.validation import (
 LOG = logging.getLogger(__name__)
 
 
+
 def form(val: Optional, function) -> Optional:
     """Returning formatted value or None"""
 

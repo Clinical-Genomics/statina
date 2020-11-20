@@ -8,7 +8,6 @@ from flask import (
     Blueprint,
     current_app,
     session,
-    flash,
 )
 from flask_login import login_required
 from datetime import datetime
@@ -16,6 +15,10 @@ from NIPTool.server.utils import *
 from NIPTool.server.constants import *
 from NIPTool.parse.batch import parse_batch_file
 from NIPTool.load.batch import load_batch, load_samples, load_concentrations
+from NIPTool.load.user import load_user
+from NIPTool.exeptions import NIPToolError
+from NIPTool.models.validation import user_load_schema, batch_load_schema
+from cerberus import Validator
 
 import logging
 
@@ -340,11 +343,28 @@ def load():
     """Function to load data into the database with rest"""
 
     request_data = request.form
+    v = Validator(batch_load_schema)
+    if not v.validate(request_data):
+        raise NIPToolError('hej')
 
     batch_data = parse_batch_file(request_data['result_file'])
     load_batch(current_app.adapter, batch_data[0], request_data)
+
     load_samples(current_app.adapter, batch_data, request_data['project_name'])
     load_concentrations(current_app.adapter, request_data["concentrations"])
 
+    return redirect(request.referrer)
+
+#from google.auth import jwt
+
+@server_bp.route("/user", methods=["POST"])
+def user():
+    """Function to load user into the database with rest"""
+    #autentication_header=request.headers['Autentication']
+
+   # claims = jwt.decode(encoded, certs=public_certs)
+
+    request_data = request.form
+    load_user(current_app.adapter, request_data["email"], request_data["name"], request_data["role"])
 
     return redirect(request.referrer)

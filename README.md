@@ -36,7 +36,7 @@ NIPTool can be runned also as a container. The image is available [on Docker Hub
 
 To build a new image from the Dockerfile use the commands: `docker build -t niptool .`
 
-To run the image use the following command: docker run --name niptool niptool
+To run the image use the following command: `docker run --name niptool niptool`
 
 To remove the container, type: `docker rm niptool`
 

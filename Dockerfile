@@ -4,10 +4,6 @@ LABEL base_image="python:3.8-slim"
 LABEL about.home="https://github.com/Clinical-Genomics/NIPTool"
 LABEL about.tags="NIPT,statistics,Non Invasive Prenatal Test,python"
 
-# Install required libs
-#UN apk update
-#RUN apk --no-cache add make automake gcc g++
-
 WORKDIR /home/worker/app
 COPY . /home/worker/app
 

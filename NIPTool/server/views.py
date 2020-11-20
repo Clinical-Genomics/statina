@@ -360,6 +360,10 @@ def user():
     """Function to load user into the database with rest"""
 
     request_data = request.form
+    v = Validator(user_load_schema)
+    if not v.validate(request_data):
+        return "Incomplete batch load request", 400
+
     load_user(current_app.adapter, request_data["email"], request_data["name"], request_data["role"])
 
     return redirect(request.referrer)

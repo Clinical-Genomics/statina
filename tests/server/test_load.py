@@ -12,6 +12,15 @@ def test_user(mock_app):
     # The user should be added to the database
     assert mock_app.adapter.user_collection.estimated_document_count() == 1
 
+def test_user_empty_data(mock_app):
+    # GIVEN no data
+
+    # WHEN running the user request with empty data
+    response = mock_app.test_client().post('/user', data=dict())
+
+    # THEN assert BadRequestKeyError: 400 Bad Request
+    assert response.status_code == 400
+
 
 def test_batch_valid_files(mock_app, valid_concentrations, valid_csv, segmental_calls, multiqc_report):
     # GIVEN the following request data:

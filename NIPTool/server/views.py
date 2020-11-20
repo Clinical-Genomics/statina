@@ -345,24 +345,19 @@ def load():
     request_data = request.form
     v = Validator(batch_load_schema)
     if not v.validate(request_data):
-        raise NIPToolError('hej')
+        return "Incomplete batch load request", 400
 
     batch_data = parse_batch_file(request_data['result_file'])
     load_batch(current_app.adapter, batch_data[0], request_data)
-
     load_samples(current_app.adapter, batch_data, request_data['project_name'])
     load_concentrations(current_app.adapter, request_data["concentrations"])
 
     return redirect(request.referrer)
 
-#from google.auth import jwt
 
 @server_bp.route("/user", methods=["POST"])
 def user():
     """Function to load user into the database with rest"""
-    #autentication_header=request.headers['Autentication']
-
-   # claims = jwt.decode(encoded, certs=public_certs)
 
     request_data = request.form
     load_user(current_app.adapter, request_data["email"], request_data["name"], request_data["role"])

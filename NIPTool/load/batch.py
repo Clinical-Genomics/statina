@@ -24,11 +24,7 @@ def load_batch(adapter, batch_data: dict, request_data: dict) -> None:
     Raises:
         MissingResultsError: when parsing file that is empty"""
 
-    mongo_batch = build_batch(batch_data)
-    mongo_batch["_id"] = request_data['project_name']
-    mongo_batch["multiqc_report"] = request_data['multiqc_report']
-    mongo_batch["segmental_calls"] = request_data['segmental_calls']
-    mongo_batch["fluffy_result_file"] = request_data['result_file']
+    mongo_batch = build_batch(batch_data, request_data)
     adapter.add_or_update_document(mongo_batch, adapter.batch_collection)
 
 

@@ -4,7 +4,7 @@ from mongomock import MongoClient
 from .small_helpers import SmallHelpers
 from NIPTool.server import create_app, configure_app
 from NIPTool.adapter.plugin import NiptAdapter
-from NIPTool.server.views import server_bp
+from NIPTool.server.load import load_bp
 
 
 DATABASE = "testdb"
@@ -23,7 +23,7 @@ def mock_app(database):
     app = create_app(test=True)
     app.db = database
     app.adapter = NiptAdapter(database.client, db_name=database.name)
-    app.register_blueprint(server_bp)
+    app.register_blueprint(load_bp)
     return app
 
 

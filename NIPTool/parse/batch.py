@@ -1,5 +1,5 @@
 import logging
-import pandas as pd
+import pandas
 from pathlib import Path
 
 from typing import Optional, List
@@ -50,8 +50,8 @@ def parse_batch_file(nipt_results_path: str) -> List[dict]:
     if not file.exists():
         raise MissingResultsError("Results file missing.")
 
-    df = pd.read_csv(file, na_filter=False)
-    results = df.to_dict(orient="records")
+    data_frame = pandas.read_csv(file, na_filter=False)
+    results = data_frame.to_dict(orient="records")
 
     samples = []
     for sample in results:

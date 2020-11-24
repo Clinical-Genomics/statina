@@ -56,7 +56,7 @@ def load_concentrations(adapter, concentrations_file: str) -> None:
         mongo_sample = adapter.sample(sample)
         if not mongo_sample:
             LOG.warning(
-                f"Trying to add concentration to sample {sample} but it doesnt exist in the databse."
+                f"Trying to add concentration to sample {sample} but it doesnt exist in the database."
             )
             return
         mongo_sample["concentration"] = concentration

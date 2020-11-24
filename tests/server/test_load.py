@@ -33,7 +33,7 @@ def test_batch_valid_files(mock_app, valid_concentrations, valid_csv, segmental_
                 concentrations=valid_concentrations, project_name=project_name)
 
     # WHEN running the request with the data
-    mock_app.test_client().post('/load', data=data)
+    mock_app.test_client().post('/batch', data=data)
 
     # THEN assert the samples should be added to the sample collection
     # and the batch should be added to the batch collection
@@ -45,7 +45,7 @@ def test_batch_no_data(mock_app):
     # GIVEN no data
 
     # WHEN running the request with empty data
-    response = mock_app.test_client().post('/load', data=dict())
+    response = mock_app.test_client().post('/batch', data=dict())
 
     # THEN assert nothing added to sample or batch collections
     assert mock_app.adapter.sample_collection.estimated_document_count() == 0
@@ -64,7 +64,7 @@ def test_batch_missing_files(mock_app, valid_concentrations, valid_csv):
     data = dict(result_file=valid_csv, concentrations=valid_concentrations, project_name="project_name")
 
     # WHEN running the request with the data
-    mock_app.test_client().post('/load', data=data)
+    mock_app.test_client().post('/batch', data=data)
 
     # THEN assert the samples are being added
     assert mock_app.adapter.sample_collection.estimated_document_count() == 3
@@ -84,7 +84,7 @@ def test_batch_invalid_file(mock_app, valid_concentrations, invalid_csv, segment
                 concentrations=valid_concentrations, project_name=project_name)
 
     # WHEN running the3 request with the data
-    mock_app.test_client().post('/load', data=data)
+    mock_app.test_client().post('/batch', data=data)
 
     # THEN assert nothing added to sample the collection
     assert mock_app.adapter.sample_collection.estimated_document_count() == 0

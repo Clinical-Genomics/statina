@@ -1,5 +1,4 @@
-import pytest
-from NIPTool.exeptions import NIPToolError, FileValidationError
+import json
 
 
 def test_user(mock_app):
@@ -7,10 +6,13 @@ def test_user(mock_app):
     data = dict(email='maya.papaya@something.se', name="Maya Papaya", role="RW")
 
     # WHEN running the user request with the data
-    mock_app.test_client().post('/user', data=data)
+    response = mock_app.test_client().post('/user', data=data)
 
     # The user should be added to the database
     assert mock_app.adapter.user_collection.estimated_document_count() == 1
+    resp_data = json.loads(response.data)
+    assert resp_data["message"] == "Data loaded into database"
+    assert response.status_code == 200
 
 def test_user_empty_data(mock_app):
     # GIVEN no data
@@ -33,12 +35,15 @@ def test_batch_valid_files(mock_app, valid_concentrations, valid_csv, segmental_
                 concentrations=valid_concentrations, project_name=project_name)
 
     # WHEN running the request with the data
-    mock_app.test_client().post('/batch', data=data)
+    response = mock_app.test_client().post('/batch', data=data)
 
     # THEN assert the samples should be added to the sample collection
     # and the batch should be added to the batch collection
     assert mock_app.adapter.sample_collection.estimated_document_count() == 3
     assert mock_app.adapter.batch_collection.estimated_document_count() == 1
+    resp_data = json.loads(response.data)
+    assert resp_data["message"] == "Data loaded into database"
+    assert response.status_code == 200
 
 
 def test_batch_no_data(mock_app):
@@ -64,13 +69,16 @@ def test_batch_missing_files(mock_app, valid_concentrations, valid_csv):
     data = dict(result_file=valid_csv, concentrations=valid_concentrations, project_name="project_name")
 
     # WHEN running the request with the data
-    mock_app.test_client().post('/batch', data=data)
+    response = mock_app.test_client().post('/batch', data=data)
 
     # THEN assert the samples are being added
     assert mock_app.adapter.sample_collection.estimated_document_count() == 3
 
     # THEN assert batch is being added without error
     assert mock_app.adapter.batch_collection.estimated_document_count() == 1
+    resp_data = json.loads(response.data)
+    assert resp_data["message"] == "Data loaded into database"
+    assert response.status_code == 200
 
 
 def test_batch_invalid_file(mock_app, valid_concentrations, invalid_csv, segmental_calls, multiqc_report):
@@ -84,7 +92,7 @@ def test_batch_invalid_file(mock_app, valid_concentrations, invalid_csv, segment
                 concentrations=valid_concentrations, project_name=project_name)
 
     # WHEN running the3 request with the data
-    mock_app.test_client().post('/batch', data=data)
+    response = mock_app.test_client().post('/batch', data=data)
 
     # THEN assert nothing added to sample the collection
     assert mock_app.adapter.sample_collection.estimated_document_count() == 0
@@ -93,3 +101,8 @@ def test_batch_invalid_file(mock_app, valid_concentrations, invalid_csv, segment
     keys = ['_id', 'multiqc_report', 'segmental_calls', 'fluffy_result_file', 'added']
     assert mock_app.adapter.batch_collection.estimated_document_count() == 1
     assert set(mock_app.adapter.batch(project_name).keys()) == set(keys)
+    resp_data = json.loads(response.data)
+    assert resp_data["message"] == "Data loaded into database"
+    assert response.status_code == 200
+
+

@@ -20,18 +20,14 @@ def check_requiered_fields(document):
 
 
 def load_batch(adapter, batch_data: dict, request_data: dict) -> None:
-    """Function to load data from fluffy result file. 
-    Raises:
-        MissingResultsError: when parsing file that is empty"""
+    """Function to load data from fluffy result file."""
 
     mongo_batch = build_batch(batch_data, request_data)
     adapter.add_or_update_document(mongo_batch, adapter.batch_collection)
 
 
 def load_samples(adapter, batch_data: list, project_name: str) -> None:
-    """Function to load data from fluffy result file.
-    Raises:
-        MissingResultsError: when parsing file that is empty"""
+    """Function to load data from fluffy result file."""
 
     for sample in batch_data:
         if not check_requiered_fields(sample):

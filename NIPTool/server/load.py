@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 from flask import (
-jsonify,
+    jsonify,
     request,
     Blueprint,
     current_app)
@@ -15,7 +15,6 @@ from cerberus import Validator
 import logging
 
 LOG = logging.getLogger(__name__)
-
 
 app = current_app
 load_bp = Blueprint("load", __name__)
@@ -42,6 +41,7 @@ def batch():
     resp = jsonify({"message": message})
     resp.status_code = 200
     return resp
+
 
 @load_bp.route("/user", methods=["POST"])
 def user():

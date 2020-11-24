@@ -16,6 +16,12 @@ from datetime import datetime
 from NIPTool.server.utils import *
 from NIPTool.server.constants import *
 
+
+import logging
+
+LOG = logging.getLogger(__name__)
+
+
 app = current_app
 server_bp = Blueprint("server", __name__)
 
@@ -35,6 +41,7 @@ def batches():
     """List of all batches"""
     all_batches = list(app.adapter.batches())
     return render_template("batches.html", batches=all_batches)
+
 
 
 ### Batch tabs
@@ -219,7 +226,6 @@ def download(batch_id, file_id):
 
 # Statistics
 
-
 @server_bp.route("/statistics")
 @login_required
 def statistics():
@@ -264,6 +270,7 @@ def statistics():
 @login_required
 def update():
     """Update the database"""
+
     time_stamp = datetime.now().strftime("%Y/%m/%d %H:%M:%S")
     user = app.user
     if user.role != "RW":
@@ -315,3 +322,4 @@ def update():
                 )
 
     return redirect(request.referrer)
+

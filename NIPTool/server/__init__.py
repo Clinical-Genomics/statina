@@ -21,7 +21,6 @@ def create_app(test=False):
 
     try:
         app.config.from_envvar('NIPT_CONFIG')
-        LOG.error(app.config)
         configure_app(app)
     except:
         pass

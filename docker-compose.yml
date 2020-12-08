@@ -9,6 +9,7 @@ services:
     volumes:
       - ./NIPT_RESULTS:/var/NIPT_RESULTS
     environment:
+      MONGODB_HOST: 'mongo'
       NIPT_CONFIG: '/home/worker/app/config.py'
     networks:
       - niptool-net

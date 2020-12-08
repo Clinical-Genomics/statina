@@ -19,13 +19,12 @@ def create_app(test=False):
     if test:
         return app
 
-    #try:
-    LOG.error('hej')
-    app.config.from_envvar('NIPT_CONFIG')
-    LOG.error(app.config)
-    configure_app(app)
-    #except:
-    #    pass
+    try:
+        app.config.from_envvar('NIPT_CONFIG')
+        LOG.error(app.config)
+        configure_app(app)
+    except:
+        pass
 
     return app
 

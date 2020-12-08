@@ -8,27 +8,42 @@ services:
     build:
       context: NIPTool
       dockerfile: Dockerfile
+    volumes:
+      - /home/worker/app/NIPTool/NIPT_RESULTS:/var/NIPT_RESULTS
     environment:
-      - DB_URI='mongodb://localhost:27017'
-      - DB_NAME='nipt-stage'
-      - DEBUG=0
-      - SECRET_KEY='hej'
-      - GOOGLE_CLIENT_ID='527111695356-mnoqdc2e68nf19tq7o8vdibnb8lj3ge4.apps.googleusercontent.com'
-      - GOOGLE_CLIENT_SECRET='A7rEjzAjO57VYmB1EIaoO71N'
+      NIPT_CONFIG: '/home/worker/app/NIPTool/config.py'
     networks:
       - niptool-net
+    depends_on:
+      - mongo
     expose:
       - '5000'
     ports:
       - '5000:5000'
     command: nipt run --host 0.0.0.0
 
+  mongo:
+    networks:
+      - niptool-net
+    image: mongo
+    ports:
+      - '27017:27017'
+    expose:
+      - '27017'
+
+  restore:
+    networks:
+      - niptool-net
+    image: mongo
+    volumes:
+      - ./dump:/var/dump
+    links:
+      - mongo:mongo
+    command: mongorestore --host mongo:27017 /var/dump/
 
 networks:
   niptool-net:
     driver: bridge
     ipam:
       driver: default
-      config:
-        - subnet: 172.21.0.0/24
 

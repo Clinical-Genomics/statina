@@ -3,7 +3,6 @@ import os
 
 # mongo
 DB_HOST = (os.getenv("MONGODB_HOST") or "localhost")
-print(DB_HOST)
 DB_URI = f"mongodb://{DB_HOST}:27017"
 DB_NAME = 'nipt-stage'
 DEBUG = 0

@@ -1,0 +1,49 @@
+version: '3'
+# usage:
+# (sudo) docker-compose up
+# (sudo) docker-compose down
+services:
+  nipttool-web:
+    container_name: niptool-web
+    image: niptool
+    volumes:
+      - ./NIPT_RESULTS:/var/NIPT_RESULTS
+    environment:
+      NIPT_CONFIG: '/home/worker/app/config.py'
+    networks:
+      - niptool-net
+    expose:
+      - '5000'
+    depends_on:
+      - mongo
+    ports:
+      - '5000:5000'
+    command: nipt run --host 0.0.0.0
+
+  mongo:
+    container_name: mongo
+    image: mongo
+    networks:
+      - niptool-net
+    ports:
+      - '27017:27017'
+    expose:
+      - '27017'
+
+  restore:
+    image: mongo
+    volumes:
+      - ./dump:/var/dump
+    links:
+      - mongo:mongo
+    networks:
+      - niptool-net
+    command: mongorestore --host mongo:27017 /var/dump/
+
+
+networks:
+  niptool-net:
+    driver: bridge
+    ipam:
+      driver: default
+

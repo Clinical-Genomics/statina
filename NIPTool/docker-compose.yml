@@ -1,0 +1,34 @@
+version: '3'
+# usage:
+# (sudo) docker-compose up
+# (sudo) docker-compose down
+services:
+  nipttool-web:
+    container_name: niptool-web
+    build:
+      context: NIPTool
+      dockerfile: Dockerfile
+    environment:
+      - DB_URI='mongodb://localhost:27017'
+      - DB_NAME='nipt-stage'
+      - DEBUG=0
+      - SECRET_KEY='hej'
+      - GOOGLE_CLIENT_ID='527111695356-mnoqdc2e68nf19tq7o8vdibnb8lj3ge4.apps.googleusercontent.com'
+      - GOOGLE_CLIENT_SECRET='A7rEjzAjO57VYmB1EIaoO71N'
+    networks:
+      - niptool-net
+    expose:
+      - '5000'
+    ports:
+      - '5000:5000'
+    command: nipt run --host 0.0.0.0
+
+
+networks:
+  niptool-net:
+    driver: bridge
+    ipam:
+      driver: default
+      config:
+        - subnet: 172.21.0.0/24
+

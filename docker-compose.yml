@@ -7,10 +7,10 @@ services:
     container_name: niptool-web
     image: niptool
     volumes:
-      - ./NIPT_RESULTS:/var/NIPT_RESULTS
+      - ./demo/NIPT_RESULTS:/var/NIPT_RESULTS
     environment:
       MONGODB_HOST: 'mongo'
-      NIPT_CONFIG: '/home/worker/app/config.py'
+      NIPT_CONFIG: '/home/worker/app/demo/config.py'
     networks:
       - niptool-net
     expose:
@@ -34,12 +34,12 @@ services:
   restore:
     image: mongo
     volumes:
-      - ./dump:/var/dump
+      - ./demo/db_dump:/var/db_dump
     links:
       - mongo:mongo
     networks:
       - niptool-net
-    command: mongorestore --host mongo:27017 /var/dump/
+    command: mongorestore --host mongo:27017 /var/db_dump
 
 
 networks:

@@ -2,8 +2,9 @@
 {% block content %}
 <nav class="navbar navbar-default navbar-static-top" role="navigation" style="margin-bottom: 0">
     <div class="navbar-header">
-        <a class="navbar-brand" href="{{ url_for('server.batches')}}" >Back to NIPT Batches</a>
+        <a class="navbar-brand" href="{{ url_for('server.batches')}}" >NIPT Batches</a>
     </div>
+    {% if page_id!="index" %}
     <ul class="nav navbar-top-links navbar-right">
         <li class="dropdown">
             <a class="navbar-brand" data-toggle="dropdown">
@@ -19,6 +20,7 @@
             </ul>
         </li>
     </ul>
+    {% endif %}
     <div class="navbar-right">
         <a class="navbar-brand">{{current_user.name}}</a>
     </div>

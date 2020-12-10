@@ -30,9 +30,9 @@ server_bp = Blueprint("server", __name__)
 def index():
     """Log in view."""
     user = session.get("user")
-    if user:
+    if user or app.config.get("LOGIN_DISABLED"):
         return redirect(url_for("server.batches"))
-    return render_template("index.html", user=user)
+    return render_template("index.html", user=user, page_id="index")
 
 
 @server_bp.route("/batches")
@@ -40,7 +40,7 @@ def index():
 def batches():
     """List of all batches"""
     all_batches = list(app.adapter.batches())
-    return render_template("batches.html", batches=all_batches)
+    return render_template("batches.html", batches=all_batches, page_id="all_batches")
 
 
 
@@ -183,6 +183,7 @@ def sample(sample_id):
         sample=sample,
         status_classes=STATUS_CLASSES,
         batch=batch,
+        page_id="sample"
     )
 
 
@@ -260,6 +261,7 @@ def statistics():
         box_plots=box_plots,
         scatter_stat=scatter_stat,
         scatter_plots=scatter_plots,
+        page_id="statistics"
     )
 
 

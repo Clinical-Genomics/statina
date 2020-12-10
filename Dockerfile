@@ -16,6 +16,4 @@ RUN pip install -e .
 # Create and switch to a new non-root user
 RUN useradd worker
 RUN chown worker:worker -R /home/worker
-
-RUN apt-get update && apt-get install -y curl
 USER worker

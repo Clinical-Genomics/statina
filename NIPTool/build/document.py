@@ -1,5 +1,4 @@
 from NIPTool.models.constants import SAMPLE_KEYS, BATCH_KEYS
-from typing import Optional
 
 
 def build_document(csv_data: dict, document_keys: list) -> dict:

@@ -15,11 +15,11 @@ def build_document(csv_data: dict, document_keys: list) -> dict:
 
 
 
-def build_sample(sample_data: dict, segmental_calls: Optional[str], sample_id: str) -> dict:
+def build_sample(sample_data: dict, segmental_calls: Optional[str]) -> dict:
     """Builds a document for the sample collection"""
 
     sample = build_document(sample_data, SAMPLE_KEYS)
-    sample["_id"] = sample_id
+    sample["_id"] = sample_data.get("SampleID")
     if segmental_calls:
         sample["segmental_calls"] = segmental_calls
 

@@ -1,4 +1,4 @@
-requiered_fields = ["SampleID"]
+requiered_fields = ["SampleID", "SampleProject"]
 
 strings = [
     "SampleID",

@@ -11,6 +11,7 @@ from NIPTool.load.batch import load_batch, load_samples
 from NIPTool.load.user import load_user
 from NIPTool.models.validation import user_load_schema, batch_load_schema
 from cerberus import Validator
+from NIPTool.exeptions import NIPToolError
 
 
 import logging
@@ -37,8 +38,13 @@ def batch():
 
     batch_data = parse_batch_file(request_data['result_file'])
 
-    load_batch(current_app.adapter, batch_data[0], request_data)
-    load_samples(current_app.adapter, batch_data, request_data)
+    try:
+        load_batch(current_app.adapter, batch_data[0], request_data)
+        load_samples(current_app.adapter, batch_data, request_data)
+    except NIPToolError as e:
+        resp = jsonify({"message": e.message})
+        resp.status_code = 422
+        return resp
 
     message = "Data loaded into database"
     resp = jsonify({"message": message})

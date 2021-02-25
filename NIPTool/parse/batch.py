@@ -14,6 +14,26 @@ from NIPTool.models.validation import (
 
 LOG = logging.getLogger(__name__)
 
+def pars_segmental_calls(segmental_calls_path: Optional[str]) -> dict:
+    """Builds a dict with segmental calls bed files.
+        key: sample ids
+        value: bed file path"""
+
+    segmental_calls = {}
+    if not validate_file_path(segmental_calls_path):
+        return segmental_calls
+
+    segmental_calls_dir = Path(segmental_calls_path)
+    if not segmental_calls_dir.exists():
+        LOG.info('Segmental Calls file path missing.')
+        return segmental_calls
+
+    for file in segmental_calls_dir.iterdir():
+        if file.suffix == '.bed':
+            sample_id = file.name.split('.')[0]
+            segmental_calls[sample_id] = str(file.absolute())
+
+    return segmental_calls
 
 def validate_file_path(file_path: Optional[str])-> bool:
     """File path validation"""

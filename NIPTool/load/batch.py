@@ -36,6 +36,6 @@ def load_samples(adapter, batch_data: list, request_data: dict) -> None:
             raise InvalidFileError(message="Could not load data from result file. Required fields missing.")
         sample_id = sample["SampleID"]
         segmental_calls_path = segmental_calls.get(sample_id)
-        mongo_sample = build_sample(sample_data=sample, segmental_calls=segmental_calls_path, sample_id=sample_id)
+        mongo_sample = build_sample(sample_data=sample, segmental_calls=segmental_calls_path)
 
         adapter.add_or_update_document(mongo_sample, adapter.sample_collection)

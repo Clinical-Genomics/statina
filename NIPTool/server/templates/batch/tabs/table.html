@@ -62,7 +62,7 @@
                                             <td width="4%" class = "{{sample.FFX.warn}}">{{sample.FFX.value}}</td>
                                             <td width="4%" class = "{{sample.FFY.warn}}">{{sample.FFY.value}}</td>
                                             <td width="4%" class = "{{sample.CNVSegment.warn}}">{{sample.CNVSegment.value}}</td>
-                                            <td><a class="dropdown-item" href="{{ url_for('server.download', file_id='segmental_calls', batch_id=batch._id) }}">segmental calls</a></td>
+                                            <td><a class="dropdown-item" href="{{ url_for('server.sample_download', file_id='segmental_calls', sample_id=sample.sample_id) }}">segmental calls</a></td>
                                             <td><p> <small></small></p></td>
                                             <td><p> <small>{{ sample.Status }}</small></p></td>
                                             {% if current_user.role=='RW' %}

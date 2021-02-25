@@ -9,18 +9,16 @@ from flask import (
     Blueprint,
     current_app,
     session)
-from pathlib import Path
 
 from flask_login import login_required
 from datetime import datetime
 from NIPTool.server.utils import *
 from NIPTool.server.constants import *
-
-
+from NIPTool.parse.batch import validate_file_path
+from pathlib import Path
 import logging
 
 LOG = logging.getLogger(__name__)
-
 
 app = current_app
 server_bp = Blueprint("server", __name__)
@@ -41,7 +39,6 @@ def batches():
     """List of all batches"""
     all_batches = list(app.adapter.batches())
     return render_template("batches.html", batches=all_batches, page_id="all_batches")
-
 
 
 ### Batch tabs
@@ -209,18 +206,34 @@ def sample_tris(sample_id):
     )
 
 
-import tempfile
-
-
-@server_bp.route("/download/<batch_id>/<file_id>")
+@server_bp.route("/batch_download/<batch_id>/<file_id>")
 @login_required
-def download(batch_id, file_id):
-    """View for downloads"""
+def batch_download(batch_id, file_id):
+    """View for batch downloads"""
+
     batch = app.adapter.batch(batch_id)
-    file = Path(batch[file_id])
-    if not file.exists():
-        # warn
+    file_path = batch.get(file_id)
+
+    if not validate_file_path(file_path):
         return redirect(request.referrer)
+
+    file = Path(file_path)
+
+    return send_from_directory(str(file.parent), file.name, as_attachment=True)
+
+
+@server_bp.route("/sample_download/<sample_id>/<file_id>")
+@login_required
+def sample_download(sample_id, file_id):
+    """View for sample downloads"""
+
+    sample = app.adapter.sample(sample_id)
+    file_path = sample.get(file_id)
+
+    if not validate_file_path(file_path):
+        return redirect(request.referrer)
+
+    file = Path(file_path)
 
     return send_from_directory(str(file.parent), file.name, as_attachment=True)
 
@@ -324,4 +337,3 @@ def update():
                 )
 
     return redirect(request.referrer)
-

@@ -1,4 +1,5 @@
 from NIPTool.models.constants import SAMPLE_KEYS, BATCH_KEYS
+from typing import Optional
 
 
 def build_document(csv_data: dict, document_keys: list) -> dict:
@@ -13,11 +14,14 @@ def build_document(csv_data: dict, document_keys: list) -> dict:
     return document
 
 
-def build_sample(sample_data: dict) -> dict:
+
+def build_sample(sample_data: dict, segmental_calls: Optional[str], sample_id: str) -> dict:
     """Builds a document for the sample collection"""
 
     sample = build_document(sample_data, SAMPLE_KEYS)
-    sample["_id"] = sample_data["SampleID"]
+    sample["_id"] = sample_id
+    if segmental_calls:
+        sample["segmental_calls"] = segmental_calls
 
     return sample
 
@@ -26,7 +30,7 @@ def build_batch(batch_data: dict, request_data: dict) -> dict:
     """Builds a document for the batch collection"""
 
     batch = build_document(batch_data, BATCH_KEYS)
-    batch["_id"] = request_data['project_name']
+    batch["_id"] = batch_data['SampleProject']
     batch["fluffy_result_file"] = request_data['result_file']
 
     if request_data.get('multiqc_report'):

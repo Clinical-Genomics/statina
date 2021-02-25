@@ -15,6 +15,19 @@ from NIPTool.models.validation import (
 LOG = logging.getLogger(__name__)
 
 
+def validate_file_path(file_path: Optional[str])-> bool:
+    """File path validation"""
+
+    if not file_path:
+        return False
+
+    file = Path(file_path)
+
+    if not file.exists():
+        return False
+
+    return True
+
 
 def form(val: Optional, function) -> Optional:
     """Returning formatted value or None"""

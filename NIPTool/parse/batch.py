@@ -1,8 +1,9 @@
+import csv
 import logging
-import pandas
 from pathlib import Path
 
-from typing import Optional, List
+from typing import Optional, List, Iterable, Dict
+from pydantic import parse_obj_as
 
 from NIPTool.exeptions import MissingResultsError
 from NIPTool.models.validation import (
@@ -11,6 +12,8 @@ from NIPTool.models.validation import (
     strings,
     exceptions,
 )
+from NIPTool.schemas.batch import Batch, InBatch
+from NIPTool.schemas.sample import Sample
 
 LOG = logging.getLogger(__name__)
 
@@ -48,53 +51,30 @@ def validate_file_path(file_path: Optional[str])-> bool:
 
     return True
 
+def add_files_to_batch(batch: Batch, batch_files: InBatch) -> None:
+    """Adds files to batch"""
+    pass
 
-def form(val: Optional, function) -> Optional:
-    """Returning formatted value or None"""
+def convert_empty_str_to_none(data: dict) -> dict:
+    """Convert all values that are empty string to None in a dict"""
+    for key, value in data.items():
+        if not value:
+            data[key] = None
+    return data
 
-    try:
-        return function(val)
-    except:
-        return None
-
-
-def validate(key: str, val: Optional) -> Optional:
-    """Formatting value according to defined models."""
-
-    if val in exceptions:
-        formatted_value = None
-    elif key in ints:
-        formatted_value = form(val, int)
-    elif key in floats:
-        formatted_value = form(val, float)
-    elif key in strings:
-        formatted_value = form(val, str)
-    else:
-        formatted_value = None
-    return formatted_value
+def parse_csv(infile: Path) -> List[Dict[str, str]]:
+    with open(infile, "r") as csv_file:
+        entries = [convert_empty_str_to_none(entry) for entry in csv.DictReader(csv_file)]
+    return entries
 
 
-def parse_batch_file(nipt_results_path: str) -> List[dict]:
-    """Parsing file content. Formatting values. Ignoring values
-    that could not be formatted according to defined models"""
+def get_samples(nipt_results_path: Path) -> List[Sample]:
+    """Parse NIPT result file into samples"""
 
-    file = Path(nipt_results_path)
+    return parse_obj_as(List[Sample], parse_csv(nipt_results_path))
 
-    if not file.exists():
-        raise MissingResultsError("Results file missing.")
 
-    data_frame = pandas.read_csv(file, na_filter=False)
-    results = data_frame.to_dict(orient="records")
-
-    samples = []
-    for sample in results:
-        formatted_results = {}
-        for key, val in sample.items():
-            formatted_value = validate(key, val)
-            if formatted_value is None:
-                LOG.info(f"invalid format of {key}.")
-                continue
-            formatted_results[key] = formatted_value
-        samples.append(formatted_results)
-
-    return samples
+def get_batch(nipt_results_path: Path) -> Batch:
+    """Parse NIPT result file and create a batch object from the first sample information"""
+    sample_data: List[dict] = parse_csv(nipt_results_path)
+    return Batch.parse_obj(sample_data[0])

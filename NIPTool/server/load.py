@@ -6,7 +6,7 @@ from flask import (
     Blueprint,
     current_app)
 
-from NIPTool.parse.batch import parse_batch_file
+from NIPTool.parse.batch import get_samples
 from NIPTool.load.batch import load_batch, load_samples
 from NIPTool.load.user import load_user
 from NIPTool.models.validation import user_load_schema, batch_load_schema
@@ -36,7 +36,7 @@ def batch():
         resp.status_code = 400
         return resp
 
-    batch_data = parse_batch_file(request_data['result_file'])
+    batch_data = get_samples(request_data['result_file'])
 
     try:
         load_batch(current_app.adapter, batch_data[0], request_data)

@@ -1,3 +1,5 @@
+from pathlib import Path
+
 import pytest
 
 from mongomock import MongoClient
@@ -6,8 +8,15 @@ from NIPTool.server import create_app, configure_app
 from NIPTool.adapter.plugin import NiptAdapter
 from NIPTool.server.load import load_bp
 
+from NIPTool.server.app.api.api_v1.api import app
+from NIPTool.server.app.api.deps import get_nipt_adapter
+from fastapi.testclient import TestClient
 
 DATABASE = "testdb"
+
+def override_dependency(db_client):
+    return NiptAdapter(db_client, db_name=DATABASE)
+
 
 @pytest.fixture(scope="function")
 def database(request, pymongo_client):
@@ -16,6 +25,18 @@ def database(request, pymongo_client):
     mongo_client = pymongo_client
     database = mongo_client[DATABASE]
     return database
+
+
+@pytest.fixture()
+def mock_fast_client(database):
+    """Return a mock app"""
+
+    client = TestClient(app)
+    app.dependency_overrides[get_nipt_adapter] = override_dependency(database.client)
+
+    return client
+
+
 
 @pytest.fixture()
 def mock_app(database):
@@ -55,10 +76,10 @@ def fixture_small_helpers():
 
 
 @pytest.fixture
-def valid_csv():
+def valid_csv() -> Path:
     """Get file path to valid csv"""
 
-    return "tests/fixtures/valid_fluffy.csv"
+    return Path("tests/fixtures/valid_fluffy.csv")
 
 
 @pytest.fixture

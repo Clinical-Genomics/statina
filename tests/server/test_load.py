@@ -24,15 +24,12 @@ def test_user_empty_data(mock_app):
     assert response.status_code == 400
 
 
-def test_batch_valid_files(mock_app, valid_concentrations, valid_csv, segmental_calls, multiqc_report):
+def test_batch_valid_files(mock_app, valid_csv, segmental_calls, multiqc_report):
     # GIVEN the following request data:
     #   a valid csv file with three samples
-    #   a valid concentrations file
     #   segmental_calls and multiqc_report files with random content, but that do exist.
 
-    project_name = "project_name"
-    data = dict(multiqc_report=multiqc_report, segmental_calls=segmental_calls, result_file=valid_csv,
-                concentrations=valid_concentrations, project_name=project_name)
+    data = dict(multiqc_report=multiqc_report, segmental_calls=segmental_calls, result_file=valid_csv)
 
     # WHEN running the request with the data
     response = mock_app.test_client().post('/batch', data=data)
@@ -60,13 +57,12 @@ def test_batch_no_data(mock_app):
     assert response.status_code == 400
 
 
-def test_batch_missing_files(mock_app, valid_concentrations, valid_csv):
+def test_batch_missing_files(mock_app, valid_csv):
     # GIVEN the following request data:
     #   a valid csv file with three samples
-    #   a valid concentrations file
     #   but no segmental_calls and multiqc_report
 
-    data = dict(result_file=valid_csv, concentrations=valid_concentrations, project_name="project_name")
+    data = dict(result_file=valid_csv)
 
     # WHEN running the request with the data
     response = mock_app.test_client().post('/batch', data=data)
@@ -81,15 +77,12 @@ def test_batch_missing_files(mock_app, valid_concentrations, valid_csv):
     assert response.status_code == 200
 
 
-def test_batch_invalid_file(mock_app, valid_concentrations, invalid_csv, segmental_calls, multiqc_report):
+def test_batch_invalid_file(mock_app, invalid_csv, segmental_calls, multiqc_report):
     # GIVEN the following request data:
     #   a invalid csv file with three samples - required field SampleID has bad format
-    #   a valid concentrations file
     #   segmental_calls and multiqc_report files with random content, but that do exist.
 
-    project_name = "project_name"
-    data = dict(multiqc_report=multiqc_report, segmental_calls=segmental_calls, result_file=invalid_csv,
-                concentrations=valid_concentrations, project_name=project_name)
+    data = dict(multiqc_report=multiqc_report, segmental_calls=segmental_calls, result_file=invalid_csv)
 
     # WHEN running the3 request with the data
     response = mock_app.test_client().post('/batch', data=data)
@@ -97,12 +90,11 @@ def test_batch_invalid_file(mock_app, valid_concentrations, invalid_csv, segment
     # THEN assert nothing added to sample the collection
     assert mock_app.adapter.sample_collection.estimated_document_count() == 0
 
-    # THEN assert batch collection added with expected keys
-    keys = ['_id', 'multiqc_report', 'segmental_calls', 'fluffy_result_file', 'added']
-    assert mock_app.adapter.batch_collection.estimated_document_count() == 1
-    assert set(mock_app.adapter.batch(project_name).keys()) == set(keys)
+    # THEN assert nothing added to batch the collection
+    assert mock_app.adapter.batch_collection.estimated_document_count() == 0
+
     resp_data = json.loads(response.data)
-    assert resp_data["message"] == "Data loaded into database"
-    assert response.status_code == 200
+    assert resp_data["message"] == "Could not load data from result file. Required fields missing."
+    assert response.status_code == 422
 
 

@@ -7,10 +7,12 @@ from flask import (
     current_app)
 
 from NIPTool.parse.batch import parse_batch_file
-from NIPTool.load.batch import load_batch, load_samples, load_concentrations
+from NIPTool.load.batch import load_batch, load_samples
 from NIPTool.load.user import load_user
 from NIPTool.models.validation import user_load_schema, batch_load_schema
 from cerberus import Validator
+from NIPTool.exeptions import NIPToolError
+
 
 import logging
 
@@ -25,7 +27,9 @@ def batch():
     """Function to load batch data into the database with rest"""
 
     request_data = request.form
+
     v = Validator(batch_load_schema)
+
     if not v.validate(request_data):
         message = "Incomplete batch load request"
         resp = jsonify({"message": message})
@@ -33,9 +37,14 @@ def batch():
         return resp
 
     batch_data = parse_batch_file(request_data['result_file'])
-    load_batch(current_app.adapter, batch_data[0], request_data)
-    load_samples(current_app.adapter, batch_data, request_data['project_name'])
-    load_concentrations(current_app.adapter, request_data["concentrations"])
+
+    try:
+        load_batch(current_app.adapter, batch_data[0], request_data)
+        load_samples(current_app.adapter, batch_data, request_data)
+    except NIPToolError as e:
+        resp = jsonify({"message": e.message})
+        resp.status_code = 422
+        return resp
 
     message = "Data loaded into database"
     resp = jsonify({"message": message})

@@ -22,15 +22,15 @@
                             Coverage Report</a>
                         <li class="divider"></li>
                         <a class="dropdown-item"
-                           href="{{ url_for('server.download', file_id='multiqc_report', batch_id=batch._id) }}">Multi
+                           href="{{ url_for('server.batch_download', file_id='multiqc_report', batch_id=batch._id) }}">Multi
                             QC</a>
                         <li class="divider"></li>
                         <a class="dropdown-item"
-                           href="{{ url_for('server.download', file_id='fluffy_result_file', batch_id=batch._id) }}">Fluffy
+                           href="{{ url_for('server.batch_download', file_id='fluffy_result_file', batch_id=batch._id) }}">Fluffy
                             Result file</a>
                         <li class="divider"></li>
                         <a class="dropdown-item"
-                           href="{{ url_for('server.download', file_id='segmental_calls', batch_id=batch._id) }}">segmental
+                           href="{{ url_for('server.batch_download', file_id='segmental_calls', batch_id=batch._id) }}">Segmental
                             calls</a>
                     </ul>
                 </li>

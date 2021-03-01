@@ -7,6 +7,8 @@ class NIPToolError(Exception):
 class MissingResultsError(NIPToolError):
     pass
 
+class InvalidFileError(NIPToolError):
+    pass
 
 class FileValidationError(NIPToolError):
     pass

@@ -69,19 +69,6 @@ def invalid_csv():
 
 
 @pytest.fixture
-def valid_concentrations():
-    """Get file path to valid csv"""
-
-    return "tests/fixtures/valid_concentrations.yaml"
-
-
-@pytest.fixture
-def invalid_concentrations():
-    """Get file path to invalid concentrations file"""
-
-    return "tests/fixtures/not_valid_concentrations.yaml"
-
-@pytest.fixture
 def multiqc_report():
     """Get file path to multiqc_report"""
 
@@ -91,4 +78,4 @@ def multiqc_report():
 def segmental_calls():
     """Get file path to segmental_calls"""
 
-    return "tests/fixtures/segmental_calls.bed"
+    return "tests/fixtures/segmental_calls"

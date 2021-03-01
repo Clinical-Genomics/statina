@@ -1,4 +1,5 @@
 SAMPLE_KEYS = [
+    "SampleProject",
     "SampleType",
     "Description",
     "Flowcell",

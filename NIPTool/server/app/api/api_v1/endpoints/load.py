@@ -24,15 +24,7 @@ def batch(batch_files: InBatch, adapter: NiptAdapter = Depends(get_nipt_adapter)
         return {"message": "Results file missing.", "status_code": 422}
     samples: List[Sample] = get_samples(nipt_results)
     batch: Batch = get_batch(nipt_results)
-    batch.result_file = batch_files.result_file
-    if batch_files.multiqc_report:
-        if not Path(batch_files.multiqc_report).exists():
-            return {"message": "MultiQC file does not exist.", "status_code": 422}
-        batch.multiqc_report = batch_files.multiqc_report
-    if batch_files.segmental_calls:
-        if not Path(batch_files.segmental_calls).exists():
-            return {"message": "Segmental calls file does not exist.", "status_code": 422}
-        batch.segmental_calls = batch_files.segmental_calls
+
 
     try:
         load_batch(adapter=adapter, batch_id=samples[0].SampleProject, batch=batch)

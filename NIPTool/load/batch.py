@@ -2,10 +2,8 @@ import logging
 from typing import Dict, List, Optional
 
 from NIPTool.adapter import NiptAdapter
-from NIPTool.build.document import build_sample, build_batch
-from NIPTool.models.validation import requiered_fields
+
 from NIPTool.parse.batch import pars_segmental_calls
-from NIPTool.exeptions import InvalidFileError
 from NIPTool.schemas.batch import Batch
 from NIPTool.schemas.sample import Sample
 

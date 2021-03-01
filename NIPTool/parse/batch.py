@@ -77,4 +77,5 @@ def get_samples(nipt_results_path: Path) -> List[Sample]:
 def get_batch(nipt_results_path: Path) -> Batch:
     """Parse NIPT result file and create a batch object from the first sample information"""
     sample_data: List[dict] = parse_csv(nipt_results_path)
+    print(sample_data)
     return Batch.parse_obj(sample_data[0])

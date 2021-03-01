@@ -18,6 +18,7 @@ router = APIRouter()
 @router.post("/batch")
 def batch(batch_files: load.BatchLoadModel, adapter: NiptAdapter = Depends(get_nipt_adapter)):
     """Function to load batch data into the database with rest"""
+
     nipt_results = Path(batch_files.result_file)
 
     if not nipt_results.exists():
@@ -25,9 +26,8 @@ def batch(batch_files: load.BatchLoadModel, adapter: NiptAdapter = Depends(get_n
     samples: List[db_models.SampleModel] = get_samples(nipt_results)
     batch: db_models.BatchModel = get_batch(nipt_results)
 
-
     try:
-        load_batch(adapter=adapter, batch_id=samples[0].SampleProject, batch=batch)
+        load_batch(adapter=adapter, batch=batch, batch_files=batch_files)
         load_samples(adapter=adapter, samples=samples, segmental_calls=batch_files.segmental_calls)
     except NIPToolError as e:
         return {"message": e.message, "status_code": 422}

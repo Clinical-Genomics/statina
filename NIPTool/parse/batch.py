@@ -6,7 +6,6 @@ from typing import Optional, List, Dict
 from pydantic import parse_obj_as
 
 from NIPTool.schemas import db_models
-from NIPTool.schemas.server import load
 
 LOG = logging.getLogger(__name__)
 
@@ -44,11 +43,6 @@ def validate_file_path(file_path: Optional[str])-> bool:
 
     return True
 
-def add_files_to_batch(batch: db_models.BatchModel, batch_files: load.BatchLoadModel) -> None:
-    """Adds files to batch"""
-    print('hej')
-    pass
-
 def convert_empty_str_to_none(data: dict) -> dict:
     """Convert all values that are empty string to None in a dict"""
     for key, value in data.items():
@@ -73,5 +67,4 @@ def get_batch(nipt_results_path: Path) -> db_models.BatchModel:
 
     sample_data: List[dict] = parse_csv(nipt_results_path)
 
-    #return parse_obj_as(db_models.Batch, sample_data[0])
     return db_models.BatchModel.parse_obj(sample_data[0])

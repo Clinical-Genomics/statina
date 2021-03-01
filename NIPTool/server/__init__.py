@@ -7,7 +7,6 @@ import yaml
 from NIPTool.adapter.plugin import NiptAdapter
 from NIPTool.server.login import login_bp, login_manager
 from NIPTool.server.views import server_bp
-from NIPTool.server.load import load_bp
 
 logging.basicConfig(level=logging.INFO)
 LOG = logging.getLogger(__name__)
@@ -39,7 +38,6 @@ def configure_app(app, config=None):
     app.adapter = NiptAdapter(client, db_name=db_name)
     app.register_blueprint(login_bp)
     app.register_blueprint(server_bp)
-    app.register_blueprint(load_bp)
     login_manager.init_app(app)
 
     if app.config['DEBUG'] == 1:

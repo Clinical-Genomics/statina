@@ -6,14 +6,20 @@ from NIPTool.adapter import NiptAdapter
 from NIPTool.parse.batch import pars_segmental_calls
 from NIPTool.schemas.db_models.batch import BatchModel
 from NIPTool.schemas.db_models.sample import SampleModel
+from NIPTool.schemas.server import BatchLoadModel
 
 LOG = logging.getLogger(__name__)
 
 
-def load_batch(adapter: NiptAdapter, batch_id: str, batch: BatchModel) -> None:
+def load_batch(adapter: NiptAdapter, batch: BatchModel, batch_files: BatchLoadModel) -> None:
     """Function to load data from fluffy result file."""
+
     mongo_batch = batch.dict(exclude_none=True)
+    batch_id = mongo_batch.pop("SampleProject")
     mongo_batch["_id"] = batch_id
+    mongo_batch["segmental_calls"] = batch_files.segmental_calls
+    mongo_batch["multiqc_report"] = batch_files.multiqc_report
+    mongo_batch["result_file"] = batch_files.result_file
     adapter.add_or_update_document(mongo_batch, adapter.batch_collection)
 
 

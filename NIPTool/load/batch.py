@@ -33,6 +33,6 @@ def load_samples(adapter, samples: List[SampleModel], segmental_calls: Optional[
         segmental_calls_path = segmental_calls.get(sample_id)
         mongo_sample["_id"] = sample_id
         if segmental_calls_path:
-            mongo_sample["segmental_calls"] = segmental_calls
+            mongo_sample["segmental_calls"] = segmental_calls_path
 
         adapter.add_or_update_document(mongo_sample, adapter.sample_collection)

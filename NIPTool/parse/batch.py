@@ -2,18 +2,11 @@ import csv
 import logging
 from pathlib import Path
 
-from typing import Optional, List, Iterable, Dict
+from typing import Optional, List, Dict
 from pydantic import parse_obj_as
 
-from NIPTool.exeptions import MissingResultsError
-from NIPTool.models.validation import (
-    ints,
-    floats,
-    strings,
-    exceptions,
-)
-from NIPTool.schemas.batch import Batch, InBatch
-from NIPTool.schemas.sample import Sample
+from NIPTool.schemas import db_models
+from NIPTool.schemas.server import load
 
 LOG = logging.getLogger(__name__)
 
@@ -51,8 +44,9 @@ def validate_file_path(file_path: Optional[str])-> bool:
 
     return True
 
-def add_files_to_batch(batch: Batch, batch_files: InBatch) -> None:
+def add_files_to_batch(batch: db_models.BatchModel, batch_files: load.BatchLoadModel) -> None:
     """Adds files to batch"""
+    print('hej')
     pass
 
 def convert_empty_str_to_none(data: dict) -> dict:
@@ -68,14 +62,16 @@ def parse_csv(infile: Path) -> List[Dict[str, str]]:
     return entries
 
 
-def get_samples(nipt_results_path: Path) -> List[Sample]:
+def get_samples(nipt_results_path: Path) -> List[db_models.SampleModel]:
     """Parse NIPT result file into samples"""
 
-    return parse_obj_as(List[Sample], parse_csv(nipt_results_path))
+    return parse_obj_as(List[db_models.SampleModel], parse_csv(nipt_results_path))
 
 
-def get_batch(nipt_results_path: Path) -> Batch:
+def get_batch(nipt_results_path: Path) -> db_models.BatchModel:
     """Parse NIPT result file and create a batch object from the first sample information"""
+
     sample_data: List[dict] = parse_csv(nipt_results_path)
-    print(sample_data)
-    return Batch.parse_obj(sample_data[0])
+
+    #return parse_obj_as(db_models.Batch, sample_data[0])
+    return db_models.BatchModel.parse_obj(sample_data[0])

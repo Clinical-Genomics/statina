@@ -1,29 +1,29 @@
 from pathlib import Path
 from typing import List
-from fastapi import APIRouter, Depends, requests
+from fastapi import APIRouter, Depends
 from NIPTool.load.batch import load_batch, load_samples
 from NIPTool.parse.batch import get_samples, get_batch
 from NIPTool.adapter.plugin import NiptAdapter
 
 from NIPTool.load.user import load_user
-from NIPTool.schemas.batch import Batch, InBatch
-from NIPTool.schemas.sample import Sample
+from NIPTool.schemas import db_models
+from NIPTool.schemas.server import load
+
 from NIPTool.server.app.api.deps import get_nipt_adapter
-from NIPTool.server.app import schemas
-from NIPTool.exeptions import NIPToolError, MissingResultsError
+from NIPTool.exeptions import NIPToolError
 
 router = APIRouter()
 
 
 @router.post("/batch")
-def batch(batch_files: InBatch, adapter: NiptAdapter = Depends(get_nipt_adapter)):
+def batch(batch_files: load.BatchLoadModel, adapter: NiptAdapter = Depends(get_nipt_adapter)):
     """Function to load batch data into the database with rest"""
     nipt_results = Path(batch_files.result_file)
 
     if not nipt_results.exists():
         return {"message": "Results file missing.", "status_code": 422}
-    samples: List[Sample] = get_samples(nipt_results)
-    batch: Batch = get_batch(nipt_results)
+    samples: List[db_models.SampleModel] = get_samples(nipt_results)
+    batch: db_models.BatchModel = get_batch(nipt_results)
 
 
     try:
@@ -37,7 +37,7 @@ def batch(batch_files: InBatch, adapter: NiptAdapter = Depends(get_nipt_adapter)
 
 
 @router.post("/user")
-def user(user: schemas.User, adapter: NiptAdapter = Depends(get_nipt_adapter)):
+def user(user: load.UserLoadModel, adapter: NiptAdapter = Depends(get_nipt_adapter)):
     """Function to load user into the database with rest"""
 
     try:

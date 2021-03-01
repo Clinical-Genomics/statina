@@ -1,15 +1,13 @@
 from pydantic import BaseModel
 
 
-
-class Batch(BaseModel):
+class BatchLoadModel(BaseModel):
     result_file: str
     multiqc_report: str
     segmental_calls: str
 
 
-
-class User(BaseModel):
+class UserLoadModel(BaseModel):
     email: str
     name: str
     role: str

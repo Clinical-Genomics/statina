@@ -2,7 +2,7 @@ from typing import Optional
 
 from pydantic import BaseModel
 
-class Sample(BaseModel):
+class SampleModel(BaseModel):
     SampleID: str
     SampleProject: str
     SampleType: Optional[str]

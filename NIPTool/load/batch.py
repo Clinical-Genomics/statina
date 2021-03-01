@@ -4,20 +4,20 @@ from typing import Dict, List, Optional
 from NIPTool.adapter import NiptAdapter
 
 from NIPTool.parse.batch import pars_segmental_calls
-from NIPTool.schemas.batch import Batch
-from NIPTool.schemas.sample import Sample
+from NIPTool.schemas.db_models.batch import BatchModel
+from NIPTool.schemas.db_models.sample import SampleModel
 
 LOG = logging.getLogger(__name__)
 
 
-def load_batch(adapter: NiptAdapter, batch_id: str, batch: Batch) -> None:
+def load_batch(adapter: NiptAdapter, batch_id: str, batch: BatchModel) -> None:
     """Function to load data from fluffy result file."""
     mongo_batch = batch.dict(exclude_none=True)
     mongo_batch["_id"] = batch_id
     adapter.add_or_update_document(mongo_batch, adapter.batch_collection)
 
 
-def load_samples(adapter, samples: List[Sample], segmental_calls: Optional[str]) -> None:
+def load_samples(adapter, samples: List[SampleModel], segmental_calls: Optional[str]) -> None:
     """Function to load data from fluffy result file."""
 
     segmental_calls: Dict[str, str] = pars_segmental_calls(segmental_calls_path=segmental_calls)

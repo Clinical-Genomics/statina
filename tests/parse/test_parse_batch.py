@@ -3,8 +3,8 @@ from typing import List
 
 from NIPTool.parse.batch import get_samples, parse_csv
 import pytest	
-from NIPTool.exeptions import MissingResultsError, FileValidationError
-from NIPTool.schemas.sample import Sample
+from NIPTool.exeptions import MissingResultsError
+from NIPTool.schemas.db_models.sample import SampleModel
 
 
 def get_nr_csv_entries(csv_path: Path) -> int:
@@ -35,12 +35,12 @@ def test_parse_batch(valid_csv: Path):
     nr_samples = get_nr_csv_entries(valid_csv)
 
     # WHEN running parse_batch_file
-    results: List[Sample] = get_samples(valid_csv)
+    results: List[SampleModel] = get_samples(valid_csv)
 
     # THEN assert results is a list and it has length 3
     assert isinstance(results, list)
     # THEN assert that the objects are samples
-    assert isinstance(results[0], Sample)
+    assert isinstance(results[0], SampleModel)
 
 
 def test_parse_batch_file_with_missing_data(invalid_csv):	
@@ -53,13 +53,3 @@ def test_parse_batch_file_with_missing_data(invalid_csv):
     assert isinstance(results, list)
     for sample in results:
         assert sample == {}
-
-
-def test_parse_batch_file_with_missing_file():	
-    # GIVEN a non existing csv file
-
-    # WHEN running parse_batch_file	
-
-    # THEN assert MissingResultsError
-    with pytest.raises(MissingResultsError):	
-        get_samples('file_path')

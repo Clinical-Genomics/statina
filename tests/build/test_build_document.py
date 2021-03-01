@@ -1,5 +1,5 @@
 from NIPTool.build.document import build_batch, build_sample
-from NIPTool.models.constants import BATCH_KEYS, SAMPLE_KEYS
+from NIPTool.constants import BATCH_KEYS, SAMPLE_KEYS
 import pytest
 
 

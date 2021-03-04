@@ -1,0 +1,72 @@
+{% block scripts %}
+<script>
+    var XY_plot = document.getElementById('FFXY')
+    var data = []
+    var layout = {
+    annotations : [],
+    legend:{hovermode:'closest' },
+    hovermode:'closest',
+    xaxis :{range: [{{max_x}},{{min_x}}],
+            showline: true,
+            zeroline: false,
+            linecolor: '#636363',
+            linewidth: 5,
+            showgrid: false,
+            gridcolor: '#bdbdbd',
+            title: 'FFX'
+            },
+            
+    yaxis :{
+            zeroline: false,
+            showline: true,
+            showgrid: false,
+            linecolor: '#636363',
+            linewidth: 5,
+            title : 'FFY'
+            },};
+
+    var backstat = {
+        y: {{control['FFY']}},
+        x: {{control['FFX']}},
+        text: {{control['names']|tojson}},
+        name: 'Negative (N={{control['count']}})',
+        hoverinfo:'none',
+        mode: 'markers',
+        type: 'scatter',
+        marker: {color: '#ccccb3'}}
+        data.push(backstat);
+        var i = 0
+
+
+    {% for sample in cases %}
+        var NCVXYsamps = {
+            y: [{{cases[sample]['FFY']}}],
+            x: [{{cases[sample]['FFX']}}],
+            name: "{{sample}}",
+            mode: 'markers',
+            text: "{{sample}}",
+            type: 'scatter'}
+        data.push(NCVXYsamps);
+    {% endfor %}
+
+    {% for abn  in abnormal.keys() %} 
+        {% for status  in abnormal[abn] %} 
+        var verif = {                                                                  
+                name: '{{abn}} {{status}} (N={{abnormal[abn][status]["count"]}})',                                                               
+                y: {{abnormal[abn][status]['FFY']}},                                        
+                x: {{abnormal[abn][status]['FFX']}},
+                text: {{abnormal[abn][status]['names']|tojson}},                                       
+            mode: 'markers',
+            marker: {   line: {width:2},
+                        size: 7,
+                        symbol :'circle-open',                                                   
+                        type: 'scatter'              
+                    } }
+        data.push(verif);
+        var i = i +1
+        {% endfor %}
+    {% endfor %}
+
+    Plotly.newPlot('FFXY', data, layout);
+</script>
+{% endblock %}

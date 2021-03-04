@@ -9,7 +9,7 @@ from NIPTool.load.user import load_user
 from NIPTool.schemas import db_models
 from NIPTool.schemas.server import load
 
-from NIPTool.server.app.api.deps import get_nipt_adapter
+from NIPTool.server.load.api.deps import get_nipt_adapter
 from NIPTool.exeptions import NIPToolError
 
 router = APIRouter()

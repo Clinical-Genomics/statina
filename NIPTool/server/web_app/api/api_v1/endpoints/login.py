@@ -3,7 +3,7 @@ from fastapi.responses import RedirectResponse
 
 from fastapi import Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordRequestForm
-from NIPTool.schemas.server.login import Token
+from NIPTool.schemas.server.login import Token, UserInDB
 
 from NIPTool.server.web_app.api.deps import get_current_active_user, authenticate_user, create_access_token, \
     temp_get_config
@@ -14,7 +14,7 @@ router = APIRouter()
 
 @router.post("/token", response_model=Token)
 def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends(), config: dict = Depends(temp_get_config)):
-    user = authenticate_user(form_data.username, form_data.password)
+    user: UserInDB = authenticate_user(form_data.username, form_data.password)
     if not user:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
@@ -28,14 +28,11 @@ def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends(), con
     return {"access_token": access_token, "token_type": "Bearer"}
 
 
-@router.post("/authorization")
-def get_authorization(token: Token = Depends(login_for_access_token)):
+
+@router.post("/login")
+def login(token: Token  = Depends(login_for_access_token)):
     if token:
         headers = {'Authorization': f"{token.get('token_type')} {token.get('access_token')}",
                    "accept": "application/json"}
-        return Response(headers=headers)
-
-
-@router.post("/login")
-def login(auth: str = Depends(get_authorization)):
-    return RedirectResponse('../batches')
+        print(headers)
+    return RedirectResponse('../', headers=headers)

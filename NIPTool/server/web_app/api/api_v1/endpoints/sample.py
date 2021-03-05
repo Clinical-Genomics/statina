@@ -8,7 +8,7 @@ router = APIRouter()
 templates = Jinja2Templates(directory="templates")
 
 
-@router.post("/samples/{sample_id}/")
+@router.get("/samples/{sample_id}/")
 def sample(request: Request, sample_id: str, adapter: NiptAdapter = Depends(get_nipt_adapter)):
     """Sample view with sample information."""
     sample = adapter.sample(sample_id)
@@ -17,6 +17,8 @@ def sample(request: Request, sample_id: str, adapter: NiptAdapter = Depends(get_
     return templates.TemplateResponse(
         "sample/sample.html",
         context=dict(
+            request=request,
+            current_user='mayapapaya',
             chrom_abnorm=CHROM_ABNORM,
             sample=sample,
             status_classes=STATUS_CLASSES,
@@ -25,7 +27,7 @@ def sample(request: Request, sample_id: str, adapter: NiptAdapter = Depends(get_
     )
 
 
-@router.post("/samples/{sample_id}/tris")
+@router.get("/samples/{sample_id}/tris")
 def sample_tris(request: Request, sample_id: str, adapter: NiptAdapter = Depends(get_nipt_adapter)):
     """Sample view with trisomi plot."""
     sample = adapter.sample(sample_id)

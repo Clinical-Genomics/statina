@@ -1,4 +1,5 @@
 
+
 {% block content %}
 <nav class="navbar navbar-default navbar-static-top" role="navigation" style="margin-bottom: 0">
     <div class="navbar-header">
@@ -13,14 +14,16 @@
             <ul class="dropdown-menu">
                 <a class="active" href="{{ url_for('batches') }}"><i class="fa fa-home"></i> Start</a>
                 <li class="divider"></li>
+                <a class="active" href={{ url_for('statistics') }}><i class="fa fa-bar-chart"></i>  QC</a>
+                <li class="divider"></li>
+                <a class="active" href=#fixthis><i class="fa fa-sign-out"></i>  Sign Out</a>
+                <li class="divider"></li>
             </ul>
         </li>
     </ul>
     {% endif %}
     <div class="navbar-right">
-        {% if current_user %}
-        <a class="navbar-brand">{{current_user.name}}</a>
-        {% endif %}
+        <a class="navbar-brand">{{current_user}}</a>
     </div>
 </nav>
 {% endblock %}

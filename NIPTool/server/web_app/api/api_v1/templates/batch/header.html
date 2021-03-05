@@ -14,7 +14,25 @@
                     <button class="btn btn-secondary dropdown-toggle" data-toggle="dropdown">
                         Batch Downloads
                     </button>
-
+                    <ul class="dropdown-menu">
+                        <a class="dropdown-item" href="{{ url_for('report', batch_id=batch._id , coverage=0) }}">
+                            Report</a>
+                        <li class="divider"></li>
+                        <a class="dropdown-item" href="{{ url_for('report', batch_id=batch._id , coverage=1) }}">
+                            Coverage Report</a>
+                        <li class="divider"></li>
+                        <a class="dropdown-item"
+                           href="{{ url_for('batch_download', file_id='multiqc_report', batch_id=batch._id) }}">Multi
+                            QC</a>
+                        <li class="divider"></li>
+                        <a class="dropdown-item"
+                           href="{{ url_for('batch_download', file_id='fluffy_result_file', batch_id=batch._id) }}">Fluffy
+                            Result file</a>
+                        <li class="divider"></li>
+                        <a class="dropdown-item"
+                           href="{{ url_for('batch_download', file_id='segmental_calls', batch_id=batch._id) }}">Segmental
+                            calls</a>
+                    </ul>
                 </li>
             </ul>
         </div>
@@ -41,6 +59,7 @@
                                     <tbody>
                                     {% for s in seq_warnings %}
                                         <tr>
+                                            <td><a href={{ url_for('sample_page', sample_id=s) }}>{{ s }}</a></td>
                                             <td>{{ seq_warnings[s]['missing_data'] }}</td>
                                             <td>{{ seq_warnings[s]['QC_warn'] }}</td>
                                             <td>{{ seq_warnings[s]['QC_fail'] }}</td>
@@ -56,6 +75,26 @@
         {% endif %}
     </div> <!--jumbotron-->
     <ul class="nav nav-tabs" id="myTab">
-
+        <li {% if page_id =='batches' %} class="active" {% endif %}><a
+                href="{{ url_for('batch', batch_id = batch._id) }}">NCV Table</a>
+        </li>
+        <li {% if page_id =='batches_NCV13' %} class="active" {% endif %}><a
+                href="{{ url_for('NCV', batch_id = batch._id, ncv = '13') }}">NCV13</a>
+        </li>
+        <li {% if page_id =='batches_NCV18' %} class="active" {% endif %}><a
+                href="{{ url_for('NCV', batch_id = batch._id, ncv = '18') }}">NCV18</a>
+        </li>
+        <li {% if page_id =='batches_NCV21' %} class="active" {% endif %}><a
+                href="{{ url_for('NCV', batch_id = batch._id, ncv = '21') }}">NCV21</a>
+        </li>
+        <li {% if page_id =='batches_FF' %} class="active" {% endif %}><a
+                href="{{ url_for('fetal_fraction', batch_id = batch._id) }}">FF</a>
+        </li>
+        <li {% if page_id =='batches_FF_XY' %} class="active" {% endif %}><a
+                href="{{ url_for('fetal_fraction_XY', batch_id = batch._id) }}">FFXY</a>
+        </li>
+        <li {% if page_id =='batches_cov' %} class="active" {% endif %}><a
+                href="{{ url_for('coverage', batch_id = batch._id) }}">Ratio (Chr 1-22)</a>
+        </li>
     </ul>
 {% endblock %}

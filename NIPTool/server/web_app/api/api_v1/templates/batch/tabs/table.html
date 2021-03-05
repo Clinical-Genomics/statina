@@ -11,6 +11,7 @@
             <div class="col-lg-16">
                 <div class="panel panel-default">
                     <div class="panel-body">
+                        <form action="{{ url_for('update') }}" method="post">
                             <input type=text name="form_id" value="include_samples" hidden>
                         <table>
                             <tbody>
@@ -27,7 +28,7 @@
                                 </tr>
                             </tbody>
                         </table>
-                            
+
                                 <table id="batch_table" class="table table-bordered table-hover table-wrapper-scroll-y" >
                                     <thead>
                                         <tr>
@@ -52,6 +53,7 @@
                                         {% for sample in sample_info %}
                                         <input type=text name="samples" value="{{ sample.sample_id }}" hidden>
                                         <tr>
+                                            <td width="20%"> <a href={{ url_for('sample', sample_id=sample.sample_id) }}>{{ sample.sample_id }}</a></td>
                                             <td width="4%" class = "{{ sample.Zscore_13.warn}}">{{ sample.Zscore_13.value }}</td>
                                             <td width="4%" class = "{{ sample.Zscore_18.warn}}">{{ sample.Zscore_18.value }}</td>
                                             <td width="4%" class = "{{ sample.Zscore_21.warn}}">{{ sample.Zscore_21.value }}</td>
@@ -60,10 +62,11 @@
                                             <td width="4%" class = "{{sample.FFX.warn}}">{{sample.FFX.value}}</td>
                                             <td width="4%" class = "{{sample.FFY.warn}}">{{sample.FFY.value}}</td>
                                             <td width="4%" class = "{{sample.CNVSegment.warn}}">{{sample.CNVSegment.value}}</td>
+                                            <td><a class="dropdown-item" href="{{ url_for('sample_download', file_id='segmental_calls', sample_id=sample.sample_id) }}">segmental calls</a></td>
                                             <td><p> <small></small></p></td>
                                             <td><p> <small>{{ sample.Status }}</small></p></td>
                                             {% if current_user.role=='RW' %}
-                                                
+
                                             <td width="1%" {% if sample.Include %}class="success"{% endif %}> <input type="checkbox" name="include_{{ sample.sample_id }}" {% if sample.Include %}checked{% endif %}></td>
                                             <td width="18%">
                                                 <div class="form-group">

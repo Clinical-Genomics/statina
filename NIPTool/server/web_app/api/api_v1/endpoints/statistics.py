@@ -8,7 +8,7 @@ router = APIRouter()
 templates = Jinja2Templates(directory="templates")
 
 
-@router.post("/statistics")
+@router.get("/statistics")
 def statistics(request: Request, adapter: NiptAdapter = Depends(get_nipt_adapter)):
     """Statistics view."""
 

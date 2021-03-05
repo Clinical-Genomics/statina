@@ -1,7 +1,7 @@
 
 from fastapi import Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordRequestForm
-from NIPTool.schemas.server.user import User, Token
+from NIPTool.schemas.server.login import User, Token
 from fastapi import APIRouter, Depends, Request
 from fastapi.templating import Jinja2Templates
 

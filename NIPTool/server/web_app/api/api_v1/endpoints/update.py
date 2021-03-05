@@ -1,4 +1,6 @@
 from fastapi import APIRouter, Depends, Request
+from fastapi.responses import RedirectResponse
+
 from NIPTool.adapter.plugin import NiptAdapter
 from NIPTool.server.utils import *
 from NIPTool.server.web_app.api.deps import get_nipt_adapter, get_current_active_user
@@ -7,7 +9,7 @@ from datetime import datetime
 router = APIRouter()
 
 
-@router.post("/update", methods=["POST"])
+@router.post("/update")
 def update(request: Request, adapter: NiptAdapter = Depends(get_nipt_adapter)):
     """Update the database"""
 
@@ -61,4 +63,4 @@ def update(request: Request, adapter: NiptAdapter = Depends(get_nipt_adapter)):
                     sample, adapter.sample_collection
                 )
 
-    return redirect(request.referrer)
+    return RedirectResponse(request.url)

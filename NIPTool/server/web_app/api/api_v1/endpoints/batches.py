@@ -9,7 +9,7 @@ router = APIRouter()
 templates = Jinja2Templates(directory="templates")
 
 
-@router.post("/")
+@router.get("/")
 def batches(request: Request, adapter: NiptAdapter = Depends(get_nipt_adapter)):
     """List of all batches"""
 
@@ -33,15 +33,16 @@ def batch(request: Request, batch_id: str, adapter: NiptAdapter = Depends(get_ni
 
 
 @router.get("/{batch_id}/{ncv}")
-def NCV(request: Request, batch_id: str, ncv: str, adapter: NiptAdapter = Depends(get_nipt_adapter)):
+def NCV(request: Request, batch_id: str, ncv, adapter: NiptAdapter = Depends(get_nipt_adapter)):
     """Batch view with with NCV plot"""
+
     return templates.TemplateResponse(
         "batch/tabs/NCV.html", context=dict(
             request=request,
             tris_thresholds=TRISOMI_TRESHOLDS,
             batch=adapter.batch(batch_id),
             chr=ncv,
-            ncv_chrom_data={ncv: get_sample_info(adapter, ncv, batch_id)},
+            ncv_chrom_data={ncv: get_tris_cases(adapter, ncv, batch_id)},
             normal_data=get_tris_control_normal(adapter, ncv),
             abnormal_data=get_tris_control_abnormal(adapter, ncv, 0),
             page_id=f"batches_NCV{ncv}",
@@ -49,7 +50,7 @@ def NCV(request: Request, batch_id: str, ncv: str, adapter: NiptAdapter = Depend
     )
 
 
-@router.post("/batches/{batch_id}/fetal_fraction_XY")
+@router.get("/batches/{batch_id}/fetal_fraction_XY")
 def fetal_fraction_XY(request: Request, batch_id: str, adapter: NiptAdapter = Depends(get_nipt_adapter)):
     """Batch view with fetal fraction (X against Y) plot"""
     batch = adapter.batch(batch_id)
@@ -70,7 +71,7 @@ def fetal_fraction_XY(request: Request, batch_id: str, adapter: NiptAdapter = De
     )
 
 
-@router.post("/batches/{batch_id}/fetal_fraction")
+@router.get("/batches/{batch_id}/fetal_fraction")
 def fetal_fraction(request: Request, batch_id: str, adapter: NiptAdapter = Depends(get_nipt_adapter)):
     """Batch view with fetal fraction plot"""
     batch = adapter.batch(batch_id)
@@ -86,7 +87,7 @@ def fetal_fraction(request: Request, batch_id: str, adapter: NiptAdapter = Depen
     )
 
 
-@router.post("/batches/{batch_id}/coverage")
+@router.get("/batches/{batch_id}/coverage")
 def coverage(request: Request, batch_id: str, adapter: NiptAdapter = Depends(get_nipt_adapter)):
     """Batch view with coverage plot"""
     batch = adapter.batch(batch_id)
@@ -106,7 +107,7 @@ def coverage(request: Request, batch_id: str, adapter: NiptAdapter = Depends(get
     )
 
 
-@router.post("/batches/{batch_id}/report/{coverage}")
+@router.get("/batches/{batch_id}/report/{coverage}")
 def report(request: Request, batch_id: str, coverage: str, adapter: NiptAdapter = Depends(get_nipt_adapter)):
     """Report view, collecting all tables and plots from one batch."""
 

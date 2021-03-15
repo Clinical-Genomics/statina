@@ -35,7 +35,7 @@ def login(token: Token = Depends(login_for_access_token)):
         headers = {'Authorization': f"{token.get('token_type')} {token.get('access_token')}",
                    "accept": "application/json"}
         print(headers)
-    return RedirectResponse('../', headers=headers)
+    return RedirectResponse('../batches', headers=headers)
 
 
 #@router.post("/login")

@@ -1,9 +1,7 @@
-from pydantic import ValidationError
-
 from NIPTool.adapter.plugin import NiptAdapter
 from pymongo import MongoClient
-from fastapi.security import OAuth2PasswordBearer, SecurityScopes
-from fastapi import HTTPException, status, Security
+from fastapi.security import OAuth2PasswordBearer
+from fastapi import HTTPException, status
 from NIPTool.schemas.server.login import User, UserInDB, TokenData
 from fastapi import Depends
 from passlib.context import CryptContext
@@ -34,41 +32,28 @@ oauth2_scheme = OAuth2PasswordBearer(
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 
-def get_current_user(security_scopes: SecurityScopes, token: str = Depends(oauth2_scheme), adapter: NiptAdapter = Depends(get_nipt_adapter),
+def get_current_user(token: str = Depends(oauth2_scheme), adapter: NiptAdapter = Depends(get_nipt_adapter),
                      config: dict = Depends(temp_get_config)):
-    if security_scopes.scopes:
-        authenticate_value = f'Bearer scope="{security_scopes.scope_str}"'
-    else:
-        authenticate_value = f"Bearer"
     credentials_exception = HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
         detail="Could not validate credentials",
-        headers={"WWW-Authenticate": authenticate_value},
+        headers={"WWW-Authenticate": "Bearer"},
     )
     try:
         payload = jwt.decode(token, config.get("SECRET_KEY"), algorithms=[config.get("ALGORITHM")])
         username: str = payload.get("sub")
         if username is None:
             raise credentials_exception
-        token_scopes = payload.get("scopes", [])
-        token_data = TokenData(scopes=token_scopes, username=username)
-    except (JWTError, ValidationError):
+        token_data = TokenData(username=username)
+    except JWTError:
         raise credentials_exception
     user = adapter.user(token_data.username)
     if not user:
         raise credentials_exception
-    for scope in security_scopes.scopes:
-        if scope not in token_data.scopes:
-            raise HTTPException(
-                status_code=status.HTTP_401_UNAUTHORIZED,
-                detail="Not enough permissions",
-                headers={"WWW-Authenticate": authenticate_value})
     return User(**user)
 
 
-def get_current_active_user(
-    current_user: User = Security(get_current_user, scopes=["me"])
-                            ):
+def get_current_active_user(current_user: User = Depends(get_current_user))-> User:
     if current_user.disabled:
         raise HTTPException(status_code=400, detail="Inactive user")
     return current_user

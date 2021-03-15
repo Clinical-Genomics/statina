@@ -37,5 +37,4 @@ def sample_download(request: Request, sample_id: str, file_id: str, adapter: Nip
         return RedirectResponse(request.url)
 
     file = Path(file_path)
-    print(file.absolute())
     return FileResponse(str(file.absolute()), media_type='application/octet-stream', filename=file.name)

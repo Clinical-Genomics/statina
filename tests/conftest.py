@@ -7,8 +7,8 @@ from .small_helpers import SmallHelpers
 from NIPTool.server import create_app, configure_app
 from NIPTool.adapter.plugin import NiptAdapter
 
-from NIPTool.server.app.api.api_v1.api import app
-from NIPTool.server.app.api.deps import get_nipt_adapter
+from NIPTool.server.load.api.api_v1.api import app
+from NIPTool.server.load.api.deps import get_nipt_adapter
 from fastapi.testclient import TestClient
 
 DATABASE = "testdb"

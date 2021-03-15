@@ -81,10 +81,16 @@ def valid_csv() -> Path:
 
 
 @pytest.fixture
-def invalid_csv():
+def csv_with_missing_sample_id():
     """Get file path to invalid csv"""
 
-    return "tests/fixtures/not_a_valid_fluffy.csv"
+    return "tests/fixtures/fluffy_file_with_missing_sample_id.csv"
+
+@pytest.fixture
+def csv_with_missing_sample_project():
+    """Get file path to invalid csv"""
+
+    return "tests/fixtures/fluffy_file_with_missing_sample_project.csv"
 
 
 @pytest.fixture

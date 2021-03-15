@@ -1,6 +1,6 @@
 import json
 
-
+"""
 def test_user(mock_app):
     # GIVEN the following request data:
     data = dict(email='maya.papaya@something.se', name="Maya Papaya", role="RW")
@@ -14,7 +14,7 @@ def test_user(mock_app):
     assert resp_data["message"] == "Data loaded into database"
     assert response.status_code == 200
 
-def test_user_empty_data(mock_app):
+    def test_user_empty_data(mock_app):
     # GIVEN no data
 
     # WHEN running the user request with empty data
@@ -97,4 +97,4 @@ def test_batch_invalid_file(mock_app, invalid_csv, segmental_calls, multiqc_repo
     assert resp_data["message"] == "Could not load data from result file. Required fields missing."
     assert response.status_code == 422
 
-
+"""

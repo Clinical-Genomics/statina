@@ -2,8 +2,9 @@ from pathlib import Path
 from typing import List
 from pydantic import ValidationError
 import pytest
-from NIPTool.parse.batch import get_samples, parse_csv
+from NIPTool.parse.batch import get_samples, get_batch, parse_csv
 from NIPTool.schemas.db_models.sample import SampleModel
+from NIPTool.schemas.db_models.batch import BatchModel
 
 
 def get_nr_csv_entries(csv_path: Path) -> int:
@@ -28,7 +29,8 @@ def test_parse_csv(valid_csv: Path):
     # THEN assert the correct nr of samples was parsed
     assert len(result) == nr_samples
 
-def test_parse_batch(valid_csv: Path):
+
+def test_get_samples(valid_csv: Path):
     # GIVEN a valid csv file
     # GIVEN the number of samples
     nr_samples = get_nr_csv_entries(valid_csv)
@@ -42,11 +44,29 @@ def test_parse_batch(valid_csv: Path):
     assert isinstance(results[0], SampleModel)
 
 
-def test_parse_batch_file_with_missing_data(invalid_csv):	
+def test_get_samples_with_missing_sample_id_in_csv(csv_with_missing_sample_id):
     # GIVEN a csv file with missing SampleID
 
     # WHEN running get_samples
     # THEN pydantic ValidationError is being raised
     with pytest.raises(ValidationError):
-        get_samples(invalid_csv)
+        get_samples(csv_with_missing_sample_id)
 
+
+def test_get_batch(valid_csv: Path):
+    # GIVEN a valid csv file
+
+    # WHEN running get_samples
+    results: BatchModel = get_batch(valid_csv)
+
+    # THEN assert that the objects are samples
+    assert isinstance(results, BatchModel)
+
+
+def test_get_batch_with_missing_sample_project_in_csv(csv_with_missing_sample_project):
+    # GIVEN a csv file with missing SampleID
+
+    # WHEN running get_samples
+    # THEN pydantic ValidationError is being raised
+    with pytest.raises(ValidationError):
+        get_batch(csv_with_missing_sample_project)

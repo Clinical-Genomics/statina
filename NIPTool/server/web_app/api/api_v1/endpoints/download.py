@@ -18,6 +18,7 @@ def batch_download(request: Request, batch_id: str, file_id: str, adapter: NiptA
     file_path = batch.get(file_id)
 
     if not validate_file_path(file_path):
+        # handle the redirect responce!
         return RedirectResponse(request.url)
 
     path = Path(file_path)
@@ -31,10 +32,10 @@ def sample_download(request: Request, sample_id: str, file_id: str, adapter: Nip
 
     sample = adapter.sample(sample_id)
     file_path = sample.get(file_id)
-
     if not validate_file_path(file_path):
+        # handle the redirect responce!
         return RedirectResponse(request.url)
 
     file = Path(file_path)
-
+    print(file.absolute())
     return FileResponse(str(file.absolute()), media_type='application/octet-stream', filename=file.name)

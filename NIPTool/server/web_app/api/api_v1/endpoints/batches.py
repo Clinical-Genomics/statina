@@ -4,7 +4,6 @@ from NIPTool.server.utils import *
 from NIPTool.server.constants import TRISOMI_TRESHOLDS
 from NIPTool.server.web_app.api.deps import get_nipt_adapter, get_current_active_user
 from fastapi.templating import Jinja2Templates
-from NIPTool.schemas.server.login import User
 
 router = APIRouter()
 templates = Jinja2Templates(directory="templates")

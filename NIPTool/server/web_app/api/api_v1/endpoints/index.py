@@ -12,3 +12,10 @@ def index(request: Request):
     """Log in view."""
 
     return templates.TemplateResponse("index.html", context={"request": request})
+
+
+@router.get("/")
+def index(request: Request):
+    """Log in view."""
+
+    return templates.TemplateResponse("index.html", context={"request": request})

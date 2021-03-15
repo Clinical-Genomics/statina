@@ -9,6 +9,7 @@ from NIPTool.schemas import db_models
 
 LOG = logging.getLogger(__name__)
 
+
 def pars_segmental_calls(segmental_calls_path: Optional[str]) -> dict:
     """Builds a dict with segmental calls bed files.
         key: sample ids
@@ -30,7 +31,8 @@ def pars_segmental_calls(segmental_calls_path: Optional[str]) -> dict:
 
     return segmental_calls
 
-def validate_file_path(file_path: Optional[str])-> bool:
+
+def validate_file_path(file_path: Optional[str]) -> bool:
     """File path validation"""
 
     if not file_path:
@@ -43,12 +45,15 @@ def validate_file_path(file_path: Optional[str])-> bool:
 
     return True
 
+
 def convert_empty_str_to_none(data: dict) -> dict:
     """Convert all values that are empty string to None in a dict"""
+
     for key, value in data.items():
         if not value:
             data[key] = None
     return data
+
 
 def parse_csv(infile: Path) -> List[Dict[str, str]]:
     with open(infile, "r") as csv_file:

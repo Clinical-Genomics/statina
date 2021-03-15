@@ -1,9 +1,8 @@
 from pathlib import Path
 from typing import List
-
+from pydantic import ValidationError
+import pytest
 from NIPTool.parse.batch import get_samples, parse_csv
-import pytest	
-from NIPTool.exeptions import MissingResultsError
 from NIPTool.schemas.db_models.sample import SampleModel
 
 
@@ -34,7 +33,7 @@ def test_parse_batch(valid_csv: Path):
     # GIVEN the number of samples
     nr_samples = get_nr_csv_entries(valid_csv)
 
-    # WHEN running parse_batch_file
+    # WHEN running get_samples
     results: List[SampleModel] = get_samples(valid_csv)
 
     # THEN assert results is a list and it has length 3
@@ -46,10 +45,8 @@ def test_parse_batch(valid_csv: Path):
 def test_parse_batch_file_with_missing_data(invalid_csv):	
     # GIVEN a csv file with missing SampleID
 
-    # WHEN running parse_batch_file
-    results = get_samples(invalid_csv)
+    # WHEN running get_samples
+    # THEN pydantic ValidationError is being raised
+    with pytest.raises(ValidationError):
+        get_samples(invalid_csv)
 
-    # THEN assert results is a list and it has length 3
-    assert isinstance(results, list)
-    for sample in results:
-        assert sample == {}

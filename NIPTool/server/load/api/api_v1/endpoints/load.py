@@ -41,7 +41,7 @@ def user(user: load.UserLoadModel, adapter: NiptAdapter = Depends(get_nipt_adapt
     """Function to load user into the database with rest"""
 
     try:
-        load_user(adapter, user.email, user.name, user.role)
+        load_user(adapter, user)
     except NIPToolError as e:
         return {"message": e.message, "status_code": 422}
 

@@ -5,7 +5,6 @@ import pytest
 from NIPTool.parse.batch import get_samples, get_batch, parse_csv, pars_segmental_calls
 from NIPTool.schemas.db_models.sample import SampleModel
 from NIPTool.schemas.db_models.batch import BatchModel
-import logging
 
 
 def get_nr_csv_entries(csv_path: Path) -> int:

@@ -1,50 +1,33 @@
 from pathlib import Path
-
 import pytest
-
 from mongomock import MongoClient
 from .small_helpers import SmallHelpers
 from NIPTool.server import create_app, configure_app
 from NIPTool.adapter.plugin import NiptAdapter
-
 from NIPTool.server.load.api.api_v1.api import app
 from NIPTool.server.load.api.deps import get_nipt_adapter
 from fastapi.testclient import TestClient
 
 DATABASE = "testdb"
 
-def override_dependency(db_client):
-    return NiptAdapter(db_client, db_name=DATABASE)
 
-
-@pytest.fixture(scope="function")
-def database(request, pymongo_client):
-    """Get an adapter connected to mongo database"""
-
-    mongo_client = pymongo_client
-    database = mongo_client[DATABASE]
-    return database
+def override_dependency():
+    mock_client = MongoClient()
+    database = mock_client[DATABASE]
+    adapter = NiptAdapter(database.client, db_name=DATABASE)
+    return adapter
 
 
 @pytest.fixture()
-def mock_fast_client(database):
+def mock_fast_client():
     """Return a mock app"""
 
     client = TestClient(app)
-    app.dependency_overrides[get_nipt_adapter] = override_dependency(database.client)
-
+    app.dependency_overrides[get_nipt_adapter] = override_dependency()
     return client
 
 
-
-@pytest.fixture()
-def mock_app(database):
-    """Return a class with small helper functions"""
-    app = create_app(test=True)
-    app.db = database
-    app.adapter = NiptAdapter(database.client, db_name=database.name)
-    return app
-
+#####################
 
 @pytest.fixture(scope="function")
 def pymongo_client(request):
@@ -59,7 +42,27 @@ def pymongo_client(request):
     return mock_client
 
 
+@pytest.fixture(scope="function")
+def database(request, pymongo_client):
+    """Get an adapter connected to mongo database"""
 
+    mongo_client = pymongo_client
+    database = mongo_client[DATABASE]
+    return database
+
+
+
+
+
+#############
+
+@pytest.fixture()
+def mock_app(database):
+    """Return a class with small helper functions"""
+    app = create_app(test=True)
+    app.db = database
+    app.adapter = NiptAdapter(database.client, db_name=database.name)
+    return app
 
 
 @pytest.fixture(name="small_helpers")
@@ -86,6 +89,7 @@ def csv_with_missing_sample_id():
 
     return "tests/fixtures/fluffy_result_files/fluffy_file_with_missing_sample_id.csv"
 
+
 @pytest.fixture
 def csv_with_missing_sample_project():
     """Get file path to invalid csv"""
@@ -98,6 +102,7 @@ def multiqc_report():
     """Get file path to multiqc_report"""
 
     return "tests/fixtures/fluffy_result_files/multiqc_report.html"
+
 
 @pytest.fixture
 def segmental_calls():

@@ -17,13 +17,10 @@ def pars_segmental_calls(segmental_calls_path: Optional[str]) -> dict:
 
     segmental_calls = {}
     if not validate_file_path(segmental_calls_path):
+        LOG.warning('Segmental Calls file path missing.')
         return segmental_calls
 
     segmental_calls_dir = Path(segmental_calls_path)
-    if not segmental_calls_dir.exists():
-        LOG.info('Segmental Calls file path missing.')
-        return segmental_calls
-
     for file in segmental_calls_dir.iterdir():
         if file.suffix == '.bed':
             sample_id = file.name.split('.')[0]

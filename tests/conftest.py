@@ -77,30 +77,30 @@ def fixture_small_helpers():
 def valid_csv() -> Path:
     """Get file path to valid csv"""
 
-    return Path("tests/fixtures/valid_fluffy.csv")
+    return Path("tests/fixtures/fluffy_result_files/valid_fluffy.csv")
 
 
 @pytest.fixture
 def csv_with_missing_sample_id():
     """Get file path to invalid csv"""
 
-    return "tests/fixtures/fluffy_file_with_missing_sample_id.csv"
+    return "tests/fixtures/fluffy_result_files/fluffy_file_with_missing_sample_id.csv"
 
 @pytest.fixture
 def csv_with_missing_sample_project():
     """Get file path to invalid csv"""
 
-    return "tests/fixtures/fluffy_file_with_missing_sample_project.csv"
+    return "tests/fixtures/fluffy_result_files/fluffy_file_with_missing_sample_project.csv"
 
 
 @pytest.fixture
 def multiqc_report():
     """Get file path to multiqc_report"""
 
-    return "tests/fixtures/multiqc_report.html"
+    return "tests/fixtures/fluffy_result_files/multiqc_report.html"
 
 @pytest.fixture
 def segmental_calls():
     """Get file path to segmental_calls"""
 
-    return "tests/fixtures/segmental_calls"
+    return "tests/fixtures/fluffy_result_files"

@@ -2,7 +2,6 @@ from pathlib import Path
 import pytest
 from mongomock import MongoClient
 from .small_helpers import SmallHelpers
-from NIPTool.server import create_app, configure_app
 from NIPTool.adapter.plugin import NiptAdapter
 from NIPTool.server.load.api.api_v1.api import app
 from NIPTool.server.load.api.deps import get_nipt_adapter

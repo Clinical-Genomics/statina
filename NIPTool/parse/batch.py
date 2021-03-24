@@ -9,7 +9,6 @@ from NIPTool.schemas import db_models
 
 LOG = logging.getLogger(__name__)
 
-
 def pars_segmental_calls(segmental_calls_path: Optional[str]) -> dict:
     """Builds a dict with segmental calls bed files.
         key: sample ids
@@ -17,10 +16,13 @@ def pars_segmental_calls(segmental_calls_path: Optional[str]) -> dict:
 
     segmental_calls = {}
     if not validate_file_path(segmental_calls_path):
-        LOG.warning('Segmental Calls file path missing.')
         return segmental_calls
 
     segmental_calls_dir = Path(segmental_calls_path)
+    if not segmental_calls_dir.exists():
+        LOG.info('Segmental Calls file path missing.')
+        return segmental_calls
+
     for file in segmental_calls_dir.iterdir():
         if file.suffix == '.bed':
             sample_id = file.name.split('.')[0]
@@ -28,8 +30,7 @@ def pars_segmental_calls(segmental_calls_path: Optional[str]) -> dict:
 
     return segmental_calls
 
-
-def validate_file_path(file_path: Optional[str]) -> bool:
+def validate_file_path(file_path: Optional[str])-> bool:
     """File path validation"""
 
     if not file_path:
@@ -42,15 +43,12 @@ def validate_file_path(file_path: Optional[str]) -> bool:
 
     return True
 
-
 def convert_empty_str_to_none(data: dict) -> dict:
     """Convert all values that are empty string to None in a dict"""
-
     for key, value in data.items():
         if not value:
             data[key] = None
     return data
-
 
 def parse_csv(infile: Path) -> List[Dict[str, str]]:
     with open(infile, "r") as csv_file:

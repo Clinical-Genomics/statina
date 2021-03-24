@@ -16,6 +16,7 @@ def pars_segmental_calls(segmental_calls_path: Optional[str]) -> dict:
 
     segmental_calls = {}
     if not validate_file_path(segmental_calls_path):
+        LOG.warning('Segmental Calls file path missing.')
         return segmental_calls
 
     segmental_calls_dir = Path(segmental_calls_path)

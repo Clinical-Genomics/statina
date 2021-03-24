@@ -32,6 +32,7 @@ def fast_app_client():
 
 #####################
 
+
 @pytest.fixture(scope="function")
 def pymongo_client(request):
     """Get a client to the mongo database"""
@@ -56,16 +57,22 @@ def database(request, pymongo_client):
 
 @pytest.fixture(scope="function")
 def valid_load_user():
-    user = UserLoadModel(email='maya.papaya@something.se', name="Maya Papaya", role="RW")
+    user = UserLoadModel(email="maya.papaya@something.se", name="Maya Papaya", role="RW")
     return user
+
 
 @pytest.fixture(scope="function")
 def valid_load_batch(multiqc_report, segmental_calls, valid_csv):
-    batch_files = BatchLoadModel(multiqc_report=multiqc_report, segmental_calls=segmental_calls, result_file=valid_csv)
+    batch_files = BatchLoadModel(
+        multiqc_report=multiqc_report, segmental_calls=segmental_calls, result_file=valid_csv
+    )
     return batch_files
 
 
-
+@pytest.fixture(name="small_helpers")
+def fixture_small_helpers():
+    """Return a class with small helper functions"""
+    return SmallHelpers()
 
 
 ##########################################

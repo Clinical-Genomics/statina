@@ -4,9 +4,9 @@
 <div class="container-fluid">
     {% include 'sample/header.html' %}
     <ul class="nav nav-tabs" id="myTab">
-        <li><a href="{{url_for('server.sample', sample_id = sample._id)}}">Status table</a>
+        <li><a href="{{url_for('sample', sample_id = sample._id)}}">Status table</a>
         </li>
-        <li class="active"><a href="{{url_for('server.sample_tris', sample_id = sample._id)}}">131821-Plot</a>
+        <li class="active"><a href="{{url_for('sample_tris', sample_id = sample._id)}}">131821-Plot</a>
         </li>
     </ul>
     <div class="tab-pane fade in active" id='131821'>

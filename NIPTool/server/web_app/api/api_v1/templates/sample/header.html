@@ -1,6 +1,6 @@
 {% block content %}
 
-<form action="{{ url_for('server.update') }}" method="post">
+<form action="{{ url_for('update') }}" method="post">
     <div class="vertical-center">
         <div class="row">
             <div class="col-lg-12">
@@ -19,7 +19,7 @@
                                 <table class="table table-bordered ">
                                     <tr>
                                         <td><strong>Batch:</strong></td>
-                                        <td><a href={{ url_for('server.batch', batch_id=batch._id) }}>{{ batch._id }}</a></td>
+                                        <td><a href={{ url_for('batch', batch_id=batch._id) }}>{{ batch._id }}</a></td>
                                         <td><strong># QCFlags:</strong></td>
                                         <td>{{ sample.QCFlag}}</td>
                                     </tr>

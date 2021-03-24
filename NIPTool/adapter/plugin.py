@@ -45,7 +45,7 @@ class NiptAdapter(MongoAdapter):
                 LOG.info("No updates for document %s.", document_id)
         return document_id
 
-    def user(self, username):
+    def user(self, username: str):
         """Find user from user collection"""
         return self.user_collection.find_one({"_id": username})
 

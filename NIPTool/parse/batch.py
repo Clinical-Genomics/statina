@@ -29,7 +29,8 @@ def pars_segmental_calls(segmental_calls_path: Optional[str]) -> dict:
     return segmental_calls
 
 
-def validate_file_path(file_path: Optional[str]) -> bool:
+
+def validate_file_path(file_path: Optional[str])-> bool:
     """File path validation"""
 
     if not file_path:

@@ -4,8 +4,8 @@ from pydantic import BaseSettings
 
 
 class Settings(BaseSettings):
-    db_uri: str
-    db_name: str
+    db_uri: str = "test_uri"
+    db_name: str = "test_db"
 
 
 settings = Settings()

@@ -23,7 +23,7 @@ def load_batch(adapter: NiptAdapter, batch: BatchModel, batch_files: BatchLoadMo
     adapter.add_or_update_document(mongo_batch, adapter.batch_collection)
 
 
-def load_samples(adapter, samples: List[SampleModel], segmental_calls: Optional[str]) -> None:
+def load_samples(adapter: NiptAdapter, samples: List[SampleModel], segmental_calls: Optional[str]) -> None:
     """Function to load data from fluffy result file."""
 
     segmental_calls: Dict[str, str] = pars_segmental_calls(segmental_calls_path=segmental_calls)

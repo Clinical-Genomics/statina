@@ -20,10 +20,12 @@ def load_batch(adapter: NiptAdapter, batch: BatchModel, batch_files: BatchLoadMo
     mongo_batch["segmental_calls"] = batch_files.segmental_calls
     mongo_batch["multiqc_report"] = batch_files.multiqc_report
     mongo_batch["result_file"] = batch_files.result_file
-    adapter.add_or_update_document(mongo_batch, adapter.batch_collection)
+    adapter.add_or_update_document(document_news=mongo_batch, collection=adapter.batch_collection)
 
 
-def load_samples(adapter, samples: List[SampleModel], segmental_calls: Optional[str]) -> None:
+def load_samples(
+    adapter: NiptAdapter, samples: List[SampleModel], segmental_calls: Optional[str]
+) -> None:
     """Function to load data from fluffy result file."""
 
     segmental_calls: Dict[str, str] = pars_segmental_calls(segmental_calls_path=segmental_calls)
@@ -35,4 +37,6 @@ def load_samples(adapter, samples: List[SampleModel], segmental_calls: Optional[
         if segmental_calls_path:
             mongo_sample["segmental_calls"] = segmental_calls_path
 
-        adapter.add_or_update_document(mongo_sample, adapter.sample_collection)
+        adapter.add_or_update_document(
+            document_news=mongo_sample, collection=adapter.sample_collection
+        )

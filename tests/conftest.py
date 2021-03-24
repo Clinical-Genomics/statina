@@ -1,30 +1,35 @@
+from pathlib import Path
 import pytest
-
 from mongomock import MongoClient
 from .small_helpers import SmallHelpers
-from NIPTool.server import create_app, configure_app
 from NIPTool.adapter.plugin import NiptAdapter
-from NIPTool.server.load import load_bp
-
+from NIPTool.server.load.api.api_v1.api import app
+from NIPTool.server.load.api.deps import get_nipt_adapter
+from fastapi.testclient import TestClient
+from NIPTool.schemas.server.load import UserLoadModel, BatchLoadModel
 
 DATABASE = "testdb"
 
-@pytest.fixture(scope="function")
-def database(request, pymongo_client):
-    """Get an adapter connected to mongo database"""
 
-    mongo_client = pymongo_client
+def override_nipt_adapter():
+    """Function for overriding the nipt adapter dependency"""
+
+    mongo_client = MongoClient()
     database = mongo_client[DATABASE]
-    return database
+    adapter = NiptAdapter(database.client, db_name=DATABASE)
+    return adapter
+
 
 @pytest.fixture()
-def mock_app(database):
-    """Return a class with small helper functions"""
-    app = create_app(test=True)
-    app.db = database
-    app.adapter = NiptAdapter(database.client, db_name=database.name)
-    app.register_blueprint(load_bp)
-    return app
+def fast_app_client():
+    """Return a mock fastapi app"""
+
+    client = TestClient(app)
+    app.dependency_overrides[get_nipt_adapter] = override_nipt_adapter
+    return client
+
+
+#####################
 
 
 @pytest.fixture(scope="function")
@@ -40,7 +45,27 @@ def pymongo_client(request):
     return mock_client
 
 
+@pytest.fixture(scope="function")
+def database(request, pymongo_client):
+    """Get an adapter connected to mongo database"""
 
+    mongo_client = pymongo_client
+    database = mongo_client[DATABASE]
+    return database
+
+
+@pytest.fixture(scope="function")
+def valid_load_user():
+    user = UserLoadModel(email="maya.papaya@something.se", name="Maya Papaya", role="RW")
+    return user
+
+
+@pytest.fixture(scope="function")
+def valid_load_batch(multiqc_report, segmental_calls, valid_csv):
+    batch_files = BatchLoadModel(
+        multiqc_report=multiqc_report, segmental_calls=segmental_calls, result_file=valid_csv
+    )
+    return batch_files
 
 
 @pytest.fixture(name="small_helpers")
@@ -55,27 +80,35 @@ def fixture_small_helpers():
 
 
 @pytest.fixture
-def valid_csv():
+def valid_csv() -> Path:
     """Get file path to valid csv"""
 
-    return "tests/fixtures/valid_fluffy.csv"
+    return "tests/fixtures/fluffy_result_files/valid_fluffy.csv"
 
 
 @pytest.fixture
-def invalid_csv():
+def csv_with_missing_sample_id():
     """Get file path to invalid csv"""
 
-    return "tests/fixtures/not_a_valid_fluffy.csv"
+    return "tests/fixtures/fluffy_result_files/fluffy_file_with_missing_sample_id.csv"
+
+
+@pytest.fixture
+def csv_with_missing_sample_project():
+    """Get file path to invalid csv"""
+
+    return "tests/fixtures/fluffy_result_files/fluffy_file_with_missing_sample_project.csv"
 
 
 @pytest.fixture
 def multiqc_report():
     """Get file path to multiqc_report"""
 
-    return "tests/fixtures/multiqc_report.html"
+    return "tests/fixtures/fluffy_result_files/multiqc_report.html"
+
 
 @pytest.fixture
 def segmental_calls():
     """Get file path to segmental_calls"""
 
-    return "tests/fixtures/segmental_calls"
+    return "tests/fixtures/fluffy_result_files"

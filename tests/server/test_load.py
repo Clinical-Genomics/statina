@@ -1,100 +1,111 @@
-import json
+import pytest
+from fastapi import status
+from pydantic import ValidationError
+
+from NIPTool.schemas.server import BatchLoadModel
+
+"""
+def test_user_mocked(mocker, fast_app_client, valid_load_user):
+    # GIVEN a load_user function that never fails
+    mocker.patch('NIPTool.server.load.api.api_v1.endpoints.load.load_user')
+
+    # WHEN running the user request with the data
+    response = fast_app_client.post('/api/v1/load/user', json=valid_load_user.dict())
+
+    assert response.status_code == status.HTTP_200_OK
 
 
-def test_user(mock_app):
+def test_user_load_fails_mocked(mocker, mock_fast_client):
     # GIVEN the following request data:
     data = dict(email='maya.papaya@something.se', name="Maya Papaya", role="RW")
 
+    with patch('NIPTool.server.load.api.api_v1.endpoints.load.load_user', side_effect=Exception('mocked error')):
+        # WHEN running the user request with the data
+        response = mock_fast_client.post('/api/v1/load/user', json=data)
+        assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY"""
+
+
+def test_user(fast_app_client, valid_load_user):
+    # GIVEN valid user load data
+
     # WHEN running the user request with the data
-    response = mock_app.test_client().post('/user', data=data)
+    response = fast_app_client.post("/api/v1/load/user", json=valid_load_user.dict())
 
-    # The user should be added to the database
-    assert mock_app.adapter.user_collection.estimated_document_count() == 1
-    resp_data = json.loads(response.data)
-    assert resp_data["message"] == "Data loaded into database"
-    assert response.status_code == 200
-
-def test_user_empty_data(mock_app):
-    # GIVEN no data
-
-    # WHEN running the user request with empty data
-    response = mock_app.test_client().post('/user', data=dict())
-
-    # THEN assert BadRequestKeyError: 400 Bad Request
-    assert response.status_code == 400
+    # THEN
+    assert "Data loaded into database" in response.text
+    assert response.status_code == status.HTTP_200_OK
 
 
-def test_batch_valid_files(mock_app, valid_csv, segmental_calls, multiqc_report):
-    # GIVEN the following request data:
-    #   a valid csv file with three samples
-    #   segmental_calls and multiqc_report files with random content, but that do exist.
+def test_user_wrong_input(fast_app_client, valid_load_user):
+    # GIVEN user data with missing email field
+    data = valid_load_user.dict()
+    data.pop("email")
 
-    data = dict(multiqc_report=multiqc_report, segmental_calls=segmental_calls, result_file=valid_csv)
+    # WHEN running the user request with the data
+    response = fast_app_client.post("/api/v1/load/user", json=data)
+
+    # THEN
+    assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
+
+
+def test_batch_valid_files(fast_app_client, valid_load_batch):
+    # GIVEN the valid load batch data
 
     # WHEN running the request with the data
-    response = mock_app.test_client().post('/batch', data=data)
+    response = fast_app_client.post("/api/v1/load/batch", json=valid_load_batch.dict())
 
-    # THEN assert the samples should be added to the sample collection
-    # and the batch should be added to the batch collection
-    assert mock_app.adapter.sample_collection.estimated_document_count() == 3
-    assert mock_app.adapter.batch_collection.estimated_document_count() == 1
-    resp_data = json.loads(response.data)
-    assert resp_data["message"] == "Data loaded into database"
-    assert response.status_code == 200
+    # THEN
+    assert "Data loaded into database" in response.text
+    assert response.status_code == status.HTTP_200_OK
 
 
-def test_batch_no_data(mock_app):
-    # GIVEN no data
-
-    # WHEN running the request with empty data
-    response = mock_app.test_client().post('/batch', data=dict())
-
-    # THEN assert nothing added to sample or batch collections
-    assert mock_app.adapter.sample_collection.estimated_document_count() == 0
-    assert mock_app.adapter.batch_collection.estimated_document_count() == 0
-
-    # THEN assert BadRequestKeyError: 400 Bad Request
-    assert response.status_code == 400
-
-
-def test_batch_missing_files(mock_app, valid_csv):
+def test_batch_wrong_segmental_calls_path(fast_app_client, valid_load_batch):
     # GIVEN the following request data:
     #   a valid csv file with three samples
     #   but no segmental_calls and multiqc_report
 
-    data = dict(result_file=valid_csv)
+    data = valid_load_batch.dict()
+    data["segmental_calls"] = "no_valid_path"
 
     # WHEN running the request with the data
-    response = mock_app.test_client().post('/batch', data=data)
-
-    # THEN assert the samples are being added
-    assert mock_app.adapter.sample_collection.estimated_document_count() == 3
+    response = fast_app_client.post("/api/v1/load/batch", json=data)
 
     # THEN assert batch is being added without error
-    assert mock_app.adapter.batch_collection.estimated_document_count() == 1
-    resp_data = json.loads(response.data)
-    assert resp_data["message"] == "Data loaded into database"
-    assert response.status_code == 200
+    assert "Data loaded into database" in response.text
+    assert response.status_code == status.HTTP_200_OK
 
 
-def test_batch_invalid_file(mock_app, invalid_csv, segmental_calls, multiqc_report):
+def test_batch_wrong_result_file_path(fast_app_client, valid_load_batch):
     # GIVEN the following request data:
-    #   a invalid csv file with three samples - required field SampleID has bad format
-    #   segmental_calls and multiqc_report files with random content, but that do exist.
 
-    data = dict(multiqc_report=multiqc_report, segmental_calls=segmental_calls, result_file=invalid_csv)
+    data = valid_load_batch.dict()
+    data["result_file"] = "no_valid_path"
 
-    # WHEN running the3 request with the data
-    response = mock_app.test_client().post('/batch', data=data)
+    # WHEN running the request with the data
+    response = fast_app_client.post("/api/v1/load/batch", json=data)
 
-    # THEN assert nothing added to sample the collection
-    assert mock_app.adapter.sample_collection.estimated_document_count() == 0
-
-    # THEN assert nothing added to batch the collection
-    assert mock_app.adapter.batch_collection.estimated_document_count() == 0
-
-    resp_data = json.loads(response.data)
-    assert resp_data["message"] == "Could not load data from result file. Required fields missing."
-    assert response.status_code == 422
+    # THEN assert
+    assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
+    assert "Results file missing" in response.text
 
 
+def test_batch_no_data(fast_app_client):
+    # GIVEN no data
+
+    # WHEN running the request with empty data
+    response = fast_app_client.post("/api/v1/load/batch", json=dict())
+
+    # THEN assert BadRequestKeyError: 400 Bad Request
+    assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
+
+
+def test_batch_invalid_file(fast_app_client, valid_load_batch, csv_with_missing_sample_id):
+    # GIVEN batch load data with a csv result file with missing sample ids:
+    data = valid_load_batch.dict()
+    data["result_file"] = csv_with_missing_sample_id
+
+    # WHEN running the request with the data
+    # THEN assert ValidationError and "Required fields missing" in responce message
+    with pytest.raises(ValidationError):
+        response = fast_app_client.post("/api/v1/load/batch", json=data)
+        assert "Could not load data from result file. Required fields missing." in response.text

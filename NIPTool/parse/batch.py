@@ -1,18 +1,14 @@
+import csv
 import logging
-import pandas
 from pathlib import Path
 
-from typing import Optional, List
+from typing import Optional, List, Dict
+from pydantic import parse_obj_as
 
-from NIPTool.exeptions import MissingResultsError
-from NIPTool.models.validation import (
-    ints,
-    floats,
-    strings,
-    exceptions,
-)
+from NIPTool.schemas import db_models
 
 LOG = logging.getLogger(__name__)
+
 
 def pars_segmental_calls(segmental_calls_path: Optional[str]) -> dict:
     """Builds a dict with segmental calls bed files.
@@ -21,13 +17,10 @@ def pars_segmental_calls(segmental_calls_path: Optional[str]) -> dict:
 
     segmental_calls = {}
     if not validate_file_path(segmental_calls_path):
+        LOG.warning('Segmental Calls file path missing.')
         return segmental_calls
 
     segmental_calls_dir = Path(segmental_calls_path)
-    if not segmental_calls_dir.exists():
-        LOG.info('Segmental Calls file path missing.')
-        return segmental_calls
-
     for file in segmental_calls_dir.iterdir():
         if file.suffix == '.bed':
             sample_id = file.name.split('.')[0]
@@ -35,7 +28,8 @@ def pars_segmental_calls(segmental_calls_path: Optional[str]) -> dict:
 
     return segmental_calls
 
-def validate_file_path(file_path: Optional[str])-> bool:
+
+def validate_file_path(file_path: Optional[str]) -> bool:
     """File path validation"""
 
     if not file_path:
@@ -49,52 +43,30 @@ def validate_file_path(file_path: Optional[str])-> bool:
     return True
 
 
-def form(val: Optional, function) -> Optional:
-    """Returning formatted value or None"""
+def convert_empty_str_to_none(data: dict) -> dict:
+    """Convert all values that are empty string to None in a dict"""
 
-    try:
-        return function(val)
-    except:
-        return None
-
-
-def validate(key: str, val: Optional) -> Optional:
-    """Formatting value according to defined models."""
-
-    if val in exceptions:
-        formatted_value = None
-    elif key in ints:
-        formatted_value = form(val, int)
-    elif key in floats:
-        formatted_value = form(val, float)
-    elif key in strings:
-        formatted_value = form(val, str)
-    else:
-        formatted_value = None
-    return formatted_value
+    for key, value in data.items():
+        if not value:
+            data[key] = None
+    return data
 
 
-def parse_batch_file(nipt_results_path: str) -> List[dict]:
-    """Parsing file content. Formatting values. Ignoring values
-    that could not be formatted according to defined models"""
+def parse_csv(infile: Path) -> List[Dict[str, str]]:
+    with open(infile, "r") as csv_file:
+        entries = [convert_empty_str_to_none(entry) for entry in csv.DictReader(csv_file)]
+    return entries
 
-    file = Path(nipt_results_path)
 
-    if not file.exists():
-        raise MissingResultsError("Results file missing.")
+def get_samples(nipt_results_path: Path) -> List[db_models.SampleModel]:
+    """Parse NIPT result file into samples"""
 
-    data_frame = pandas.read_csv(file, na_filter=False)
-    results = data_frame.to_dict(orient="records")
+    return parse_obj_as(List[db_models.SampleModel], parse_csv(nipt_results_path))
 
-    samples = []
-    for sample in results:
-        formatted_results = {}
-        for key, val in sample.items():
-            formatted_value = validate(key, val)
-            if formatted_value is None:
-                LOG.info(f"invalid format of {key}.")
-                continue
-            formatted_results[key] = formatted_value
-        samples.append(formatted_results)
 
-    return samples
+def get_batch(nipt_results_path: Path) -> db_models.BatchModel:
+    """Parse NIPT result file and create a batch object from the first sample information"""
+
+    sample_data: List[dict] = parse_csv(nipt_results_path)
+
+    return db_models.BatchModel.parse_obj(sample_data[0])

@@ -3,8 +3,8 @@ from typing import Optional
 from pydantic import BaseModel
 
 
-class BatchModel(BaseModel):
-    SampleProject: str
+class DatabaseBatch(BaseModel):
+    _id: str
     result_file: Optional[str]
     multiqc_report: Optional[str]
     segmental_calls: Optional[str]

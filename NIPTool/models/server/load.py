@@ -1,13 +1,14 @@
 from pydantic import BaseModel
 
 
-class BatchLoadModel(BaseModel):
+class BatchRequestBody(BaseModel):
+    """"""
     result_file: str
     multiqc_report: str
     segmental_calls: str
 
 
-class UserLoadModel(BaseModel):
+class UserRequestBody(BaseModel):
     email: str
     name: str
     role: str

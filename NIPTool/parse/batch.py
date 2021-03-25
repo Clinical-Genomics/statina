@@ -5,7 +5,7 @@ from pathlib import Path
 from typing import Optional, List, Dict
 from pydantic import parse_obj_as
 
-from NIPTool.schemas import db_models
+from NIPTool.models.fluffy_results import FluffyBatch, FluffySample
 
 LOG = logging.getLogger(__name__)
 
@@ -59,15 +59,15 @@ def parse_csv(infile: Path) -> List[Dict[str, str]]:
     return entries
 
 
-def get_samples(nipt_results_path: Path) -> List[db_models.SampleModel]:
+def get_samples(nipt_results_path: Path) -> List[FluffySample]:
     """Parse NIPT result file into samples"""
 
-    return parse_obj_as(List[db_models.SampleModel], parse_csv(nipt_results_path))
+    return parse_obj_as(List[FluffySample], parse_csv(nipt_results_path))
 
 
-def get_batch(nipt_results_path: Path) -> db_models.BatchModel:
+def get_batch(nipt_results_path: Path) -> FluffyBatch:
     """Parse NIPT result file and create a batch object from the first sample information"""
 
     sample_data: List[dict] = parse_csv(nipt_results_path)
 
-    return db_models.BatchModel.parse_obj(sample_data[0])
+    return FluffyBatch.parse_obj(sample_data[0])

@@ -2,7 +2,26 @@ from typing import Optional
 
 from pydantic import BaseModel
 
-class SampleModel(BaseModel):
+
+class FluffyBatch(BaseModel):
+    SampleProject: str
+    Flowcell: Optional[str]
+    SequencingDate: Optional[str]
+    Median_13: Optional[float]
+    Median_18: Optional[float]
+    Median_21: Optional[float]
+    Median_X: Optional[float]
+    Median_Y: Optional[float]
+    Stdev_13: Optional[float]
+    Stdev_18: Optional[float]
+    Stdev_21: Optional[float]
+    Stdev_X: Optional[float]
+    Stdev_Y: Optional[float]
+
+    class Config:
+        validate_assignment = True
+
+class FluffySample(BaseModel):
     SampleID: str
     SampleProject: str
     SampleType: Optional[str]

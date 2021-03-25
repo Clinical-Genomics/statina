@@ -2,7 +2,7 @@ from NIPTool.adapter.plugin import NiptAdapter
 from pymongo import MongoClient
 from fastapi.security import OAuth2PasswordBearer
 from fastapi import HTTPException, status
-from NIPTool.schemas.server.login import User, UserInDB, TokenData
+from NIPTool.models.server.login import User, UserInDB, TokenData
 from fastapi import Depends
 from passlib.context import CryptContext
 from datetime import datetime, timedelta

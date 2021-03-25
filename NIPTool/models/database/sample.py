@@ -12,7 +12,7 @@ class Sample(BaseModel):
     Index1: Optional[str]
     Index2: Optional[str]
     Library_nM: Optional[float]
-    QCFlag: Optional[str] # Check this!
+    QCFlag: Optional[str]  # Check this!
     Zscore_13: Optional[float]
     Zscore_18: Optional[float]
     Zscore_21: Optional[float]
@@ -76,3 +76,7 @@ class Sample(BaseModel):
     UnfilteredCNVcalls: Optional[int]
     CNVSegment: Optional[str]
     segmental_calls: Optional[str]
+    comment: Optional[str]
+    include: Optional[bool]
+    change_include_date: Optional[str]
+    status_change_abnormality: Optional[str]

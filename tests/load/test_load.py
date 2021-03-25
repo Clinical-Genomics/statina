@@ -1,6 +1,5 @@
 from NIPTool.adapter.plugin import NiptAdapter
-from NIPTool.crud.insert import load_batch
-from NIPTool.load.user import load_user
+from NIPTool.crud.insert import load_batch, load_user
 from NIPTool.parse.batch import get_batch, get_samples
 
 

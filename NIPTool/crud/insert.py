@@ -3,7 +3,7 @@ from typing import Dict, List, Optional
 
 from NIPTool.adapter import NiptAdapter
 from NIPTool.models.database import Batch, Sample
-from NIPTool.models.server.load import BatchRequestBody
+from NIPTool.models.server.load import BatchRequestBody, UserRequestBody
 from NIPTool.parse.batch import parse_segmental_calls
 
 LOG = logging.getLogger(__name__)
@@ -45,3 +45,11 @@ def load_samples(
             )
         )
     return inserted_samples
+
+
+def load_user(adapter: NiptAdapter, user: UserRequestBody) -> dict:
+    """Function to load a new user to the database."""
+
+    user = {"_id": user.email, "email": user.email, "name": user.name, "role": user.role}
+    adapter.user_collection.insert_one(user)
+    return user

@@ -3,9 +3,8 @@ from typing import List
 
 from fastapi import APIRouter, Depends, Response, status
 from NIPTool.adapter.plugin import NiptAdapter
-from NIPTool.crud.insert import load_batch, load_samples
+from NIPTool.crud.insert import load_batch, load_samples, load_user
 from NIPTool.exeptions import NIPToolError
-from NIPTool.load.user import load_user
 from NIPTool.models.database import Batch, Sample
 from NIPTool.models.server.load import BatchRequestBody, UserRequestBody
 from NIPTool.parse.batch import get_batch, get_samples

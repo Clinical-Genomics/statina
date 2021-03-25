@@ -3,8 +3,8 @@ from typing import Optional
 from pydantic import BaseModel, Field
 
 
-class DatabaseBatch(BaseModel):
-    id: str = Field(..., alias='_id')
+class Batch(BaseModel):
+    SampleProject: str
     result_file: Optional[str]
     multiqc_report: Optional[str]
     segmental_calls: Optional[str]
@@ -23,4 +23,3 @@ class DatabaseBatch(BaseModel):
 
     class Config:
         validate_assignment = True
-        allow_population_by_field_name = True

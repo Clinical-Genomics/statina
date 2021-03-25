@@ -3,8 +3,8 @@ from typing import Optional
 from pydantic import BaseModel, Field
 
 
-class DatabaseSample(BaseModel):
-    id: str = Field(..., alias='_id')
+class Sample(BaseModel):
+    SampleID: str
     SampleProject: str
     SampleType: Optional[str]
     Description: Optional[str]
@@ -76,6 +76,3 @@ class DatabaseSample(BaseModel):
     UnfilteredCNVcalls: Optional[int]
     CNVSegment: Optional[str]
     segmental_calls: Optional[str]
-
-    class Config:
-        allow_population_by_field_name = True

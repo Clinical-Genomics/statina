@@ -1,3 +1,3 @@
-from .batch import DatabaseBatch
-from .sample import DatabaseSample
-from .user import DatabaseUser
+from .batch import Batch
+from .sample import Sample
+from .user import User

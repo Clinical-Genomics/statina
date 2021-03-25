@@ -6,7 +6,7 @@ from NIPTool.parse.batch import get_samples, get_batch
 from NIPTool.adapter.plugin import NiptAdapter
 from NIPTool.load.user import load_user
 from NIPTool.models.server.load import BatchRequestBody, UserRequestBody
-from NIPTool.models.fluffy_results import FluffyBatch, FluffySample
+from NIPTool.models.database import Sample, Batch
 from NIPTool.server.load.api.deps import get_nipt_adapter
 from NIPTool.exeptions import NIPToolError
 
@@ -26,11 +26,11 @@ def batch(
     if not nipt_results.exists():
         response.status_code = status.HTTP_422_UNPROCESSABLE_ENTITY
         return {"message": "Results file missing."}
-    samples: List[FluffySample] = get_samples(nipt_results)
-    batch: FluffyBatch = get_batch(nipt_results)
+    samples: List[Sample] = get_samples(nipt_results)
+    batch: Batch = get_batch(nipt_results)
     try:
-        load_batch(adapter=adapter, fluffy_batch=batch, batch_files=batch_files)
-        load_samples(adapter=adapter, fluffy_samples=samples, segmental_calls=batch_files.segmental_calls)
+        load_batch(adapter=adapter, batch=batch, batch_files=batch_files)
+        load_samples(adapter=adapter, samples=samples, segmental_calls=batch_files.segmental_calls)
     except NIPToolError as e:
         return {"message": e.message, "status_code": status.HTTP_422_UNPROCESSABLE_ENTITY}
     message = "Data loaded into database"

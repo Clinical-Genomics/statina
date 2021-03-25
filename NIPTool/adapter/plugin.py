@@ -22,7 +22,7 @@ class NiptAdapter(MongoAdapter):
 
     def add_or_update_document(self, document_news: dict, collection):
         """Adds/updates a document in the database"""
-        
+
         document_id = document_news.get("_id")
         if not document_id:
             document_id = collection.insert(document_news)

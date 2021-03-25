@@ -1,15 +1,15 @@
 from pathlib import Path
 from typing import List
-from fastapi import APIRouter, Depends, status, Response
-from NIPTool.load.batch import load_batch, load_samples
-from NIPTool.parse.batch import get_samples, get_batch
-from NIPTool.adapter.plugin import NiptAdapter
-from NIPTool.load.user import load_user
-from NIPTool.models.server.load import BatchRequestBody, UserRequestBody
-from NIPTool.models.database import Sample, Batch
-from NIPTool.server.load.api.deps import get_nipt_adapter
-from NIPTool.exeptions import NIPToolError
 
+from fastapi import APIRouter, Depends, Response, status
+from NIPTool.adapter.plugin import NiptAdapter
+from NIPTool.crud.insert import load_batch, load_samples
+from NIPTool.exeptions import NIPToolError
+from NIPTool.load.user import load_user
+from NIPTool.models.database import Batch, Sample
+from NIPTool.models.server.load import BatchRequestBody, UserRequestBody
+from NIPTool.parse.batch import get_batch, get_samples
+from NIPTool.server.load.api.deps import get_nipt_adapter
 
 router = APIRouter()
 

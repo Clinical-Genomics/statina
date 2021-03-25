@@ -1,9 +1,10 @@
 from pathlib import Path
 from typing import List
-from pydantic import ValidationError
+
 import pytest
-from NIPTool.parse.batch import get_samples, get_batch, parse_csv, pars_segmental_calls
-from NIPTool.models.database import Sample, Batch
+from NIPTool.models.database import Batch, Sample
+from NIPTool.parse.batch import get_batch, get_samples, parse_csv, parse_segmental_calls
+from pydantic import ValidationError
 
 
 def get_nr_csv_entries(csv_path: Path) -> int:
@@ -18,7 +19,7 @@ def get_nr_csv_entries(csv_path: Path) -> int:
 def test_parse_segmental_calls(segmental_calls: str):
     # GIVEN a result files directory with 3 segmental calls files
     # WHEN running pars_segmental_calls
-    result = pars_segmental_calls(segmental_calls)
+    result = parse_segmental_calls(segmental_calls)
 
     # THEN assert that the result is a dict
     assert isinstance(result, dict)
@@ -32,10 +33,10 @@ def test_parse_segmental_calls_no_path(caplog):
     path = "non_existing_path"
 
     # WHEN running pars_segmental_calls
-    result = pars_segmental_calls(path)
+    result = parse_segmental_calls(path)
 
     # THEN assert a waring about missing path is being logged
-    assert 'Segmental Calls file path missing' in caplog.text
+    assert "Segmental Calls file path missing" in caplog.text
 
     # THEN assert that the result is a empty dict
     assert result == {}

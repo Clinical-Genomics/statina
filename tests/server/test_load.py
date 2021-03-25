@@ -2,7 +2,6 @@ import pytest
 from fastapi import status
 from pydantic import ValidationError
 
-from NIPTool.schemas.server import BatchLoadModel
 
 """
 def test_user_mocked(mocker, fast_app_client, valid_load_user):

@@ -1,8 +1,9 @@
 from typing import Optional
 
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
-class SampleModel(BaseModel):
+
+class Sample(BaseModel):
     SampleID: str
     SampleProject: str
     SampleType: Optional[str]
@@ -74,4 +75,4 @@ class SampleModel(BaseModel):
     Bin2BinVariance: Optional[float]
     UnfilteredCNVcalls: Optional[int]
     CNVSegment: Optional[str]
-
+    segmental_calls: Optional[str]

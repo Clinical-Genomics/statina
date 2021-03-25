@@ -1,9 +1,9 @@
 from typing import Optional
 
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 
-class BatchModel(BaseModel):
+class Batch(BaseModel):
     SampleProject: str
     result_file: Optional[str]
     multiqc_report: Optional[str]

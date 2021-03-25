@@ -1,5 +1,5 @@
 from NIPTool.adapter import NiptAdapter
-from NIPTool.server.utils import (
+from NIPTool.server.web_app.utils import (
     get_last_batches,
     get_statistics_for_box_plot,
     get_statistics_for_scatter_plot,

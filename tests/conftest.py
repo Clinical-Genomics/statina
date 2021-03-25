@@ -6,7 +6,7 @@ from NIPTool.adapter.plugin import NiptAdapter
 from NIPTool.server.load.api.api_v1.api import app
 from NIPTool.server.load.api.deps import get_nipt_adapter
 from fastapi.testclient import TestClient
-from NIPTool.schemas.server.load import UserLoadModel, BatchLoadModel
+from NIPTool.models.server.load import  BatchRequestBody, UserRequestBody
 
 DATABASE = "testdb"
 
@@ -56,13 +56,13 @@ def database(request, pymongo_client):
 
 @pytest.fixture(scope="function")
 def valid_load_user():
-    user = UserLoadModel(email="maya.papaya@something.se", name="Maya Papaya", role="RW")
+    user = UserRequestBody(email="maya.papaya@something.se", name="Maya Papaya", role="RW")
     return user
 
 
 @pytest.fixture(scope="function")
 def valid_load_batch(multiqc_report, segmental_calls, valid_csv):
-    batch_files = BatchLoadModel(
+    batch_files = BatchRequestBody(
         multiqc_report=multiqc_report, segmental_calls=segmental_calls, result_file=valid_csv
     )
     return batch_files

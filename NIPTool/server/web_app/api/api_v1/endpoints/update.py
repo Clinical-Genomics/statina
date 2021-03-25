@@ -2,8 +2,8 @@ from fastapi import APIRouter, Depends, Request
 from fastapi.responses import RedirectResponse
 
 from NIPTool.adapter.plugin import NiptAdapter
-from NIPTool.server.utils import *
-from NIPTool.server.web_app.api.deps import get_nipt_adapter, get_current_active_user
+from NIPTool.server.web_app.utils import *
+from NIPTool.server.web_app.api.deps import get_nipt_adapter
 from datetime import datetime
 
 router = APIRouter()

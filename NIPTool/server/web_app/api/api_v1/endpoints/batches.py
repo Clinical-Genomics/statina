@@ -1,8 +1,8 @@
 from fastapi import APIRouter, Depends, Request
 from NIPTool.adapter.plugin import NiptAdapter
-from NIPTool.server.utils import *
+from NIPTool.server.web_app.utils import *
 from NIPTool.server.constants import TRISOMI_TRESHOLDS
-from NIPTool.server.web_app.api.deps import get_nipt_adapter, get_current_active_user
+from NIPTool.server.web_app.api.deps import get_nipt_adapter
 from fastapi.templating import Jinja2Templates
 
 router = APIRouter()

@@ -1,5 +1,6 @@
 from fastapi import APIRouter, Depends, Request
 from NIPTool.adapter.plugin import NiptAdapter
+from NIPTool.models.database import Batch
 from NIPTool.server.web_app.utils import *
 from NIPTool.server.constants import TRISOMI_TRESHOLDS
 from NIPTool.server.web_app.api.deps import get_nipt_adapter
@@ -45,12 +46,12 @@ def batch(request: Request, batch_id: str, adapter: NiptAdapter = Depends(get_ni
 @router.get("/{batch_id}/{ncv}")
 def NCV(request: Request, batch_id: str, ncv, adapter: NiptAdapter = Depends(get_nipt_adapter)):
     """Batch view with with NCV plot"""
-
+    batch: Batch = adapter.batch(batch_id)
     return templates.TemplateResponse(
         "batch/tabs/NCV.html", context=dict(
             request=request,
             tris_thresholds=TRISOMI_TRESHOLDS,
-            batch=adapter.batch(batch_id),
+            batch=batch.dict(),
             chr=ncv,
             ncv_chrom_data={ncv: get_tris_cases(adapter, ncv, batch_id)},
             normal_data=get_tris_control_normal(adapter, ncv),
@@ -63,7 +64,7 @@ def NCV(request: Request, batch_id: str, ncv, adapter: NiptAdapter = Depends(get
 @router.get("/batches/{batch_id}/fetal_fraction_XY")
 def fetal_fraction_XY(request: Request, batch_id: str, adapter: NiptAdapter = Depends(get_nipt_adapter)):
     """Batch view with fetal fraction (X against Y) plot"""
-    batch = adapter.batch(batch_id)
+    batch: Batch = adapter.batch(batch_id)
     control = get_ff_control_normal(adapter)
     abnormal = get_ff_control_abnormal(adapter)
     return templates.TemplateResponse(
@@ -76,7 +77,7 @@ def fetal_fraction_XY(request: Request, batch_id: str, adapter: NiptAdapter = De
             cases=get_ff_cases(adapter, batch_id),
             max_x=max(control["FFX"]) + 1,
             min_x=min(control["FFX"]) - 1,
-            batch=batch,
+            batch=batch.dict(),
             page_id="batches_FF_XY")
     )
 
@@ -84,7 +85,7 @@ def fetal_fraction_XY(request: Request, batch_id: str, adapter: NiptAdapter = De
 @router.get("/batches/{batch_id}/fetal_fraction")
 def fetal_fraction(request: Request, batch_id: str, adapter: NiptAdapter = Depends(get_nipt_adapter)):
     """Batch view with fetal fraction plot"""
-    batch = adapter.batch(batch_id)
+    batch: Batch = adapter.batch(batch_id)
     return templates.TemplateResponse(
         "batch/tabs/FF.html",
         context=dict(
@@ -92,7 +93,7 @@ def fetal_fraction(request: Request, batch_id: str, adapter: NiptAdapter = Depen
             current_user='mayapapaya',
             control=get_ff_control_normal(adapter),
             cases=get_ff_cases(adapter, batch_id),
-            batch=batch,
+            batch=batch.dict(),
             page_id="batches_FF")
     )
 
@@ -100,7 +101,7 @@ def fetal_fraction(request: Request, batch_id: str, adapter: NiptAdapter = Depen
 @router.get("/batches/{batch_id}/coverage")
 def coverage(request: Request, batch_id: str, adapter: NiptAdapter = Depends(get_nipt_adapter)):
     """Batch view with coverage plot"""
-    batch = adapter.batch(batch_id)
+    batch: Batch = adapter.batch(batch_id)
     samples = list(adapter.batch_samples(batch_id))
     scatter_data = get_scatter_data_for_coverage_plot(samples)
     box_data = get_box_data_for_coverage_plot(samples)
@@ -109,7 +110,7 @@ def coverage(request: Request, batch_id: str, adapter: NiptAdapter = Depends(get
         context=dict(
             request=request,
             current_user='mayapapaya',
-            batch=batch,
+            batch=batch.dict(),
             x_axis=list(range(1, 23)),
             scatter_data=scatter_data,
             box_data=box_data,
@@ -121,7 +122,7 @@ def coverage(request: Request, batch_id: str, adapter: NiptAdapter = Depends(get
 def report(request: Request, batch_id: str, coverage: str, adapter: NiptAdapter = Depends(get_nipt_adapter)):
     """Report view, collecting all tables and plots from one batch."""
 
-    batch = adapter.batch(batch_id)
+    batch: Batch = adapter.batch(batch_id)
     samples = list(adapter.batch_samples(batch_id))
     scatter_data = get_scatter_data_for_coverage_plot(samples)
     box_data = get_box_data_for_coverage_plot(samples)
@@ -131,7 +132,7 @@ def report(request: Request, batch_id: str, coverage: str, adapter: NiptAdapter 
         context=dict(
             request=request,
             current_user='mayapapaya',
-            batch=batch,
+            batch=batch.dict(),
             # NCV
             ncv_chrom_data={
                 "13": get_tris_cases(adapter, "13", batch_id),

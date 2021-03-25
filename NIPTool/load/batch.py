@@ -14,7 +14,7 @@ def load_batch(adapter: NiptAdapter, batch: Batch, batch_files: BatchRequestBody
     """Function to load data from fluffy result file."""
 
     batch_dict = batch.dict(exclude_none=True)
-    batch_dict["_id"] = batch_dict["SampleProject"]
+    batch_dict["_id"] = batch_dict["batch_id"]
     batch_dict["segmental_calls"] = batch_files.segmental_calls
     batch_dict["multiqc_report"] = batch_files.multiqc_report
     batch_dict["result_file"] = batch_files.result_file
@@ -30,7 +30,7 @@ def load_samples(
     segmental_calls: Dict[str, str] = pars_segmental_calls(segmental_calls_path=segmental_calls)
     for sample in samples:
         sample_dict: dict = sample.dict(exclude_none=True)
-        sample_id = sample_dict["SampleID"]
+        sample_id = sample_dict["sample_id"]
         sample_dict["_id"] = sample_id
         sample_dict["segmental_calls"] = segmental_calls.get(sample_id)
         adapter.add_or_update_document(

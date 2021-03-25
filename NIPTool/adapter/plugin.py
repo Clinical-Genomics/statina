@@ -3,6 +3,8 @@ import logging
 from mongo_adapter import MongoAdapter
 from datetime import datetime as dt
 
+from NIPTool.models.database import Batch
+
 LOG = logging.getLogger(__name__)
 
 
@@ -55,7 +57,10 @@ class NiptAdapter(MongoAdapter):
 
     def batch(self, batch_id):
         """Find one batch from the batch collection"""
-        return self.batch_collection.find_one({"_id": batch_id})
+
+        batch_data: dict = self.batch_collection.find_one({"_id": batch_id})
+        batch_data['batch_id']: str = batch_data.pop('_id')
+        return Batch(**batch_data)
 
     def sample(self, sample_id):
         """Find one sample from the sample collection"""

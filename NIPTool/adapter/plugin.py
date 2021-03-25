@@ -22,7 +22,6 @@ class NiptAdapter(MongoAdapter):
 
     def add_or_update_document(self, document_news: dict, collection):
         """Adds/updates a document in the database"""
-
         document_id = document_news.get("_id")
         if not document_id:
             document_id = collection.insert(document_news)
@@ -56,8 +55,6 @@ class NiptAdapter(MongoAdapter):
     def batch(self, batch_id):
         """Find one batch from the batch collection"""
         batch = self.batch_collection.find_one({"_id": batch_id})
-        print(dir(batch))
-        print(dict(batch))
         return batch
 
     def sample(self, sample_id):

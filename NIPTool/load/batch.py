@@ -14,12 +14,12 @@ LOG = logging.getLogger(__name__)
 def load_batch(adapter: NiptAdapter, fluffy_batch: FluffyBatch, batch_files: BatchRequestBody) -> None:
     """Function to load data from fluffy result file."""
 
-    mongo_batch = fluffy_batch.dict(exclude_none=True)
-    batch_id = mongo_batch.pop("SampleProject")
-    database_batch = DatabaseBatch(**mongo_batch, _id=batch_id, segmental_calls=batch_files.segmental_calls,
+    fluffy_batch_dict = fluffy_batch.dict(exclude_none=True)
+    batch_id = fluffy_batch_dict.pop("SampleProject")
+    database_batch = DatabaseBatch(**fluffy_batch_dict, id=batch_id, segmental_calls=batch_files.segmental_calls,
                                    multiqc_report=batch_files.multiqc_report, result_file=batch_files.result_file)
-
-    adapter.add_or_update_document(document_news=database_batch.dict(exclude_none=True),
+    database_batch_dict = database_batch.dict(exclude_none=True, by_alias=True)
+    adapter.add_or_update_document(document_news=database_batch_dict,
                                    collection=adapter.batch_collection)
 
 
@@ -29,12 +29,12 @@ def load_samples(
     """Function to load data from fluffy result file."""
 
     segmental_calls: Dict[str, str] = pars_segmental_calls(segmental_calls_path=segmental_calls)
-    for sample in fluffy_samples:
-        mongo_sample: dict = sample.dict(exclude_none=True)
-        sample_id = mongo_sample.pop("SampleID")
+    for fluffy_sample in fluffy_samples:
+        fluffy_sample_dict: dict = fluffy_sample.dict(exclude_none=True)
+        sample_id = fluffy_sample_dict.pop("SampleID")
         segmental_calls_path = segmental_calls.get(sample_id)
-        database_sample = DatabaseSample(**mongo_sample, _id=sample_id, segmental_calls=segmental_calls_path)
-
+        database_sample = DatabaseSample(**fluffy_sample_dict, _id=sample_id, segmental_calls=segmental_calls_path)
+        database_sample_dict = database_sample.dict(exclude_none=True, by_alias=True)
         adapter.add_or_update_document(
-            document_news=database_sample.dict(exclude_none=True), collection=adapter.sample_collection
+            document_news=database_sample_dict, collection=adapter.sample_collection
         )

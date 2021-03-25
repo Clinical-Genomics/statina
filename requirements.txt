@@ -15,4 +15,5 @@ pandas
 pandas-schema
 cerberus
 fastapi
+python-multipart
 

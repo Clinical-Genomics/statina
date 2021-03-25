@@ -1,3 +1,4 @@
+
 {% extends 'layout/layout.html' %}
 {% block body %}
 <div class="container-fluid">
@@ -119,7 +120,7 @@
             mode: 'markers',
             showlegend: false,
             name: "{{batch_id}}",
-            text: "Date Run: {{scatter_stat[batch_id]['date']}}"};                          
+            text: "Date Run: {{scatter_stat[batch_id]['date']}}"};
         data.push(batch);
     {% endfor %}
 

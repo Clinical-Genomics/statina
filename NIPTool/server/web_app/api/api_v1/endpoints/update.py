@@ -2,6 +2,7 @@ from fastapi import APIRouter, Depends, Request
 from fastapi.responses import RedirectResponse
 
 from NIPTool.adapter.plugin import NiptAdapter
+from NIPTool.models.server.login import User
 from NIPTool.server.web_app.utils import *
 from NIPTool.server.web_app.api.deps import get_nipt_adapter
 from datetime import datetime
@@ -14,7 +15,7 @@ def update(request: Request, adapter: NiptAdapter = Depends(get_nipt_adapter)):
     """Update the database"""
 
     time_stamp = datetime.now().strftime("%Y/%m/%d %H:%M:%S")
-    user = app.user
+    user=User(username='mayapapaya', email='mayabrandi@123.com', role='RW')
     if user.role != "RW":
         return "", 201
 

@@ -6,7 +6,7 @@ from NIPTool.server.constants import *
 
 def get_sample_info(sample):
     """Sample info for sample table in batch view."""
-
+    sample = sample.dict()
     sample_warnings = get_sample_warnings(sample)
 
     sample_info_keys = ["Zscore_13", "Zscore_18", "Zscore_21", "CNVSegment", "FF_Formatted", "FFX", "FFY", "Zscore_X"]
@@ -18,7 +18,7 @@ def get_sample_info(sample):
             sample[key] = ""
 
     return {
-        "sample_id": sample.get("_id"),
+        "sample_id": sample.get("sample_id"),
         "FF": {"value": sample.get("FF_Formatted"), "warn": sample_warnings.get("FF_Formatted")},
         "CNVSegment": {"value": sample.get("CNVSegment"), "warn": "default", },
         "FFX": {"value": sample.get("FFX"), "warn": "default", },
@@ -101,7 +101,7 @@ def get_scatter_data_for_coverage_plot(samples):
         warnings.pop('FF_Formatted')
         if set(warnings.values()) == {'default'}:
             continue
-        sample_id = sample["_id"]
+        sample_id = sample["sample_id"]
         data[sample_id] = {"x": [], "y": []}
         for chr in range(1, 23):
             ratio = sample.get(f"Chr{str(chr)}_Ratio")
@@ -143,7 +143,7 @@ def get_ff_control_normal(adapter):
                 "FFY": {"$push": "$FFY"},
                 "FFX": {"$push": "$FFX"},
                 "FF": {"$push": "$FF_Formatted"},
-                "names": {"$push": "$_id"},
+                "names": {"$push": "$sample_id"},
                 "count": {"$sum": 1},
             }
         },
@@ -165,16 +165,16 @@ def get_ff_control_abnormal(adapter):
             },
             {
                 "$group": {
-                    "_id": {f"status_{abn}": f"$status_{abn}"},
+                    "sample_id": {f"status_{abn}": f"$status_{abn}"},
                     "FFX": {"$push": "$FFX"},
                     "FFY": {"$push": "$FFY"},
-                    "names": {"$push": "$_id"},
+                    "names": {"$push": "sample_id"},
                     "count": {"$sum": 1},
                 }
             },
         ]
         for status_dict in adapter.sample_aggregate(pipe):
-            status = status_dict["_id"][f"status_{abn}"]
+            status = status_dict["sample_id"][f"status_{abn}"]
             plot_data[abn][status] = status_dict
     return plot_data
 
@@ -185,7 +185,7 @@ def get_ff_cases(adapter, batch_id):
     pipe = [
         {
             "$match": {
-                "SampleProject": {"$eq": batch_id},
+                "batch_id": {"$eq": batch_id},
                 "FF_Formatted": {"$ne": "None", "$exists": "True"},
                 "FFY": {"$ne": "None", "$exists": "True"},
                 "FFX": {"$ne": "None", "$exists": "True"},
@@ -198,7 +198,7 @@ def get_ff_cases(adapter, batch_id):
                 "FFY": {"$push": "$FFY"},
                 "FFX": {"$push": "$FFX"},
                 "FF_Formatted": {"$push": "$FF_Formatted"},
-                "names": {"$push": "$_id"},
+                "names": {"$push": "sample_id"},
             }
         },
     ]
@@ -226,7 +226,7 @@ def get_tris_control_normal(adapter, chr):
             "$group": {
                 "_id": {f"status_T{chr}": f"$status_T{chr}"},
                 "values": {"$push": f"$Zscore_{chr}"},
-                "names": {"$push": "$_id"},
+                "names": {"$push": "sample_id"},
                 "count": {"$sum": 1},
             }
         },
@@ -254,14 +254,14 @@ def get_tris_control_abnormal(adapter, chr, x_axis):
             "$group": {
                 "_id": {f"status_T{chr}": f"$status_T{chr}"},
                 "values": {"$push": f"$Zscore_{chr}"},
-                "names": {"$push": "$_id"},
+                "names": {"$push": "sample_id"},
                 "count": {"$sum": 1},
             }
         },
     ]
 
     for status_dict in adapter.sample_aggregate(pipe):
-        status = status_dict["_id"][f"status_T{chr}"]
+        status = status_dict["sample_id"][f"status_T{chr}"]
         plot_data[status] = {
             "values": [value for value in status_dict.get("values")],
             "names": status_dict.get("names"),
@@ -275,16 +275,17 @@ def get_tris_cases(adapter, chr, batch_id):
     """Cases for trisomi plots."""
 
     pipe = [
-        {"$match": {"SampleProject": {"$eq": batch_id}, "include": {"$eq": True}}},
+        {"$match": {"batch_id": {"$eq": batch_id}, "include": {"$eq": True}}},
         {
             "$group": {
-                "_id": {"batch": "$SampleProject"},
+                "_id": {"batch": "$batch_id"},
                 "values": {"$push": f"$Zscore_{chr}"},
-                "names": {"$push": "$_id"},
+                "names": {"$push": "$sample_id"},
                 "count": {"$sum": 1},
             }
         },
     ]
+    print(pipe)
 
     if not list(adapter.sample_aggregate(pipe)):
         return {}
@@ -361,7 +362,7 @@ def get_statistics_for_scatter_plot(batches: list, fields: list) -> dict:
 
     scatter_plot_data = {}
     for batch in batches:
-        batch_id = batch.get('_id')
+        batch_id = batch.get('batch_id')
         scatter_plot_data[batch_id] = {
             'date': batch.get('SequencingDate')}
         for field in fields:
@@ -373,15 +374,15 @@ def get_statistics_for_scatter_plot(batches: list, fields: list) -> dict:
 def get_statistics_for_box_plot(adapter, batches: list, fields: list):
     """Getting and formating data for box plot"""
 
-    match = {'$match': {'SampleProject': {'$in': batches}}}
+    match = {'$match': {'batch_id': {'$in': batches}}}
     lookup = {'$lookup': {
         'from': 'batch',
-        'localField': 'SampleProject',
-        'foreignField': '_id',
+        'localField': 'batch_id',
+        'foreignField': 'batch_id',
         'as': 'batch'}}
     unwind = {'$unwind': {'path': '$batch'}}
     group = {'$group': {'_id': {
-        'batch': '$SampleProject',
+        'batch': '$batch_id',
         'date': '$batch.SequencingDate'}}}
 
     for field in fields:

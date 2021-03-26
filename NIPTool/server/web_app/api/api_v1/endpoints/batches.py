@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Depends, Request
 from NIPTool.adapter.plugin import NiptAdapter
-from NIPTool.models.database import Batch
+from NIPTool.models.database import Batch, User
 from NIPTool.server.web_app.utils import *
 from NIPTool.server.constants import TRISOMI_TRESHOLDS
 from NIPTool.server.web_app.api.deps import get_nipt_adapter
@@ -71,7 +71,7 @@ def fetal_fraction_XY(request: Request, batch_id: str, adapter: NiptAdapter = De
         "batch/tabs/FF_XY.html",
         context=dict(
             request=request,
-            current_user='mayapapaya',
+            current_user=User(username='mayapapaya', email='mayabrandi@123.com', role='RW'),
             control=control,
             abnormal=abnormal,
             cases=get_ff_cases(adapter, batch_id),
@@ -90,7 +90,7 @@ def fetal_fraction(request: Request, batch_id: str, adapter: NiptAdapter = Depen
         "batch/tabs/FF.html",
         context=dict(
             request=request,
-            current_user='mayapapaya',
+            current_user=User(username='mayapapaya', email='mayabrandi@123.com', role='RW'),
             control=get_ff_control_normal(adapter),
             cases=get_ff_cases(adapter, batch_id),
             batch=batch.dict(),
@@ -109,7 +109,7 @@ def coverage(request: Request, batch_id: str, adapter: NiptAdapter = Depends(get
         "batch/tabs/coverage.html",
         context=dict(
             request=request,
-            current_user='mayapapaya',
+            current_user=User(username='mayapapaya', email='mayabrandi@123.com', role='RW'),
             batch=batch.dict(),
             x_axis=list(range(1, 23)),
             scatter_data=scatter_data,
@@ -131,7 +131,7 @@ def report(request: Request, batch_id: str, coverage: str, adapter: NiptAdapter 
         "batch/report.html",
         context=dict(
             request=request,
-            current_user='mayapapaya',
+            current_user=User(username='mayapapaya', email='mayabrandi@123.com', role='RW'),
             batch=batch.dict(),
             # NCV
             ncv_chrom_data={

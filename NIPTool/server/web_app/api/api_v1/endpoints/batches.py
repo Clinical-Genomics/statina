@@ -8,6 +8,7 @@ from fastapi.templating import Jinja2Templates
 
 router = APIRouter()
 templates = Jinja2Templates(directory="templates")
+CURRENT_USER=User(username='mayapapaya', email='mayabrandi@123.com', role='RW').dict()
 
 
 @router.post("/")
@@ -17,7 +18,7 @@ def batches(request: Request, adapter: NiptAdapter = Depends(get_nipt_adapter)):
     all_batches = list(adapter.batches())
     return templates.TemplateResponse("batches.html",
                                       context={"request": request, "batches": all_batches,
-                                               "current_user": 'mayapapaya',
+                                               "current_user": CURRENT_USER,
                                                "page_id": "all_batches"})
 
 @router.get("/")
@@ -27,7 +28,7 @@ def batches(request: Request, adapter: NiptAdapter = Depends(get_nipt_adapter)):
     all_batches = list(adapter.batches())
     return templates.TemplateResponse("batches.html",
                                       context={"request": request, "batches": all_batches,
-                                               "current_user": 'mayapapaya',
+                                               "current_user": CURRENT_USER,
                                                "page_id": "all_batches"})
 
 
@@ -40,7 +41,19 @@ def batch(request: Request, batch_id: str, adapter: NiptAdapter = Depends(get_ni
                                                "sample_info": [get_sample_info(sample) for
                                                                sample in samples],
                                                "page_id": "batches",
-                                               "current_user": 'mayapapaya'})
+                                               "current_user": CURRENT_USER})
+
+
+@router.post("/{batch_id}/")
+def batch(request: Request, batch_id: str, adapter: NiptAdapter = Depends(get_nipt_adapter)):
+    """Batch view with table of all samples in the batch."""
+    samples = adapter.batch_samples(batch_id)
+    return templates.TemplateResponse('batch/tabs/table.html',
+                                      context={"request": request, "batch": adapter.batch(batch_id),
+                                               "sample_info": [get_sample_info(sample) for
+                                                               sample in samples],
+                                               "page_id": "batches",
+                                               "current_user": CURRENT_USER})
 
 
 @router.get("/{batch_id}/{ncv}")
@@ -57,7 +70,7 @@ def NCV(request: Request, batch_id: str, ncv, adapter: NiptAdapter = Depends(get
             normal_data=get_tris_control_normal(adapter, ncv),
             abnormal_data=get_tris_control_abnormal(adapter, ncv, 0),
             page_id=f"batches_NCV{ncv}",
-            current_user='mayapapaya')
+            current_user=CURRENT_USER)
     )
 
 
@@ -71,7 +84,7 @@ def fetal_fraction_XY(request: Request, batch_id: str, adapter: NiptAdapter = De
         "batch/tabs/FF_XY.html",
         context=dict(
             request=request,
-            current_user=User(username='mayapapaya', email='mayabrandi@123.com', role='RW'),
+            current_user=CURRENT_USER,
             control=control,
             abnormal=abnormal,
             cases=get_ff_cases(adapter, batch_id),
@@ -90,7 +103,7 @@ def fetal_fraction(request: Request, batch_id: str, adapter: NiptAdapter = Depen
         "batch/tabs/FF.html",
         context=dict(
             request=request,
-            current_user=User(username='mayapapaya', email='mayabrandi@123.com', role='RW'),
+            current_user=CURRENT_USER,
             control=get_ff_control_normal(adapter),
             cases=get_ff_cases(adapter, batch_id),
             batch=batch.dict(),
@@ -109,7 +122,7 @@ def coverage(request: Request, batch_id: str, adapter: NiptAdapter = Depends(get
         "batch/tabs/coverage.html",
         context=dict(
             request=request,
-            current_user=User(username='mayapapaya', email='mayabrandi@123.com', role='RW'),
+            current_user=CURRENT_USER,
             batch=batch.dict(),
             x_axis=list(range(1, 23)),
             scatter_data=scatter_data,
@@ -131,7 +144,7 @@ def report(request: Request, batch_id: str, coverage: str, adapter: NiptAdapter 
         "batch/report.html",
         context=dict(
             request=request,
-            current_user=User(username='mayapapaya', email='mayabrandi@123.com', role='RW'),
+            current_user=CURRENT_USER,
             batch=batch.dict(),
             # NCV
             ncv_chrom_data={

@@ -16,7 +16,8 @@ def get_sample_info(sample):
             sample[key] = round(val, 2)
         else:
             sample[key] = ""
-
+    print(sample.get('sample_id'))
+    print(sample.get("include"))
     return {
         "sample_id": sample.get("sample_id"),
         "FF": {"value": sample.get("FF_Formatted"), "warn": sample_warnings.get("FF_Formatted")},

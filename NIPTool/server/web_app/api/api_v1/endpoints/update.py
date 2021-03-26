@@ -1,13 +1,37 @@
+from typing import Optional
+
 from fastapi import APIRouter, Depends, Request
 from fastapi.responses import RedirectResponse
 
 from NIPTool.adapter.plugin import NiptAdapter
-from NIPTool.models.server.login import User
+from NIPTool.models.database import User
 from NIPTool.server.web_app.utils import *
-from NIPTool.server.web_app.api.deps import get_nipt_adapter
+from NIPTool.server.web_app.api.deps import get_nipt_adapter, get_current_active_user
 from datetime import datetime
 
 router = APIRouter()
+
+
+from pydantic import BaseModel
+
+
+class Item(BaseModel):
+    form_id: str
+    sample_id: Optional[str]
+
+
+
+@router.post("/update_debugging")
+def update_debugging(request: Request, item: Item, adapter: NiptAdapter = Depends(get_nipt_adapter)):
+    """Update the database"""
+    print(item)
+    print('hej')
+    time_stamp = datetime.now().strftime("%Y/%m/%d %H:%M:%S")
+    user=User(username='mayapapaya', email='mayabrandi@123.com', role='RW')
+    if user.role != "RW":
+        return "", 201
+
+    return RedirectResponse('batches/342712/')
 
 
 @router.post("/update")

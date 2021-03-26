@@ -32,6 +32,7 @@ def load_samples(
         sample_dict: dict = sample.dict(exclude_none=True)
         sample_id = sample_dict["sample_id"]
         sample_dict["_id"] = sample_id
+
         sample_dict["segmental_calls"] = segmental_calls.get(sample_id)
         adapter.add_or_update_document(
             document_news=sample_dict, collection=adapter.sample_collection

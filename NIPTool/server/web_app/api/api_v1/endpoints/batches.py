@@ -60,6 +60,7 @@ def batch(request: Request, batch_id: str, adapter: NiptAdapter = Depends(get_ni
 def NCV(request: Request, batch_id: str, ncv, adapter: NiptAdapter = Depends(get_nipt_adapter)):
     """Batch view with with NCV plot"""
     batch: Batch = adapter.batch(batch_id)
+    u=get_tris_control_normal(adapter, ncv)
     return templates.TemplateResponse(
         "batch/tabs/NCV.html", context=dict(
             request=request,

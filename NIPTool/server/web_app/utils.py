@@ -1,13 +1,17 @@
+from typing import List
+
+from NIPTool.models.database import Sample
 from NIPTool.server.constants import *
 
 
 ### Batch views:
 
 
-def get_sample_info(sample):
+def get_sample_info(sample: Sample):
     """Sample info for sample table in batch view."""
-    sample = sample.dict()
+
     sample_warnings = get_sample_warnings(sample)
+    sample = sample.dict()
 
     sample_info_keys = ["Zscore_13", "Zscore_18", "Zscore_21", "CNVSegment", "FF_Formatted", "FFX", "FFY", "Zscore_X"]
     for key in sample_info_keys:
@@ -16,8 +20,7 @@ def get_sample_info(sample):
             sample[key] = round(val, 2)
         else:
             sample[key] = ""
-    print(sample.get('sample_id'))
-    print(sample.get("include"))
+
     return {
         "sample_id": sample.get("sample_id"),
         "FF": {"value": sample.get("FF_Formatted"), "warn": sample_warnings.get("FF_Formatted")},
@@ -57,9 +60,9 @@ def _get_ff_warning(fetal_fraction):
         return "default"
 
 
-def get_sample_warnings(sample):
+def get_sample_warnings(sample: Sample):
     """"""
-
+    sample= sample.dict()
     sample_warnings = {}
     fetal_fraction = sample.get('FF_Formatted')
     sample_warnings["FF_Formatted"] = _get_ff_warning(fetal_fraction)
@@ -93,7 +96,7 @@ def _get_tris_warning(z_score: float, fetal_fraction):
     return warn
 
 
-def get_scatter_data_for_coverage_plot(samples):
+def get_scatter_data_for_coverage_plot(samples: List[Sample]):
     """Coverage Ratio data for Coverage Plot."""
 
     data = {}
@@ -102,10 +105,11 @@ def get_scatter_data_for_coverage_plot(samples):
         warnings.pop('FF_Formatted')
         if set(warnings.values()) == {'default'}:
             continue
-        sample_id = sample["sample_id"]
+
+        sample_id = sample.sample_id
         data[sample_id] = {"x": [], "y": []}
         for chr in range(1, 23):
-            ratio = sample.get(f"Chr{str(chr)}_Ratio")
+            ratio = sample.dict().get(f"Chr{str(chr)}_Ratio")
             if ratio is None:
                 continue
             data[sample_id]["y"].append(ratio)
@@ -113,13 +117,13 @@ def get_scatter_data_for_coverage_plot(samples):
     return data
 
 
-def get_box_data_for_coverage_plot(samples):
+def get_box_data_for_coverage_plot(samples: List[Sample]):
     """Coverage Ratio data for Coverage Plot."""
     data = {}
     for chr in range(1, 23):
         data[chr] = []
         for sample in samples:
-            ratio = sample.get(f"Chr{str(chr)}_Ratio")
+            ratio = sample.dict().get(f"Chr{str(chr)}_Ratio")
             if ratio is None:
                 continue
             data[chr].append(ratio)
@@ -166,7 +170,7 @@ def get_ff_control_abnormal(adapter):
             },
             {
                 "$group": {
-                    "sample_id": {f"status_{abn}": f"$status_{abn}"},
+                    "_id": {f"status_{abn}": f"$status_{abn}"},
                     "FFX": {"$push": "$FFX"},
                     "FFY": {"$push": "$FFY"},
                     "names": {"$push": "sample_id"},
@@ -175,7 +179,7 @@ def get_ff_control_abnormal(adapter):
             },
         ]
         for status_dict in adapter.sample_aggregate(pipe):
-            status = status_dict["sample_id"][f"status_{abn}"]
+            status = status_dict["_id"][f"status_{abn}"]
             plot_data[abn][status] = status_dict
     return plot_data
 
@@ -222,7 +226,7 @@ def get_tris_control_normal(adapter, chr):
     """Normal Control Samples for trisomi plots"""
 
     pipe = [
-        {"$match": {f"status_T{chr}": {"$eq": "Normal"}, "include": {"$eq": True}}},
+        {"$match": {f"status_{chr}": {"$eq": "Normal"}, "include": {"$eq": True}}},
         {
             "$group": {
                 "_id": {f"status_T{chr}": f"$status_T{chr}"},
@@ -233,9 +237,10 @@ def get_tris_control_normal(adapter, chr):
         },
     ]
     if not list(adapter.sample_aggregate(pipe)):
-        return {}
+        return []
     data = list(adapter.sample_aggregate(pipe))[0]
     data["values"] = [value for value in data.get("values", [])]
+
     return data
 
 
@@ -247,13 +252,13 @@ def get_tris_control_abnormal(adapter, chr, x_axis):
     pipe = [
         {
             "$match": {
-                f"status_T{chr}": {"$ne": "Normal", "$exists": "True"},
+                f"status_{chr}": {"$ne": "Normal", "$exists": "True"},
                 "include": {"$eq": True},
             }
         },
         {
             "$group": {
-                "_id": {f"status_T{chr}": f"$status_T{chr}"},
+                "_id": {f"status_{chr}": f"$status_{chr}"},
                 "values": {"$push": f"$Zscore_{chr}"},
                 "names": {"$push": "sample_id"},
                 "count": {"$sum": 1},
@@ -262,7 +267,7 @@ def get_tris_control_abnormal(adapter, chr, x_axis):
     ]
 
     for status_dict in adapter.sample_aggregate(pipe):
-        status = status_dict["sample_id"][f"status_T{chr}"]
+        status = status_dict["_id"][f"status_{chr}"]
         plot_data[status] = {
             "values": [value for value in status_dict.get("values")],
             "names": status_dict.get("names"),
@@ -286,7 +291,6 @@ def get_tris_cases(adapter, chr, batch_id):
             }
         },
     ]
-    print(pipe)
 
     if not list(adapter.sample_aggregate(pipe)):
         return {}

@@ -4,8 +4,8 @@ from pydantic import BaseModel, Field
 
 
 class Sample(BaseModel):
-    sample_id: str#= Field(..., alias='SampleID')
-    batch_id: str#= Field(..., alias='SampleProject')
+    sample_id: str= Field(..., alias='SampleID')
+    batch_id: str= Field(..., alias='SampleProject')
     SampleType: Optional[str]
     Description: Optional[str]
     Flowcell: Optional[str]
@@ -94,3 +94,5 @@ class Sample(BaseModel):
     status_change_TXXY: Optional[str]
     status_change_TXYY: Optional[str]
 
+    #class Config:
+    #    allow_population_by_field_name = True

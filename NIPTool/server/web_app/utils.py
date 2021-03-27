@@ -173,7 +173,7 @@ def get_ff_control_abnormal(adapter):
                     "_id": {f"status_{abn}": f"$status_{abn}"},
                     "FFX": {"$push": "$FFX"},
                     "FFY": {"$push": "$FFY"},
-                    "names": {"$push": "sample_id"},
+                    "names": {"$push": "$sample_id"},
                     "count": {"$sum": 1},
                 }
             },
@@ -203,7 +203,7 @@ def get_ff_cases(adapter, batch_id):
                 "FFY": {"$push": "$FFY"},
                 "FFX": {"$push": "$FFX"},
                 "FF_Formatted": {"$push": "$FF_Formatted"},
-                "names": {"$push": "sample_id"},
+                "names": {"$push": "$sample_id"},
             }
         },
     ]
@@ -231,7 +231,7 @@ def get_tris_control_normal(adapter, chr):
             "$group": {
                 "_id": {f"status_T{chr}": f"$status_T{chr}"},
                 "values": {"$push": f"$Zscore_{chr}"},
-                "names": {"$push": "sample_id"},
+                "names": {"$push": "$sample_id"},
                 "count": {"$sum": 1},
             }
         },
@@ -260,7 +260,7 @@ def get_tris_control_abnormal(adapter, chr, x_axis):
             "$group": {
                 "_id": {f"status_{chr}": f"$status_{chr}"},
                 "values": {"$push": f"$Zscore_{chr}"},
-                "names": {"$push": "sample_id"},
+                "names": {"$push": "$sample_id"},
                 "count": {"$sum": 1},
             }
         },

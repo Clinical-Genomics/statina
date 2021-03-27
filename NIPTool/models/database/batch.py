@@ -4,7 +4,7 @@ from pydantic import BaseModel, Field
 
 
 class Batch(BaseModel):
-    SampleProject: str
+    batch_id: str= Field(..., alias='SampleProject')
     result_file: Optional[str]
     multiqc_report: Optional[str]
     segmental_calls: Optional[str]
@@ -23,3 +23,4 @@ class Batch(BaseModel):
 
     class Config:
         validate_assignment = True
+        allow_population_by_field_name = True

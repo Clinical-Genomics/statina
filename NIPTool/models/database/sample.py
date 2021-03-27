@@ -4,8 +4,8 @@ from pydantic import BaseModel, Field
 
 
 class Sample(BaseModel):
-    SampleID: str
-    SampleProject: str
+    sample_id: str= Field(..., alias='SampleID')
+    batch_id: str= Field(..., alias='SampleProject')
     SampleType: Optional[str]
     Description: Optional[str]
     Flowcell: Optional[str]
@@ -76,3 +76,23 @@ class Sample(BaseModel):
     UnfilteredCNVcalls: Optional[int]
     CNVSegment: Optional[str]
     segmental_calls: Optional[str]
+    include: Optional[bool]
+    change_include_date: Optional[str]
+    comment: Optional[str]
+    status_13: Optional[str]
+    status_18: Optional[str]
+    status_21: Optional[str]
+    status_X0: Optional[str]
+    status_XXX: Optional[str]
+    status_XXY: Optional[str]
+    status_XYY: Optional[str]
+    status_change_T13: Optional[str]
+    status_change_T18: Optional[str]
+    status_change_T21: Optional[str]
+    status_change_TX0: Optional[str]
+    status_change_TXXX: Optional[str]
+    status_change_TXXY: Optional[str]
+    status_change_TXYY: Optional[str]
+
+    #class Config:
+    #    allow_population_by_field_name = True

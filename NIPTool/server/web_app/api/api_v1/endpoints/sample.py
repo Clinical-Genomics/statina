@@ -1,5 +1,6 @@
 from fastapi import APIRouter, Depends, Request
 from NIPTool.adapter.plugin import NiptAdapter
+from NIPTool.models.database import User
 from NIPTool.server.web_app.utils import *
 from NIPTool.server.web_app.api.deps import get_nipt_adapter
 from fastapi.templating import Jinja2Templates
@@ -12,13 +13,14 @@ templates = Jinja2Templates(directory="templates")
 def sample(request: Request, sample_id: str, adapter: NiptAdapter = Depends(get_nipt_adapter)):
     """Sample view with sample information."""
     sample = adapter.sample(sample_id)
-    batch = adapter.batch(sample.get("SampleProject"))
+    sample = sample.dict()
+    batch = adapter.batch(sample.get("batch_id"))
 
     return templates.TemplateResponse(
         "sample/sample.html",
         context=dict(
             request=request,
-            current_user='mayapapaya',
+            current_user=User(username='mayapapaya', email='mayabrandi@123.com', role='RW'),
             chrom_abnorm=CHROM_ABNORM,
             sample=sample,
             status_classes=STATUS_CLASSES,
@@ -31,7 +33,8 @@ def sample(request: Request, sample_id: str, adapter: NiptAdapter = Depends(get_
 def sample_tris(request: Request, sample_id: str, adapter: NiptAdapter = Depends(get_nipt_adapter)):
     """Sample view with trisomi plot."""
     sample = adapter.sample(sample_id)
-    batch = adapter.batch(sample.get("SampleProject"))
+    sample = sample.dict()
+    batch = adapter.batch(sample.get("batch_id"))
     abnormal_data, data_per_abnormaliy = get_abn_for_samp_tris_plot(adapter)
     normal_data = get_normal_for_samp_tris_plot(adapter)
     sample_data = get_sample_for_samp_tris_plot(sample)
@@ -39,7 +42,7 @@ def sample_tris(request: Request, sample_id: str, adapter: NiptAdapter = Depends
         "sample/sample_tris.html",
         context=dict(
             request=request,
-            current_user='mayapapaya',
+            current_user=User(username='mayapapaya', email='mayabrandi@123.com', role='RW'),
             tris_abn=data_per_abnormaliy,
             normal_data=normal_data,
             abnormal_data=abnormal_data,

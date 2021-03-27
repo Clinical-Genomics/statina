@@ -1,7 +1,10 @@
 import logging
+from typing import List
 
 from mongo_adapter import MongoAdapter
 from datetime import datetime as dt
+from pydantic import parse_obj_as
+from NIPTool.models.database import Batch, Sample
 
 LOG = logging.getLogger(__name__)
 
@@ -47,28 +50,44 @@ class NiptAdapter(MongoAdapter):
 
     def user(self, username: str):
         """Find user from user collection"""
+
         return self.user_collection.find_one({"_id": username})
 
-    def batches(self):
+    def batches(self) -> List[Batch]:
         """Return all batches from the batch collection"""
-        return self.batch_collection.find()
 
-    def batch(self, batch_id):
+        batches = self.batch_collection.find()
+        return parse_obj_as(List[Batch], list(batches))
+
+    def batch(self, batch_id) -> Batch:
         """Find one batch from the batch collection"""
-        return self.batch_collection.find_one({"_id": batch_id})
 
-    def sample(self, sample_id):
+        batch_data: dict = self.batch_collection.find_one({"_id": batch_id})
+        batch_data['batch_id']: str = batch_data.pop('_id')
+        return Batch(**batch_data)
+
+    def sample(self, sample_id) -> Sample:
         """Find one sample from the sample collection"""
-        return self.sample_collection.find_one({"_id": sample_id})
 
-    def sample_aggregate(self, pipe: list):
+        sample_data = self.sample_collection.find_one({"_id": sample_id})
+        sample_data['sample_id']: str = sample_data.pop('_id')
+        return Sample(**sample_data)
+
+    def batch_samples(self, batch_id) -> List[Sample]:
+        """All samples within the batch"""
+
+        samples = self.sample_collection.find({"batch_id": batch_id})
+        return parse_obj_as(List[Sample], list(samples))
+
+
+    def sample_aggregate(self, pipe: list)-> list:
         """Aggregates a query pipeline on the sample collection"""
+
         return self.sample_collection.aggregate(pipe)
 
-    def batch_aggregate(self, pipe: list):
+
+    def batch_aggregate(self, pipe: list)-> list:
         """Aggregates a query pipeline on the sample collection"""
+
         return self.batch_collection.aggregate(pipe)
 
-    def batch_samples(self, batch_id):
-        """All samples within the batch"""
-        return self.sample_collection.find({"SampleProject": batch_id})

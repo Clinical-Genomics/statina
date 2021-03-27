@@ -4,7 +4,7 @@
     <div class="vertical-center">
         <div class="row">
             <div class="col-lg-12">
-                <h1 class="page-header">Sample: {{sample._id}}</h1>
+                <h1 class="page-header">Sample: {{sample.sample_id}}</h1>
             </div>
         </div>
         <div class="row">
@@ -19,7 +19,7 @@
                                 <table class="table table-bordered ">
                                     <tr>
                                         <td><strong>Batch:</strong></td>
-                                        <td><a href={{ url_for('batch', batch_id=batch._id) }}>{{ batch._id }}</a></td>
+                                        <td><a href={{ url_for('batch', batch_id=batch.batch_id) }}>{{ batch.batch_id }}</a></td>
                                         <td><strong># QCFlags:</strong></td>
                                         <td>{{ sample.QCFlag}}</td>
                                     </tr>
@@ -51,7 +51,7 @@
                     </div>
                     <td>
                         <input type=text name="form_id" value="set_sample_comment" hidden>
-                        <input type=text name="sample_id" value="{{sample._id}}" hidden>
+                        <input type=text name="sample_id" value="{{sample.sample_id}}" hidden>
                     </td>
                     <td>
                         <p align="right">
@@ -69,5 +69,4 @@
         </div>
         
     </form>
-</div>
 {% endblock %}

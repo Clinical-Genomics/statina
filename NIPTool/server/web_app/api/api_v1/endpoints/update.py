@@ -1,18 +1,40 @@
 import logging
-from datetime import datetime
 from typing import Iterable
+from typing import Optional
 
 from fastapi import APIRouter, Depends, Request
 from fastapi.responses import RedirectResponse
 from NIPTool.adapter.plugin import NiptAdapter
 from NIPTool.crud import find, update
-from NIPTool.models.database import Sample, User
-from NIPTool.server.web_app.api.deps import get_nipt_adapter
+
+from NIPTool.models.database import User
 from NIPTool.server.web_app.utils import *
+from NIPTool.server.web_app.api.deps import get_nipt_adapter, get_current_active_user
+from datetime import datetime
 
 router = APIRouter()
 
 LOG = logging.getLogger(__name__)
+
+from pydantic import BaseModel
+
+
+class Item(BaseModel):
+    form_id: str
+    sample_id: Optional[str]
+
+
+@router.post("/update_debugging")
+def update_debugging(request: Request, item: Item, adapter: NiptAdapter = Depends(get_nipt_adapter)):
+    """Update the database"""
+    print(item)
+    print('hej')
+    time_stamp = datetime.now().strftime("%Y/%m/%d %H:%M:%S")
+    user = User(username='mayapapaya', email='mayabrandi@123.com', role='RW')
+    if user.role != "RW":
+        return "", 201
+
+    return RedirectResponse('batches/342712/')
 
 
 @router.post("/update")
@@ -20,7 +42,8 @@ def update(request: Request, adapter: NiptAdapter = Depends(get_nipt_adapter)):
     """Update the database"""
 
     time_stamp: str = datetime.now().strftime("%Y/%m/%d %H:%M:%S")
-    user = User(name="mayapapaya", email="mayapapaya@mail.com", role="RW")
+    user = User(username="mayapapaya", email="mayapapaya@mail.com", role="RW")
+
     if user.role != "RW":
         return "", 201
 

@@ -3,7 +3,7 @@ from typing import List
 
 from fastapi import APIRouter, Depends, Response, status
 from NIPTool.adapter.plugin import NiptAdapter
-from NIPTool.crud.insert import load_batch, load_samples, load_user
+from NIPTool.crud.insert import insert_batch, insert_samples, insert_user
 from NIPTool.exeptions import NIPToolError
 from NIPTool.models.database import Batch, Sample
 from NIPTool.models.server.load import BatchRequestBody, UserRequestBody
@@ -28,8 +28,8 @@ def batch(
     samples: List[Sample] = get_samples(nipt_results)
     batch: Batch = get_batch(nipt_results)
     try:
-        load_batch(adapter=adapter, batch=batch, batch_files=batch_files)
-        load_samples(adapter=adapter, samples=samples, segmental_calls=batch_files.segmental_calls)
+        insert_batch(adapter=adapter, batch=batch, batch_files=batch_files)
+        insert_samples(adapter=adapter, samples=samples, segmental_calls=batch_files.segmental_calls)
     except NIPToolError as e:
         return {"message": e.message, "status_code": status.HTTP_422_UNPROCESSABLE_ENTITY}
     message = "Data loaded into database"
@@ -44,7 +44,7 @@ def user(
     """Function to load user into the database with rest"""
 
     try:
-        load_user(adapter, user)
+        insert_user(adapter, user)
     except NIPToolError as e:
         response.status_code = status.HTTP_422_UNPROCESSABLE_ENTITY
         return {"message": e.message}

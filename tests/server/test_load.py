@@ -5,8 +5,8 @@ from pydantic import ValidationError
 
 """
 def test_user_mocked(mocker, fast_app_client, valid_load_user):
-    # GIVEN a load_user function that never fails
-    mocker.patch('NIPTool.server.load.api.api_v1.endpoints.load.load_user')
+    # GIVEN a insert_user function that never fails
+    mocker.patch('NIPTool.server.load.api.api_v1.endpoints.load.insert_user')
 
     # WHEN running the user request with the data
     response = fast_app_client.post('/api/v1/load/user', json=valid_load_user.dict())
@@ -18,7 +18,7 @@ def test_user_load_fails_mocked(mocker, mock_fast_client):
     # GIVEN the following request data:
     data = dict(email='maya.papaya@something.se', name="Maya Papaya", role="RW")
 
-    with patch('NIPTool.server.load.api.api_v1.endpoints.load.load_user', side_effect=Exception('mocked error')):
+    with patch('NIPTool.server.load.api.api_v1.endpoints.load.insert_user', side_effect=Exception('mocked error')):
         # WHEN running the user request with the data
         response = mock_fast_client.post('/api/v1/load/user', json=data)
         assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY"""

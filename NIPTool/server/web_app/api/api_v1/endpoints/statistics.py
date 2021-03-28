@@ -1,5 +1,6 @@
 from fastapi import APIRouter, Depends, Request
 from NIPTool.adapter.plugin import NiptAdapter
+from NIPTool.models.database import User
 from NIPTool.server.web_app.utils import *
 from NIPTool.server.web_app.api.deps import get_nipt_adapter
 from fastapi.templating import Jinja2Templates
@@ -25,7 +26,7 @@ def statistics(request: Request, adapter: NiptAdapter = Depends(get_nipt_adapter
     ]
 
     batches = get_last_batches(adapter=adapter, nr=nr_batches)
-    batch_ids = [batch.get("_id") for batch in batches]
+    batch_ids = [batch.get("batch_id") for batch in batches]
     box_stat = get_statistics_for_box_plot(
         adapter=adapter, batches=batch_ids, fields=box_plots
     )
@@ -36,7 +37,7 @@ def statistics(request: Request, adapter: NiptAdapter = Depends(get_nipt_adapter
         "statistics.html",
         context=dict(
             request=request,
-            current_user='mayapapaya',
+            current_user=User(username='mayapapaya', email='mayabrandi@123.com', role='RW'),
             ticks=list(range(1, nr_batches + 1)),
             nr_batches=nr_batches,
             batch_ids=batch_ids,

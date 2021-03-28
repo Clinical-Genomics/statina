@@ -32,14 +32,14 @@ def insert_samples(
     """Function to load data from fluffy result file."""
 
     segmental_calls: Dict[str, str] = parse_segmental_calls(segmental_calls_path=segmental_calls)
-    mongo_samples = []
+    sample_dicts = []
     for sample in samples:
         sample_dict: dict = sample.dict(exclude_none=True)
         sample_dict["_id"] = sample.sample_id
         sample_dict["segmental_calls"] = segmental_calls.get(sample.sample_id)
-        mongo_samples.append(sample_dict)
+        sample_dicts.append(sample_dict)
     try:
-        result: InsertManyResult = adapter.sample_collection.insert_many(mongo_samples)
+        result: InsertManyResult = adapter.sample_collection.insert_many(sample_dicts)
         LOG.info("Added sample documents.")
     except DuplicateKeyError as e:
         return {"message": "dup keys"}  ##this exception is acting wierd

@@ -3,9 +3,7 @@ import logging
 from pymongo.collection import Collection
 from pymongo.database import Database
 
-
 from mongo_adapter import MongoAdapter
-
 
 LOG = logging.getLogger(__name__)
 
@@ -23,7 +21,3 @@ class NiptAdapter(MongoAdapter):
         self.user_collection: Collection = self.db.user
 
         LOG.info("Use database %s.", db_name)
-
-
-
-

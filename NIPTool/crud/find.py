@@ -8,6 +8,7 @@ from NIPTool.models.database import Batch, User, Sample
 
 def user(adapter: NiptAdapter, user_name: str) -> User:
     """Find user from user collection"""
+
     raw_user: dict = adapter.user_collection.find_one({"_id": user_name})
     return User(**raw_user)
 

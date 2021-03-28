@@ -49,7 +49,7 @@ def insert_samples(
 def insert_user(adapter: NiptAdapter, user: UserRequestBody) -> str:
     """Function to load a new user to the database."""
 
-    user_dict = {"_id": user.email, "email": user.email, "username": user.name, "role": user.role}
+    user_dict = {"_id": user.email, "email": user.email, "username": user.username, "role": user.role}
     result: InsertOneResult = adapter.user_collection.insert_one(user_dict)
     LOG.info("Added user documen %s.", user.email)
     return result.inserted_id

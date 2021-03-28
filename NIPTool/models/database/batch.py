@@ -5,7 +5,6 @@ from pydantic import BaseModel, Field
 
 class Batch(BaseModel):
     batch_id: str=Field(..., alias='SampleProject')
-    batch_id: str= Field(..., alias='SampleProject')
     result_file: Optional[str]
     multiqc_report: Optional[str]
     segmental_calls: Optional[str]

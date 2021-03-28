@@ -94,5 +94,5 @@ class Sample(BaseModel):
     status_change_TXXY: Optional[str]
     status_change_TXYY: Optional[str]
 
-    #class Config:
-    #    allow_population_by_field_name = True
+    class Config:
+        allow_population_by_field_name = True

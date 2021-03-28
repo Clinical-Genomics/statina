@@ -3,8 +3,8 @@ import pytest
 from mongomock import MongoClient
 from .small_helpers import SmallHelpers
 from NIPTool.adapter.plugin import NiptAdapter
-from NIPTool.server.load.api.api_v1.api import app
-from NIPTool.server.load.api.deps import get_nipt_adapter
+from NIPTool.server.crud.api.api_v1.api import app
+from NIPTool.server.crud.api.deps import get_nipt_adapter
 from fastapi.testclient import TestClient
 from NIPTool.models.server.load import  BatchRequestBody, UserRequestBody
 
@@ -56,7 +56,7 @@ def database(request, pymongo_client):
 
 @pytest.fixture(scope="function")
 def valid_load_user():
-    user = UserRequestBody(email="maya.papaya@something.se", name="Maya Papaya", role="RW")
+    user = UserRequestBody(email="maya.papaya@something.se", username="Maya Papaya", role="RW")
     return user
 
 

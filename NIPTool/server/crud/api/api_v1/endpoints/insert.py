@@ -8,7 +8,7 @@ from NIPTool.exeptions import NIPToolError
 from NIPTool.models.database import Batch, Sample
 from NIPTool.models.server.load import BatchRequestBody, UserRequestBody
 from NIPTool.parse.batch import get_batch, get_samples
-from NIPTool.server.load.api.deps import get_nipt_adapter
+from NIPTool.server.crud.api.deps import get_nipt_adapter
 
 router = APIRouter()
 
@@ -31,7 +31,7 @@ def batch(
         insert_batch(adapter=adapter, batch=batch, batch_files=batch_files)
         insert_samples(adapter=adapter, samples=samples, segmental_calls=batch_files.segmental_calls)
     except NIPToolError as e:
-        return {"message": e.message, "status_code": status.HTTP_422_UNPROCESSABLE_ENTITY}
+        return {"message": e.message} #status code????
     message = "Data loaded into database"
     response.status_code = status.HTTP_200_OK
     return {"message": message}

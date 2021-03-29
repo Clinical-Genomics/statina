@@ -31,7 +31,7 @@ def test_user(fast_app_client, valid_load_user):
     response = fast_app_client.post("/api/v1/insert/user", json=valid_load_user.dict())
 
     # THEN
-    assert "Data loaded into database" in response.text
+    assert "inserted to the database" in response.text
     assert response.status_code == status.HTTP_200_OK
 
 
@@ -54,7 +54,7 @@ def test_batch_valid_files(fast_app_client, valid_load_batch):
     response = fast_app_client.post("/api/v1/insert/batch", json=valid_load_batch.dict())
 
     # THEN
-    assert "Data loaded into database" in response.text
+    assert "inserted to the database" in response.text
     assert response.status_code == status.HTTP_200_OK
 
 
@@ -70,7 +70,7 @@ def test_batch_wrong_segmental_calls_path(fast_app_client, valid_load_batch):
     response = fast_app_client.post("/api/v1/insert/batch", json=data)
 
     # THEN assert batch is being added without error
-    assert "Data loaded into database" in response.text
+    assert "inserted to the database" in response.text
     assert response.status_code == status.HTTP_200_OK
 
 

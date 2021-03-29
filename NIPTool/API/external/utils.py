@@ -2,7 +2,7 @@ from typing import List
 
 from NIPTool.crud import find
 from NIPTool.models.database import Sample
-from NIPTool.server.constants import *
+from NIPTool.API.external.constants import *
 
 
 ### Batch views:
@@ -14,7 +14,16 @@ def get_sample_info(sample: Sample):
     sample_warnings = get_sample_warnings(sample)
     sample = sample.dict()
 
-    sample_info_keys = ["Zscore_13", "Zscore_18", "Zscore_21", "CNVSegment", "FF_Formatted", "FFX", "FFY", "Zscore_X"]
+    sample_info_keys = [
+        "Zscore_13",
+        "Zscore_18",
+        "Zscore_21",
+        "CNVSegment",
+        "FF_Formatted",
+        "FFX",
+        "FFY",
+        "Zscore_X",
+    ]
     for key in sample_info_keys:
         val = sample.get(key)
         if isinstance(val, (float, int)):
@@ -25,9 +34,18 @@ def get_sample_info(sample: Sample):
     return {
         "sample_id": sample.get("sample_id"),
         "FF": {"value": sample.get("FF_Formatted"), "warn": sample_warnings.get("FF_Formatted")},
-        "CNVSegment": {"value": sample.get("CNVSegment"), "warn": "default", },
-        "FFX": {"value": sample.get("FFX"), "warn": "default", },
-        "FFY": {"value": sample.get("FFY"), "warn": "default", },
+        "CNVSegment": {
+            "value": sample.get("CNVSegment"),
+            "warn": "default",
+        },
+        "FFX": {
+            "value": sample.get("FFX"),
+            "warn": "default",
+        },
+        "FFY": {
+            "value": sample.get("FFY"),
+            "warn": "default",
+        },
         "Zscore_13": {"value": sample.get("Zscore_13"), "warn": sample_warnings.get("Zscore_13")},
         "Zscore_18": {"value": sample.get("Zscore_18"), "warn": sample_warnings.get("Zscore_18")},
         "Zscore_21": {"value": sample.get("Zscore_21"), "warn": sample_warnings.get("Zscore_21")},
@@ -63,9 +81,9 @@ def _get_ff_warning(fetal_fraction):
 
 def get_sample_warnings(sample: Sample):
     """"""
-    sample= sample.dict()
+    sample = sample.dict()
     sample_warnings = {}
-    fetal_fraction = sample.get('FF_Formatted')
+    fetal_fraction = sample.get("FF_Formatted")
     sample_warnings["FF_Formatted"] = _get_ff_warning(fetal_fraction)
     for key in ["Zscore_13", "Zscore_18", "Zscore_21"]:
         z_score = sample.get(key)
@@ -103,8 +121,8 @@ def get_scatter_data_for_coverage_plot(samples: List[Sample]):
     data = {}
     for sample in samples:
         warnings = get_sample_warnings(sample)
-        warnings.pop('FF_Formatted')
-        if set(warnings.values()) == {'default'}:
+        warnings.pop("FF_Formatted")
+        if set(warnings.values()) == {"default"}:
             continue
 
         sample_id = sample.sample_id
@@ -353,24 +371,24 @@ def get_sample_for_samp_tris_plot(sample):
 def get_last_batches(adapter, nr: int) -> list:
     """geting the <nr> last batches based on SequencingDate"""
 
-    batch_sort_aggregation = [{'$sort': {'SequencingDate': -1}}]
+    batch_sort_aggregation = [{"$sort": {"SequencingDate": -1}}]
     sorted_batches = list(find.batch_aggregate(pipe=batch_sort_aggregation, adapter=adapter))
     if len(sorted_batches) > nr:
         sorted_batches = sorted_batches[0:nr]
 
-    return (sorted_batches)
+    return sorted_batches
 
 
 # Statistics
+
 
 def get_statistics_for_scatter_plot(batches: list, fields: list) -> dict:
     """Formating data for scatter plot"""
 
     scatter_plot_data = {}
     for batch in batches:
-        batch_id = batch.get('batch_id')
-        scatter_plot_data[batch_id] = {
-            'date': batch.get('SequencingDate')}
+        batch_id = batch.get("batch_id")
+        scatter_plot_data[batch_id] = {"date": batch.get("SequencingDate")}
         for field in fields:
             scatter_plot_data[batch_id][field] = batch.get(field)
 
@@ -380,19 +398,20 @@ def get_statistics_for_scatter_plot(batches: list, fields: list) -> dict:
 def get_statistics_for_box_plot(adapter, batches: list, fields: list):
     """Getting and formating data for box plot"""
 
-    match = {'$match': {'batch_id': {'$in': batches}}}
-    lookup = {'$lookup': {
-        'from': 'batch',
-        'localField': 'batch_id',
-        'foreignField': 'batch_id',
-        'as': 'batch'}}
-    unwind = {'$unwind': {'path': '$batch'}}
-    group = {'$group': {'_id': {
-        'batch': '$batch_id',
-        'date': '$batch.SequencingDate'}}}
+    match = {"$match": {"batch_id": {"$in": batches}}}
+    lookup = {
+        "$lookup": {
+            "from": "batch",
+            "localField": "batch_id",
+            "foreignField": "batch_id",
+            "as": "batch",
+        }
+    }
+    unwind = {"$unwind": {"path": "$batch"}}
+    group = {"$group": {"_id": {"batch": "$batch_id", "date": "$batch.SequencingDate"}}}
 
     for field in fields:
-        group['$group'][field] = {'$push': f"${field}"}
+        group["$group"][field] = {"$push": f"${field}"}
 
     pipe = [match, lookup, unwind, group]
     # maybe add a fina sort to the pipe

@@ -3,10 +3,10 @@ import pytest
 from mongomock import MongoClient
 from .small_helpers import SmallHelpers
 from NIPTool.adapter.plugin import NiptAdapter
-from NIPTool.server.crud.api.api_v1.api import app
-from NIPTool.server.crud.api.deps import get_nipt_adapter
+from NIPTool.API.internal.api.api_v1.api import app
+from NIPTool.API.internal.api.deps import get_nipt_adapter
 from fastapi.testclient import TestClient
-from NIPTool.models.server.load import  BatchRequestBody, UserRequestBody
+from NIPTool.models.server.load import BatchRequestBody, UserRequestBody
 
 DATABASE = "testdb"
 

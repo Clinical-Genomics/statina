@@ -18,7 +18,7 @@ def batches(
 ):  # , user: User = Depends(get_current_active_user)):
     """List of all batches"""
 
-    all_batches = list(find.batches(adapter=adapter))
+    all_batches: List[Batch] = find.batches(adapter=adapter)
     return templates.TemplateResponse(
         "batches.html",
         context={

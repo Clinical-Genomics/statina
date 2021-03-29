@@ -15,9 +15,9 @@ router = APIRouter()
 
 @router.post("/batch")
 def batch(
-    response: Response,
-    batch_files: BatchRequestBody,
-    adapter: NiptAdapter = Depends(get_nipt_adapter),
+        response: Response,
+        batch_files: BatchRequestBody,
+        adapter: NiptAdapter = Depends(get_nipt_adapter),
 ):
     """Function to load batch data into the database with rest"""
 
@@ -31,24 +31,24 @@ def batch(
         insert_batch(adapter=adapter, batch=batch, batch_files=batch_files)
         insert_samples(adapter=adapter, samples=samples, segmental_calls=batch_files.segmental_calls)
     except NIPToolError as e:
-        return {"message": e.message} #status code????
-    message = "Data loaded into database"
+        response.status_code = e.code
+        return {"message": e.message}
+
     response.status_code = status.HTTP_200_OK
-    return {"message": message}
+    return {"message": f"Batch {batch.batch_id} inserted to the database"}
 
 
 @router.post("/user")
 def user(
-    response: Response, user: UserRequestBody, adapter: NiptAdapter = Depends(get_nipt_adapter)
+        response: Response, user: UserRequestBody, adapter: NiptAdapter = Depends(get_nipt_adapter)
 ):
     """Function to load user into the database with rest"""
 
     try:
         insert_user(adapter, user)
     except NIPToolError as e:
-        response.status_code = status.HTTP_422_UNPROCESSABLE_ENTITY
+        # response.status_code = status.HTTP_422_UNPROCESSABLE_ENTITY  what status code????
         return {"message": e.message}
 
-    message = "Data loaded into database"
     response.status_code = status.HTTP_200_OK
-    return {"message": message}
+    return {"message": f"User {user.email} inserted to the database."}

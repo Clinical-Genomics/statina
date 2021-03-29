@@ -4,6 +4,7 @@ from typing import Dict, List, Optional
 from pymongo.errors import DuplicateKeyError
 
 from NIPTool.adapter import NiptAdapter
+from NIPTool.exeptions import InsertError, NIPToolError
 from NIPTool.models.database import Batch, Sample
 from NIPTool.models.server.load import BatchRequestBody, UserRequestBody
 from NIPTool.parse.batch import parse_segmental_calls
@@ -23,7 +24,7 @@ def insert_batch(adapter: NiptAdapter, batch: Batch, batch_files: BatchRequestBo
         result: InsertOneResult = adapter.batch_collection.insert_one(batch_dict)
         LOG.info("Added document %s.", batch_dict["batch_id"])
     except DuplicateKeyError as e:
-        return {"message": "dup keys"}  ##this exception is acting wierd
+        raise InsertError(message=f"Batch {batch.batch_id} allready in database.")
     return result.inserted_id
 
 
@@ -41,8 +42,8 @@ def insert_samples(
     try:
         result: InsertManyResult = adapter.sample_collection.insert_many(sample_dicts)
         LOG.info("Added sample documents.")
-    except DuplicateKeyError as e:
-        return {"message": "dup keys"}  ##this exception is acting wierd
+    except:
+        raise InsertError(f"Sample keys allready in database.")
     return result.inserted_ids
 
 
@@ -50,6 +51,9 @@ def insert_user(adapter: NiptAdapter, user: UserRequestBody) -> str:
     """Function to load a new user to the database."""
 
     user_dict = {"_id": user.email, "email": user.email, "username": user.username, "role": user.role}
-    result: InsertOneResult = adapter.user_collection.insert_one(user_dict)
-    LOG.info("Added user documen %s.", user.email)
+    try:
+        result: InsertOneResult = adapter.user_collection.insert_one(user_dict)
+        LOG.info("Added user documen %s.", user.email)
+    except:
+        raise InsertError(f"User {user.email} allready in database.")
     return result.inserted_id

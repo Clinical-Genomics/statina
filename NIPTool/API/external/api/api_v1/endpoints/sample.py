@@ -13,8 +13,7 @@ templates = Jinja2Templates(directory="templates")
 @router.get("/samples/{sample_id}/")
 def sample(request: Request, sample_id: str, adapter: NiptAdapter = Depends(get_nipt_adapter)):
     """Sample view with sample information."""
-    sample = find.sample(sample_id=sample_id, adapter=adapter)
-    sample = sample.dict()
+    sample: dict = find.sample(sample_id=sample_id, adapter=adapter).dict()
     batch = find.batch(batch_id=sample.get("batch_id"), adapter=adapter)
 
     return templates.TemplateResponse(
@@ -34,8 +33,7 @@ def sample(request: Request, sample_id: str, adapter: NiptAdapter = Depends(get_
 @router.get("/samples/{sample_id}/tris")
 def sample_tris(request: Request, sample_id: str, adapter: NiptAdapter = Depends(get_nipt_adapter)):
     """Sample view with trisomi plot."""
-    sample = find.sample(sample_id=sample_id, adapter=adapter)
-    sample = sample.dict()
+    sample: dict = find.sample(sample_id=sample_id, adapter=adapter).dict()
     batch = find.batch(batch_id=sample.get("batch_id"), adapter=adapter)
     abnormal_data, data_per_abnormaliy = get_abn_for_samp_tris_plot(adapter=adapter)
     normal_data = get_normal_for_samp_tris_plot(adapter=adapter)

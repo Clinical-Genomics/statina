@@ -15,7 +15,6 @@ def insert_batch(adapter: NiptAdapter, batch: Batch, batch_files: BatchRequestBo
     """Load a batch into the database"""
 
     batch_dict = batch.dict(exclude_none=True)
-    batch_dict["_id"] = batch.batch_id
     batch_dict["segmental_calls"] = batch_files.segmental_calls
     batch_dict["multiqc_report"] = batch_files.multiqc_report
     batch_dict["result_file"] = batch_files.result_file
@@ -36,7 +35,6 @@ def insert_samples(
     sample_dicts = []
     for sample in samples:
         sample_dict: dict = sample.dict(exclude_none=True)
-        sample_dict["_id"] = sample.sample_id
         sample_dict["segmental_calls"] = segmental_calls.get(sample.sample_id)
         sample_dicts.append(sample_dict)
     try:
@@ -51,7 +49,6 @@ def insert_user(adapter: NiptAdapter, user: UserRequestBody) -> str:
     """Function to load a new user to the database."""
 
     user_dict = {
-        "_id": user.email,
         "email": user.email,
         "username": user.username,
         "role": user.role,

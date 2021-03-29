@@ -1,3 +1,5 @@
+from pydantic import BaseSettings
+
 from NIPTool.adapter.plugin import NiptAdapter
 from pymongo import MongoClient
 from fastapi.security import OAuth2PasswordBearer
@@ -10,18 +12,27 @@ from typing import Optional
 from jose import JWTError, jwt
 
 
+class Settings(BaseSettings):
+    db_uri: str = "test_uri"
+    db_name: str = "test_db"
+
+
+settings = Settings()
+
+
 def temp_get_config():
-    return {'DB_URI': 'mongodb://localhost:27030', 'DB_NAME': 'nipt-stage',
-            "SECRET_KEY": "97f30d198c86a604f12c22c74077a22cc223009f78fbb8de2065c26cca68e9a5",
-            "ALGORITHM": "HS256",
-            "ACCESS_TOKEN_EXPIRE_MINUTES": 30
-            }
+    return {
+        "DB_URI": "mongodb://localhost:27030",
+        "DB_NAME": "nipt-stage",
+        "SECRET_KEY": "97f30d198c86a604f12c22c74077a22cc223009f78fbb8de2065c26cca68e9a5",
+        "ALGORITHM": "HS256",
+        "ACCESS_TOKEN_EXPIRE_MINUTES": 30,
+    }
 
 
 def get_nipt_adapter():
-    config = temp_get_config()
-    client = MongoClient(config['DB_URI'])
-    return NiptAdapter(client, db_name=config['DB_NAME'])
+    client = MongoClient(settings.db_uri)
+    return NiptAdapter(client, db_name=settings.db_name)
 
 
 oauth2_scheme = OAuth2PasswordBearer(
@@ -32,8 +43,11 @@ oauth2_scheme = OAuth2PasswordBearer(
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 
-def get_current_user(token: str = Depends(oauth2_scheme), adapter: NiptAdapter = Depends(get_nipt_adapter),
-                     config: dict = Depends(temp_get_config)):
+def get_current_user(
+    token: str = Depends(oauth2_scheme),
+    adapter: NiptAdapter = Depends(get_nipt_adapter),
+    config: dict = Depends(temp_get_config),
+):
     credentials_exception = HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
         detail="Could not validate credentials",
@@ -53,7 +67,7 @@ def get_current_user(token: str = Depends(oauth2_scheme), adapter: NiptAdapter =
     return User(**user)
 
 
-def get_current_active_user(current_user: User = Depends(get_current_user))-> User:
+def get_current_active_user(current_user: User = Depends(get_current_user)) -> User:
     if current_user.disabled:
         raise HTTPException(status_code=400, detail="Inactive user")
     return current_user
@@ -67,7 +81,7 @@ def get_password_hash(password):
     return pwd_context.hash(password)
 
 
-def authenticate_user(username: str, password: str)-> UserInDB:
+def authenticate_user(username: str, password: str) -> UserInDB:
     adapter = get_nipt_adapter()
     user_dict = adapter.user(username)
     if not user_dict:

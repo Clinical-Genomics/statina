@@ -172,7 +172,7 @@ def report(
     """Report view, collecting all tables and plots from one batch."""
 
     batch: Batch = find.batch(batch_id=batch_id, adapter=adapter)
-    samples = list(find.batch_samples(batch_id=batch_id, adapter=adapter))
+    samples: List[Sample] = find.batch_samples(batch_id=batch_id, adapter=adapter)
     scatter_data = get_scatter_data_for_coverage_plot(samples)
     box_data = get_box_data_for_coverage_plot(samples)
     control = get_ff_control_normal(adapter)

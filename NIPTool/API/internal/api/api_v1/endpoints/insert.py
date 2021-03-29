@@ -4,7 +4,7 @@ from typing import List
 from fastapi import APIRouter, Depends, Response, status
 from NIPTool.adapter.plugin import NiptAdapter
 from NIPTool.crud.insert import insert_batch, insert_samples, insert_user
-from NIPTool.exeptions import NIPToolError
+from NIPTool.crud import find
 from NIPTool.models.database import Batch, Sample
 from NIPTool.models.server.load import BatchRequestBody, UserRequestBody
 from NIPTool.parse.batch import get_batch, get_samples
@@ -27,14 +27,11 @@ def batch(
         return {"message": "Results file missing."}
     samples: List[Sample] = get_samples(nipt_results)
     batch: Batch = get_batch(nipt_results)
-    try:
-        insert_batch(adapter=adapter, batch=batch, batch_files=batch_files)
-        insert_samples(
-            adapter=adapter, samples=samples, segmental_calls=batch_files.segmental_calls
-        )
-    except NIPToolError as e:
-        response.status_code = e.code
-        return {"message": e.message}
+    if find.batch(adapter=adapter, batch_id=batch.batch_id):
+        return "batch allready in database"
+
+    insert_batch(adapter=adapter, batch=batch, batch_files=batch_files)
+    insert_samples(adapter=adapter, samples=samples, segmental_calls=batch_files.segmental_calls)
 
     response.status_code = status.HTTP_200_OK
     return {"message": f"Batch {batch.batch_id} inserted to the database"}
@@ -46,11 +43,9 @@ def user(
 ):
     """Function to load user into the database with rest"""
 
-    try:
-        insert_user(adapter, user)
-    except NIPToolError as e:
-        response.status_code = e.code
-        return {"message": e.message}
+    if find.user(adapter=adapter, email=user.email):
+        return "user allready in database"
+    insert_user(adapter=adapter, user=user)
 
     response.status_code = status.HTTP_200_OK
     return {"message": f"User {user.email} inserted to the database."}

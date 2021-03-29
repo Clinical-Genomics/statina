@@ -1,14 +1,13 @@
 import logging
 from typing import Dict, List, Optional
 
-from pymongo.errors import DuplicateKeyError
-
 from NIPTool.adapter import NiptAdapter
-from NIPTool.exeptions import InsertError, NIPToolError
+from NIPTool.exeptions import InsertError
 from NIPTool.models.database import Batch, Sample
 from NIPTool.models.server.load import BatchRequestBody, UserRequestBody
 from NIPTool.parse.batch import parse_segmental_calls
 from pymongo.results import InsertManyResult, InsertOneResult
+
 LOG = logging.getLogger(__name__)
 
 
@@ -23,13 +22,14 @@ def insert_batch(adapter: NiptAdapter, batch: Batch, batch_files: BatchRequestBo
     try:
         result: InsertOneResult = adapter.batch_collection.insert_one(batch_dict)
         LOG.info("Added document %s.", batch_dict["batch_id"])
-    except DuplicateKeyError as e:
+    except:
         raise InsertError(message=f"Batch {batch.batch_id} allready in database.")
     return result.inserted_id
 
 
 def insert_samples(
-        adapter: NiptAdapter, samples: List[Sample], segmental_calls: Optional[str]) -> List[str]:
+    adapter: NiptAdapter, samples: List[Sample], segmental_calls: Optional[str]
+) -> List[str]:
     """Function to load data from fluffy result file."""
 
     segmental_calls: Dict[str, str] = parse_segmental_calls(segmental_calls_path=segmental_calls)
@@ -50,10 +50,15 @@ def insert_samples(
 def insert_user(adapter: NiptAdapter, user: UserRequestBody) -> str:
     """Function to load a new user to the database."""
 
-    user_dict = {"_id": user.email, "email": user.email, "username": user.username, "role": user.role}
+    user_dict = {
+        "_id": user.email,
+        "email": user.email,
+        "username": user.username,
+        "role": user.role,
+    }
     try:
         result: InsertOneResult = adapter.user_collection.insert_one(user_dict)
         LOG.info("Added user documen %s.", user.email)
     except:
-        raise InsertError(f"User {user.email} allready in database.")
+        raise InsertError(f"User {user.email} already in database.")
     return result.inserted_id

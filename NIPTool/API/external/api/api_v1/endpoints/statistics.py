@@ -1,8 +1,8 @@
 from fastapi import APIRouter, Depends, Request
 from NIPTool.adapter.plugin import NiptAdapter
 from NIPTool.models.database import User
-from NIPTool.server.web_app.utils import *
-from NIPTool.server.web_app.api.deps import get_nipt_adapter
+from NIPTool.API.external.utils import *
+from NIPTool.API.external.api.deps import get_nipt_adapter
 from fastapi.templating import Jinja2Templates
 
 router = APIRouter()
@@ -27,17 +27,13 @@ def statistics(request: Request, adapter: NiptAdapter = Depends(get_nipt_adapter
 
     batches = get_last_batches(adapter=adapter, nr=nr_batches)
     batch_ids = [batch.get("batch_id") for batch in batches]
-    box_stat = get_statistics_for_box_plot(
-        adapter=adapter, batches=batch_ids, fields=box_plots
-    )
-    scatter_stat = get_statistics_for_scatter_plot(
-        batches=batches, fields=scatter_plots
-    )
+    box_stat = get_statistics_for_box_plot(adapter=adapter, batches=batch_ids, fields=box_plots)
+    scatter_stat = get_statistics_for_scatter_plot(batches=batches, fields=scatter_plots)
     return templates.TemplateResponse(
         "statistics.html",
         context=dict(
             request=request,
-            current_user=User(username='mayapapaya', email='mayabrandi@123.com', role='RW'),
+            current_user=User(username="mayapapaya", email="mayabrandi@123.com", role="RW"),
             ticks=list(range(1, nr_batches + 1)),
             nr_batches=nr_batches,
             batch_ids=batch_ids,
@@ -45,5 +41,6 @@ def statistics(request: Request, adapter: NiptAdapter = Depends(get_nipt_adapter
             box_plots=box_plots,
             scatter_stat=scatter_stat,
             scatter_plots=scatter_plots,
-            page_id="statistics")
+            page_id="statistics",
+        ),
     )

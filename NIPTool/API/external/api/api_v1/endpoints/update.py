@@ -8,8 +8,8 @@ from NIPTool.adapter.plugin import NiptAdapter
 from NIPTool.crud import find, update
 
 from NIPTool.models.database import User
-from NIPTool.server.web_app.utils import *
-from NIPTool.server.web_app.api.deps import get_nipt_adapter, get_current_active_user
+from NIPTool.API.external.utils import *
+from NIPTool.API.external.api.deps import get_nipt_adapter, get_current_active_user
 from datetime import datetime
 
 router = APIRouter()
@@ -25,16 +25,18 @@ class Item(BaseModel):
 
 
 @router.post("/update_debugging")
-def update_debugging(request: Request, item: Item, adapter: NiptAdapter = Depends(get_nipt_adapter)):
+def update_debugging(
+    request: Request, item: Item, adapter: NiptAdapter = Depends(get_nipt_adapter)
+):
     """Update the database"""
     print(item)
-    print('hej')
+    print("hej")
     time_stamp = datetime.now().strftime("%Y/%m/%d %H:%M:%S")
-    user = User(username='mayapapaya', email='mayabrandi@123.com', role='RW')
+    user = User(username="mayapapaya", email="mayabrandi@123.com", role="RW")
     if user.role != "RW":
         return "", 201
 
-    return RedirectResponse('batches/342712/')
+    return RedirectResponse("batches/342712/")
 
 
 @router.post("/update")

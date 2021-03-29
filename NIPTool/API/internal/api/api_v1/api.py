@@ -1,6 +1,6 @@
 from fastapi import FastAPI
 
-from NIPTool.server.crud.api.api_v1.endpoints import insert
+from NIPTool.API.internal.api.api_v1.endpoints import insert
 
 
 app = FastAPI()

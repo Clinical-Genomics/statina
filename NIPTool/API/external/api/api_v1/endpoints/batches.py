@@ -18,7 +18,7 @@ def batches(
 ):  # , user: User = Depends(get_current_active_user)):
     """List of all batches"""
 
-    all_batches = list(find.batches(adapter=adapter))
+    all_batches: List[Batch] = find.batches(adapter=adapter)
     return templates.TemplateResponse(
         "batches.html",
         context={
@@ -36,7 +36,7 @@ def batches(
 ):  # , user: User = Depends(get_current_active_user)):
     """List of all batches"""
 
-    all_batches = list(find.batches(adapter=adapter))
+    all_batches: List[Batch] = find.batches(adapter=adapter)
     return templates.TemplateResponse(
         "batches.html",
         context={
@@ -51,7 +51,8 @@ def batches(
 @router.get("/{batch_id}/")
 def batch(request: Request, batch_id: str, adapter: NiptAdapter = Depends(get_nipt_adapter)):
     """Batch view with table of all samples in the batch."""
-    samples = find.batch_samples(batch_id=batch_id, adapter=adapter)
+
+    samples: List[Sample] = find.batch_samples(batch_id=batch_id, adapter=adapter)
     return templates.TemplateResponse(
         "batch/tabs/table.html",
         context={
@@ -67,7 +68,7 @@ def batch(request: Request, batch_id: str, adapter: NiptAdapter = Depends(get_ni
 @router.post("/{batch_id}/")
 def batch(request: Request, batch_id: str, adapter: NiptAdapter = Depends(get_nipt_adapter)):
     """Batch view with table of all samples in the batch."""
-    samples = find.batch_samples(batch_id=batch_id, adapter=adapter)
+    samples: List[Sample] = find.batch_samples(batch_id=batch_id, adapter=adapter)
     return templates.TemplateResponse(
         "batch/tabs/table.html",
         context={
@@ -84,7 +85,6 @@ def batch(request: Request, batch_id: str, adapter: NiptAdapter = Depends(get_ni
 def NCV(request: Request, batch_id: str, ncv, adapter: NiptAdapter = Depends(get_nipt_adapter)):
     """Batch view with with NCV plot"""
     batch: Batch = find.batch(batch_id=batch_id, adapter=adapter)
-    u = get_tris_control_normal(adapter, ncv)
     return templates.TemplateResponse(
         "batch/tabs/NCV.html",
         context=dict(
@@ -148,7 +148,7 @@ def fetal_fraction(
 def coverage(request: Request, batch_id: str, adapter: NiptAdapter = Depends(get_nipt_adapter)):
     """Batch view with coverage plot"""
     batch: Batch = find.batch(batch_id=batch_id, adapter=adapter)
-    samples = list(find.batch_samples(batch_id=batch_id, adapter=adapter))
+    samples: List[Sample] = find.batch_samples(batch_id=batch_id, adapter=adapter)
     scatter_data = get_scatter_data_for_coverage_plot(samples)
     box_data = get_box_data_for_coverage_plot(samples)
     return templates.TemplateResponse(

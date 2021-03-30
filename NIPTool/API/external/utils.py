@@ -24,6 +24,7 @@ def get_sample_info(sample: Sample):
         "FFY",
         "Zscore_X",
     ]
+
     for key in sample_info_keys:
         val = sample.get(key)
         if isinstance(val, (float, int)):
@@ -82,6 +83,7 @@ def _get_ff_warning(fetal_fraction):
 def get_sample_warnings(sample: Sample):
     """"""
     sample = sample.dict()
+
     sample_warnings = {}
     fetal_fraction = sample.get("FF_Formatted")
     sample_warnings["FF_Formatted"] = _get_ff_warning(fetal_fraction)
@@ -258,6 +260,7 @@ def get_tris_control_normal(adapter, chr):
     if not list(find.sample_aggregate(pipe=pipe, adapter=adapter)):
         return []
     data = list(find.sample_aggregate(pipe=pipe, adapter=adapter))[0]
+
     data["values"] = [value for value in data.get("values", [])]
 
     return data
@@ -286,6 +289,7 @@ def get_tris_control_abnormal(adapter, chr, x_axis):
     ]
 
     for status_dict in find.sample_aggregate(pipe=pipe, adapter=adapter):
+
         status = status_dict["_id"][f"status_{chr}"]
         plot_data[status] = {
             "values": [value for value in status_dict.get("values")],
@@ -389,6 +393,7 @@ def get_statistics_for_scatter_plot(batches: list, fields: list) -> dict:
     for batch in batches:
         batch_id = batch.get("batch_id")
         scatter_plot_data[batch_id] = {"date": batch.get("SequencingDate")}
+
         for field in fields:
             scatter_plot_data[batch_id][field] = batch.get(field)
 

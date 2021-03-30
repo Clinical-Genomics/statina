@@ -5,6 +5,7 @@ from NIPTool.models.database import Batch, User
 from NIPTool.API.external.utils import *
 from NIPTool.API.external.constants import TRISOMI_TRESHOLDS
 from NIPTool.API.external.api.deps import get_nipt_adapter
+
 from fastapi.templating import Jinja2Templates
 
 router = APIRouter()
@@ -68,6 +69,7 @@ def batch(request: Request, batch_id: str, adapter: NiptAdapter = Depends(get_ni
 @router.post("/{batch_id}/")
 def batch(request: Request, batch_id: str, adapter: NiptAdapter = Depends(get_nipt_adapter)):
     """Batch view with table of all samples in the batch."""
+
     samples: List[Sample] = find.batch_samples(batch_id=batch_id, adapter=adapter)
     return templates.TemplateResponse(
         "batch/tabs/table.html",
@@ -85,6 +87,7 @@ def batch(request: Request, batch_id: str, adapter: NiptAdapter = Depends(get_ni
 def NCV(request: Request, batch_id: str, ncv, adapter: NiptAdapter = Depends(get_nipt_adapter)):
     """Batch view with with NCV plot"""
     batch: Batch = find.batch(batch_id=batch_id, adapter=adapter)
+
     return templates.TemplateResponse(
         "batch/tabs/NCV.html",
         context=dict(
@@ -107,6 +110,7 @@ def fetal_fraction_XY(
 ):
     """Batch view with fetal fraction (X against Y) plot"""
     batch: Batch = find.batch(batch_id=batch_id, adapter=adapter)
+
     control = get_ff_control_normal(adapter)
     abnormal = get_ff_control_abnormal(adapter)
     return templates.TemplateResponse(
@@ -131,6 +135,7 @@ def fetal_fraction(
 ):
     """Batch view with fetal fraction plot"""
     batch: Batch = find.batch(batch_id=batch_id, adapter=adapter)
+
     return templates.TemplateResponse(
         "batch/tabs/FF.html",
         context=dict(
@@ -149,6 +154,7 @@ def coverage(request: Request, batch_id: str, adapter: NiptAdapter = Depends(get
     """Batch view with coverage plot"""
     batch: Batch = find.batch(batch_id=batch_id, adapter=adapter)
     samples: List[Sample] = find.batch_samples(batch_id=batch_id, adapter=adapter)
+
     scatter_data = get_scatter_data_for_coverage_plot(samples)
     box_data = get_box_data_for_coverage_plot(samples)
     return templates.TemplateResponse(
@@ -173,6 +179,7 @@ def report(
 
     batch: Batch = find.batch(batch_id=batch_id, adapter=adapter)
     samples: List[Sample] = find.batch_samples(batch_id=batch_id, adapter=adapter)
+
     scatter_data = get_scatter_data_for_coverage_plot(samples)
     box_data = get_box_data_for_coverage_plot(samples)
     control = get_ff_control_normal(adapter)

@@ -9,6 +9,7 @@ from NIPTool.API.external.utils import (
     get_statistics_for_scatter_plot,
 )
 from NIPTool.API.external.api.deps import get_nipt_adapter
+
 from fastapi.templating import Jinja2Templates
 
 router = APIRouter()
@@ -35,6 +36,7 @@ def statistics(request: Request, adapter: NiptAdapter = Depends(get_nipt_adapter
     batch_ids = [batch.get("batch_id") for batch in batches]
     box_stat = get_statistics_for_box_plot(adapter=adapter, batches=batch_ids, fields=box_plots)
     scatter_stat = get_statistics_for_scatter_plot(batches=batches, fields=scatter_plots)
+
     return templates.TemplateResponse(
         "statistics.html",
         context=dict(

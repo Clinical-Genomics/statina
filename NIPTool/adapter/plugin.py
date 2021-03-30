@@ -5,6 +5,7 @@ from pymongo.database import Database
 
 from mongo_adapter import MongoAdapter
 
+
 LOG = logging.getLogger(__name__)
 
 

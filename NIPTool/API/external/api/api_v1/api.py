@@ -1,6 +1,14 @@
 from fastapi import FastAPI
 
-from NIPTool.server.web_app.api.api_v1.endpoints import batches, index, sample, update, download, statistics, login
+from NIPTool.API.external.api.api_v1.endpoints import (
+    batches,
+    index,
+    sample,
+    update,
+    download,
+    statistics,
+    login,
+)
 
 app = FastAPI()
 

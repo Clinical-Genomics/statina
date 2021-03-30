@@ -4,15 +4,15 @@ from pydantic import BaseModel, Field
 
 
 class Sample(BaseModel):
-    sample_id: str= Field(..., alias='SampleID')
-    batch_id: str= Field(..., alias='SampleProject')
+    sample_id: str = Field(..., alias="SampleID")
+    batch_id: str = Field(..., alias="SampleProject")
     SampleType: Optional[str]
     Description: Optional[str]
     Flowcell: Optional[str]
     Index1: Optional[str]
     Index2: Optional[str]
     Library_nM: Optional[float]
-    QCFlag: Optional[str] # Check this!
+    QCFlag: Optional[str]  # Check this!
     Zscore_13: Optional[float]
     Zscore_18: Optional[float]
     Zscore_21: Optional[float]
@@ -94,5 +94,5 @@ class Sample(BaseModel):
     status_change_TXXY: Optional[str]
     status_change_TXYY: Optional[str]
 
-    #class Config:
-    #    allow_population_by_field_name = True
+    class Config:
+        allow_population_by_field_name = True

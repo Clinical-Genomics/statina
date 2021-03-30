@@ -1,15 +1,14 @@
 from pathlib import Path
 from typing import List
-from fastapi import APIRouter, Depends, status, Response
-from NIPTool.load.batch import load_batch, load_samples
-from NIPTool.parse.batch import get_samples, get_batch
-from NIPTool.adapter.plugin import NiptAdapter
-from NIPTool.load.user import load_user
-from NIPTool.models.server.load import BatchRequestBody, UserRequestBody
-from NIPTool.models.database import Sample, Batch
-from NIPTool.server.load.api.deps import get_nipt_adapter
-from NIPTool.exeptions import NIPToolError
 
+from fastapi import APIRouter, Depends, Response, status
+from NIPTool.adapter.plugin import NiptAdapter
+from NIPTool.crud.insert import insert_batch, insert_samples, insert_user
+from NIPTool.crud import find
+from NIPTool.models.database import Batch, Sample
+from NIPTool.models.server.load import BatchRequestBody, UserRequestBody
+from NIPTool.parse.batch import get_batch, get_samples
+from NIPTool.API.internal.api.deps import get_nipt_adapter
 
 router = APIRouter()
 
@@ -28,14 +27,14 @@ def batch(
         return {"message": "Results file missing."}
     samples: List[Sample] = get_samples(nipt_results)
     batch: Batch = get_batch(nipt_results)
-    try:
-        load_batch(adapter=adapter, batch=batch, batch_files=batch_files)
-        load_samples(adapter=adapter, samples=samples, segmental_calls=batch_files.segmental_calls)
-    except NIPToolError as e:
-        return {"message": e.message, "status_code": status.HTTP_422_UNPROCESSABLE_ENTITY}
-    message = "Data loaded into database"
+    if find.batch(adapter=adapter, batch_id=batch.batch_id):
+        return "batch allready in database"
+
+    insert_batch(adapter=adapter, batch=batch, batch_files=batch_files)
+    insert_samples(adapter=adapter, samples=samples, segmental_calls=batch_files.segmental_calls)
+
     response.status_code = status.HTTP_200_OK
-    return {"message": message}
+    return {"message": f"Batch {batch.batch_id} inserted to the database"}
 
 
 @router.post("/user")
@@ -44,12 +43,9 @@ def user(
 ):
     """Function to load user into the database with rest"""
 
-    try:
-        load_user(adapter, user)
-    except NIPToolError as e:
-        response.status_code = status.HTTP_422_UNPROCESSABLE_ENTITY
-        return {"message": e.message}
+    if find.user(adapter=adapter, email=user.email):
+        return "user allready in database"
+    insert_user(adapter=adapter, user=user)
 
-    message = "Data loaded into database"
     response.status_code = status.HTTP_200_OK
-    return {"message": message}
+    return {"message": f"User {user.email} inserted to the database."}

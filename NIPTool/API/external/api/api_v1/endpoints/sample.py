@@ -4,6 +4,7 @@ from NIPTool.crud import find
 from NIPTool.models.database import User
 from NIPTool.API.external.utils import *
 from NIPTool.API.external.api.deps import get_nipt_adapter
+
 from fastapi.templating import Jinja2Templates
 
 router = APIRouter()

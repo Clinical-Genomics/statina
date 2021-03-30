@@ -15,6 +15,7 @@ class SmallHelpers:
 
         return {
             "_id": batch_id,
+            "batch_id": batch_id,
             "SequencingDate": sequencing_date,
             "Median_13": 0.994623404680424,
             "Median_18": 1.01950547134618,
@@ -40,10 +41,10 @@ class SmallHelpers:
 
         return {
             "_id": sample_id,
-            "SampleID": sample_id,
+            "sample_id": sample_id,
             "SampleType": "",
             "Description": "",
-            "SampleProject": batch_id,
+            "batch_id": batch_id,
             "Index1": "CTACGAAG",
             "Index2": "CTCGACAG",
             "Library_nM": "",
@@ -112,3 +113,4 @@ class SmallHelpers:
             "CNVSegment": "Found",
             "comment": "None",
         }
+

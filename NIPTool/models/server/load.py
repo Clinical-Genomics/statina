@@ -9,5 +9,5 @@ class BatchRequestBody(BaseModel):
 
 class UserRequestBody(BaseModel):
     email: str
-    name: str
+    username: str
     role: str

@@ -14,6 +14,7 @@ templates = Jinja2Templates(directory="templates")
 @router.get("/samples/{sample_id}/")
 def sample(request: Request, sample_id: str, adapter: NiptAdapter = Depends(get_nipt_adapter)):
     """Sample view with sample information."""
+
     sample: dict = find.sample(sample_id=sample_id, adapter=adapter).dict()
     batch = find.batch(batch_id=sample.get("batch_id"), adapter=adapter)
 
@@ -34,6 +35,7 @@ def sample(request: Request, sample_id: str, adapter: NiptAdapter = Depends(get_
 @router.post("/samples/{sample_id}/")
 def sample(request: Request, sample_id: str, adapter: NiptAdapter = Depends(get_nipt_adapter)):
     """Sample view with sample information."""
+
     sample: dict = find.sample(sample_id=sample_id, adapter=adapter).dict()
     batch = find.batch(batch_id=sample.get("batch_id"), adapter=adapter)
 

@@ -17,7 +17,7 @@ router = APIRouter()
 
 LOG = logging.getLogger(__name__)
 
-USER = User(username="mayapapaya", email="mayapapaya@mail.com", role="R")
+USER = User(username="mayapapaya", email="mayapapaya@mail.com", role="RW")
 
 
 @router.post("/set_sample_status")

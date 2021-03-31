@@ -16,7 +16,7 @@
                         <!-- /.panel-heading -->
                         <div class="panel-body">
                             <div class="table-responsive">
-                                <form action="{{ url_for('update') }}" method="post">
+                                <form action="{{ url_for('set_sample_status') }}" method="post">
                                     <input type=text name="form_id" value="set_sample_status" hidden>
                                     <input type=text name="sample_id" value="{{sample.sample_id}}" hidden>
                                     <table class="table table-bordered table-hover" >

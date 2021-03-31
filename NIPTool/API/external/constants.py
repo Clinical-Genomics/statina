@@ -7,8 +7,8 @@ STATUS_CLASSES = {
     "Other": "warning",
     "Failed": "danger",
 }
-CHROM_ABNORM = ["T13", "T18", "T21", "X0", "XXX", "XXY", "XYY"]
-TRIS_CHROM_ABNORM = ["T13", "T18", "T21"]
+CHROM_ABNORM = ["13", "18", "21", "X0", "XXX", "XXY", "XYY"]
+TRIS_CHROM_ABNORM = ["13", "18", "21"]
 SEX_CHROM_ABNORM = ["X0", "XXX", "XXY", "XYY"]
 STATUS_COLORS = {
     "Suspected": "#DBA901",

@@ -77,8 +77,8 @@ class Sample(BaseModel):
     CNVSegment: Optional[str]
     segmental_calls: Optional[str]
     include: Optional[bool]
-    change_include_date: Optional[str]
-    comment: Optional[str]
+    change_include_date: Optional[str] = ""
+    comment: Optional[str] = ""
     status_13: Optional[str]
     status_18: Optional[str]
     status_21: Optional[str]
@@ -86,13 +86,13 @@ class Sample(BaseModel):
     status_XXX: Optional[str]
     status_XXY: Optional[str]
     status_XYY: Optional[str]
-    status_change_T13: Optional[str]
-    status_change_T18: Optional[str]
-    status_change_T21: Optional[str]
-    status_change_TX0: Optional[str]
-    status_change_TXXX: Optional[str]
-    status_change_TXXY: Optional[str]
-    status_change_TXYY: Optional[str]
+    status_change_13: Optional[str] = ""
+    status_change_18: Optional[str] = ""
+    status_change_21: Optional[str] = ""
+    status_change_X0: Optional[str] = ""
+    status_change_XXX: Optional[str] = ""
+    status_change_XXY: Optional[str] = ""
+    status_change_XYY: Optional[str] = ""
 
     class Config:
         allow_population_by_field_name = True

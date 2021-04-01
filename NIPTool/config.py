@@ -7,8 +7,8 @@ from NIPTool.adapter.plugin import NiptAdapter
 
 
 class Settings(BaseSettings):
-    db_uri: str = "test_uri"
-    db_name: str = "test_db"
+    db_uri: str = "mongodb://localhost:27017/nipt-demo"
+    db_name: str = "nipt-demo"
     host: str = "localhost"
     port: int = 8000
 

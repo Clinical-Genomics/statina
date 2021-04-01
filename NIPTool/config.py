@@ -9,6 +9,8 @@ from NIPTool.adapter.plugin import NiptAdapter
 class Settings(BaseSettings):
     db_uri: str = "test_uri"
     db_name: str = "test_db"
+    host: str = "localhost"
+    port: int = 8000
 
     class Config:
         from_file = pkg_resources.resource_filename("NIPTool", ".env")

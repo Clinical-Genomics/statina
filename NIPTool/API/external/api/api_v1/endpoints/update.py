@@ -22,7 +22,7 @@ USER = User(username="mayapapaya", email="mayapapaya@mail.com", role="RW")
 
 @router.post("/set_sample_status")
 async def set_sample_status(request: Request, adapter: NiptAdapter = Depends(get_nipt_adapter)):
-    """Update the sample status."""
+    """Update the manualy interpreted chromosome abnormality status for a sample."""
 
     form = await request.form()
 

@@ -3,7 +3,7 @@ from typing import List
 
 from fastapi import APIRouter, Depends, Response, status
 from NIPTool.adapter.plugin import NiptAdapter
-from NIPTool.API.internal.api.deps import get_nipt_adapter
+from NIPTool.config import get_nipt_adapter
 from NIPTool.crud import find
 from NIPTool.crud.insert import insert_batch, insert_samples, insert_user
 from NIPTool.models.database import Batch, Sample
@@ -20,7 +20,6 @@ def batch(
     adapter: NiptAdapter = Depends(get_nipt_adapter),
 ):
     """Function to load batch data into the database with rest"""
-
     nipt_results = Path(batch_files.result_file)
     if not nipt_results.exists():
         response.status_code = status.HTTP_422_UNPROCESSABLE_ENTITY

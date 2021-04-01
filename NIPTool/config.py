@@ -1,14 +1,15 @@
-from NIPTool.adapter.plugin import NiptAdapter
 from pydantic import BaseSettings
 from pymongo import MongoClient
 
+from NIPTool.adapter.plugin import NiptAdapter
+
 
 class Settings(BaseSettings):
-    db_uri: str = "test-uri"
-    db_name: str = "test-db"
+    db_uri: str = "test_uri"
+    db_name: str = "test_db"
 
     class Config:
-        env_file = ".env"
+        from_file = ".env"
 
 
 settings = Settings()
@@ -16,7 +17,4 @@ settings = Settings()
 
 def get_nipt_adapter():
     client = MongoClient(settings.db_uri)
-    print(settings)
-    print(settings.db_uri)
-    print(client)
     return NiptAdapter(client, db_name=settings.db_name)

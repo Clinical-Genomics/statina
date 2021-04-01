@@ -1,5 +1,3 @@
-from typing import List
-
 from fastapi import APIRouter, Depends, Request
 from NIPTool.adapter.plugin import NiptAdapter
 from NIPTool.models.database import User
@@ -8,7 +6,7 @@ from NIPTool.API.external.utils import (
     get_statistics_for_box_plot,
     get_statistics_for_scatter_plot,
 )
-from NIPTool.API.external.api.deps import get_nipt_adapter
+from NIPTool.config import get_nipt_adapter
 
 from fastapi.templating import Jinja2Templates
 

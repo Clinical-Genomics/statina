@@ -1,10 +1,12 @@
-from fastapi import APIRouter, Depends, Request
-from NIPTool.adapter.plugin import NiptAdapter
-from NIPTool.API.external.api.deps import get_nipt_adapter, get_current_active_user
-from fastapi.templating import Jinja2Templates
-from NIPTool.parse.batch import validate_file_path
 from pathlib import Path
-from fastapi.responses import RedirectResponse, FileResponse
+
+from fastapi import APIRouter, Depends, Request
+from fastapi.responses import FileResponse, RedirectResponse
+from fastapi.templating import Jinja2Templates
+from NIPTool.adapter.plugin import NiptAdapter
+from NIPTool.config import get_nipt_adapter
+from NIPTool.crud import find
+from NIPTool.parse.batch import validate_file_path
 
 router = APIRouter()
 templates = Jinja2Templates(directory="templates")
@@ -16,11 +18,11 @@ def batch_download(
 ):
     """View for batch downloads"""
 
-    batch = adapter.batch(batch_id)
+    batch: dict = find.batch(adapter=adapter, batch_id=batch_id).dict()
     file_path = batch.get(file_id)
 
     if not validate_file_path(file_path):
-        # handle the redirect responce!
+        # handle the redirect response!
         return RedirectResponse(request.url)
 
     path = Path(file_path)
@@ -36,10 +38,10 @@ def sample_download(
 ):
     """View for sample downloads"""
 
-    sample = adapter.sample(sample_id)
+    sample: dict = find.sample(adapter=adapter, sample_id=sample_id).dict()
     file_path = sample.get(file_id)
     if not validate_file_path(file_path):
-        # handle the redirect responce!
+        # handle the redirect response!
         return RedirectResponse(request.url)
 
     file = Path(file_path)

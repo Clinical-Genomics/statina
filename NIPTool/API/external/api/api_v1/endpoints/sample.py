@@ -1,11 +1,10 @@
 from fastapi import APIRouter, Depends, Request
-from NIPTool.adapter.plugin import NiptAdapter
-from NIPTool.crud import find
-from NIPTool.models.database import User
-from NIPTool.API.external.utils import *
-from NIPTool.API.external.api.deps import get_nipt_adapter
-
 from fastapi.templating import Jinja2Templates
+from NIPTool.adapter.plugin import NiptAdapter
+from NIPTool.API.external.utils import *
+from NIPTool.config import get_nipt_adapter
+from NIPTool.crud import find
+from NIPTool.models.database import Batch, User
 
 router = APIRouter()
 templates = Jinja2Templates(directory="templates")

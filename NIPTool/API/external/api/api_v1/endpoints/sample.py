@@ -1,18 +1,16 @@
 from fastapi import APIRouter, Depends, Request
-from fastapi.templating import Jinja2Templates
 from NIPTool.adapter.plugin import NiptAdapter
 from NIPTool.API.external.utils import *
-from NIPTool.config import get_nipt_adapter
+from NIPTool.config import get_nipt_adapter, templates
 from NIPTool.crud import find
 from NIPTool.models.database import Batch, User
 
 router = APIRouter()
-templates = Jinja2Templates(directory="templates")
 
 
 @router.get("/samples/{sample_id}/")
 def sample(request: Request, sample_id: str, adapter: NiptAdapter = Depends(get_nipt_adapter)):
-    """Sample view with sample information."""
+    """Get sample with id"""
 
     sample: dict = find.sample(sample_id=sample_id, adapter=adapter).dict()
     batch: Batch = find.batch(batch_id=sample.get("batch_id"), adapter=adapter)
@@ -33,7 +31,7 @@ def sample(request: Request, sample_id: str, adapter: NiptAdapter = Depends(get_
 
 @router.post("/samples/{sample_id}/")
 def sample(request: Request, sample_id: str, adapter: NiptAdapter = Depends(get_nipt_adapter)):
-    """Sample view with sample information."""
+    """Post sample with id"""
 
     sample: dict = find.sample(sample_id=sample_id, adapter=adapter).dict()
     batch: Batch = find.batch(batch_id=sample.get("batch_id"), adapter=adapter)

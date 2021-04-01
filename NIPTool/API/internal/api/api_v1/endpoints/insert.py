@@ -43,7 +43,7 @@ def user(
     """Function to load user into the database with rest"""
 
     if find.user(adapter=adapter, email=user.email):
-        return "user allready in database"
+        return "user already in database"
     insert_user(adapter=adapter, user=user)
 
     response.status_code = status.HTTP_200_OK

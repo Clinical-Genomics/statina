@@ -6,7 +6,6 @@ from typing import List
 import click
 import pkg_resources
 import uvicorn
-from dotenv import dotenv_values
 
 # Get version and doc decorator
 from NIPTool import __version__
@@ -14,7 +13,6 @@ from NIPTool.adapter import NiptAdapter
 from NIPTool.config import settings
 from NIPTool.crud import find
 from NIPTool.crud.insert import insert_batch, insert_samples
-from NIPTool.main import external_app, internal_app
 from NIPTool.models.database import Batch, Sample
 from NIPTool.models.server.load import BatchRequestBody
 from NIPTool.parse.batch import get_batch, get_samples

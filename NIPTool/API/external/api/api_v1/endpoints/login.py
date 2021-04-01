@@ -1,17 +1,10 @@
-from fastapi import APIRouter, Response
-from fastapi.responses import RedirectResponse
-
-from fastapi import Depends, HTTPException, status, Security
-from fastapi.security import OAuth2PasswordRequestForm
-from NIPTool.models.server.login import Token, UserInDB, User
-
-from NIPTool.API.external.api.deps import (
-    get_current_active_user,
-    authenticate_user,
-    create_access_token,
-    temp_get_config,
-)
 from datetime import timedelta
+
+from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi.responses import RedirectResponse
+from fastapi.security import OAuth2PasswordRequestForm
+from NIPTool.API.external.api.deps import authenticate_user, create_access_token, temp_get_config
+from NIPTool.models.server.login import Token, UserInDB
 
 router = APIRouter()
 

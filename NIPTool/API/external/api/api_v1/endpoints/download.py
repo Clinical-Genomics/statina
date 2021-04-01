@@ -2,14 +2,12 @@ from pathlib import Path
 
 from fastapi import APIRouter, Depends, Request
 from fastapi.responses import FileResponse, RedirectResponse
-from fastapi.templating import Jinja2Templates
 from NIPTool.adapter.plugin import NiptAdapter
-from NIPTool.config import get_nipt_adapter
+from NIPTool.config import get_nipt_adapter, templates
 from NIPTool.crud import find
 from NIPTool.parse.batch import validate_file_path
 
 router = APIRouter()
-templates = Jinja2Templates(directory="templates")
 
 
 @router.get("/batch_download/{batch_id}/{file_id}")

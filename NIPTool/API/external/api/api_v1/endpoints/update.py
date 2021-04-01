@@ -71,7 +71,7 @@ async def sample_comment(request: Request, adapter: NiptAdapter = Depends(get_ni
     return RedirectResponse(request.headers.get("referer"))
 
 
-@router.post("/save_include")
+@router.post("/include_samples")
 async def include_samples(request: Request, adapter: NiptAdapter = Depends(get_nipt_adapter)):
     """Update include status and comment for samples in batch"""
 

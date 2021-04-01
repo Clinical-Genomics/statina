@@ -4,7 +4,8 @@ from pathlib import Path
 from typing import List
 
 import click
-from dotenv import dotenv_values, load_dotenv
+import pkg_resources
+from dotenv import dotenv_values
 
 # Get version and doc decorator
 from NIPTool import __version__
@@ -19,6 +20,8 @@ from pymongo import MongoClient
 LOG_LEVELS = ["DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL"]
 LOG = logging.getLogger(__name__)
 
+ENV_FILE = pkg_resources.resource_filename("NIPTool", ".env")
+
 
 @click.version_option(__version__)
 @click.group()
@@ -26,8 +29,7 @@ LOG = logging.getLogger(__name__)
 def cli(context: click.Context):
     """ Main entry point """
     logging.basicConfig(level=logging.INFO)
-    load_dotenv()
-    settings: dict = dotenv_values(".env")
+    settings: dict = dotenv_values(ENV_FILE)
     client = MongoClient(settings["DB_URI"])
     context.obj = {"adapter": NiptAdapter(client, db_name=settings["DB_NAME"])}
     LOG.info("Connected to %s", settings["DB_NAME"])

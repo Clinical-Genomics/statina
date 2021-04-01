@@ -1,14 +1,12 @@
 from fastapi import APIRouter, Depends, Request
-from fastapi.templating import Jinja2Templates
 from NIPTool.adapter.plugin import NiptAdapter
 from NIPTool.API.external.constants import TRISOMI_TRESHOLDS
 from NIPTool.API.external.utils import *
-from NIPTool.config import get_nipt_adapter
+from NIPTool.config import get_nipt_adapter, templates
 from NIPTool.crud import find
 from NIPTool.models.database import Batch, User
 
 router = APIRouter()
-templates = Jinja2Templates(directory="templates")
 CURRENT_USER = User(username="mayapapaya", email="mayabrandi@123.com", role="RW").dict()
 
 
@@ -34,9 +32,8 @@ def batches(
     request: Request, adapter: NiptAdapter = Depends(get_nipt_adapter)
 ):  # , user: User = Depends(get_current_active_user)):
     """List of all batches"""
-    print("hej")
-    print(adapter.client)
     all_batches: List[Batch] = find.batches(adapter=adapter)
+
     return templates.TemplateResponse(
         "batches.html",
         context={

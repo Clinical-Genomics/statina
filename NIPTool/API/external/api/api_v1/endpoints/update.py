@@ -72,7 +72,7 @@ async def sample_comment(request: Request, adapter: NiptAdapter = Depends(get_ni
 
 
 @router.post("/save_include")
-async def save_include(request: Request, adapter: NiptAdapter = Depends(get_nipt_adapter)):
+async def include_samples(request: Request, adapter: NiptAdapter = Depends(get_nipt_adapter)):
     """Update the database"""
 
     form = await request.form()

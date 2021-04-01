@@ -1,52 +1,58 @@
 #!/usr/bin/env python
 import logging
+from pathlib import Path
+from typing import List
 
 import click
-
-from flask.cli import FlaskGroup, with_appcontext
-from flask import current_app
-
-# commands
-from NIPTool.server import create_app, configure_app
+from dotenv import dotenv_values, load_dotenv
 
 # Get version and doc decorator
 from NIPTool import __version__
+from NIPTool.adapter import NiptAdapter
+from NIPTool.crud import find
+from NIPTool.crud.insert import insert_batch, insert_samples
+from NIPTool.models.database import Batch, Sample
+from NIPTool.models.server.load import BatchRequestBody
+from NIPTool.parse.batch import get_batch, get_samples
+from pymongo import MongoClient
 
 LOG_LEVELS = ["DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL"]
 LOG = logging.getLogger(__name__)
 
 
 @click.version_option(__version__)
-@click.group(
-    cls=FlaskGroup,
-    create_app=create_app,
-    add_default_commands=True,
-    invoke_without_command=False,
-    add_version_option=False)
-@click.option("-c", "--config", type=click.File(), help="Path to config yaml file")
-@with_appcontext
-def cli(config):
+@click.group()
+@click.pass_context
+def cli(context: click.Context):
     """ Main entry point """
-    if current_app.test:
-        return
-    configure_app(current_app, config)
-    pass
+    logging.basicConfig(level=logging.INFO)
+    load_dotenv()
+    settings: dict = dotenv_values(".env")
+    client = MongoClient(settings["DB_URI"])
+    context.obj = {"adapter": NiptAdapter(client, db_name=settings["DB_NAME"])}
+    LOG.info("Connected to %s", settings["DB_NAME"])
 
 
-@cli.command()
-def test():
-    """Test server using CLI"""
-    click.echo("test")
-    pass
+@cli.command(name="load")
+@click.option("--result-file", type=click.Path(exists=True, dir_okay=False), required=True)
+@click.option("--multiqc-report", type=click.Path(dir_okay=False))
+@click.option("--segmental-calls", type=click.Path(dir_okay=False))
+@click.pass_obj
+def load_command(
+    context: dict, result_file: click.Path, multiqc_report: click.Path, segmental_calls: click.Path
+):
+    """Load fluffy result into database"""
+    batch_files: BatchRequestBody = BatchRequestBody(
+        result_file=str(result_file),
+        multiqc_report=str(multiqc_report),
+        segmental_calls=str(segmental_calls),
+    )
 
-
-@cli.command()
-@with_appcontext
-def name():
-    """Returns the app name, for testing purposes, mostly"""
-    click.echo(current_app.name)
-    return current_app.name
-
-
-cli.add_command(test)
-cli.add_command(name)
+    nipt_results = Path(str(result_file))
+    adapter: NiptAdapter = context["adapter"]
+    samples: List[Sample] = get_samples(nipt_results)
+    batch: Batch = get_batch(nipt_results)
+    if find.batch(adapter=adapter, batch_id=batch.batch_id):
+        return "batch already in database"
+    insert_batch(adapter=adapter, batch=batch, batch_files=batch_files)
+    insert_samples(adapter=adapter, samples=samples, segmental_calls=batch_files.segmental_calls)

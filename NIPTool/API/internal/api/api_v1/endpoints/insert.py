@@ -3,12 +3,12 @@ from typing import List
 
 from fastapi import APIRouter, Depends, Response, status
 from NIPTool.adapter.plugin import NiptAdapter
-from NIPTool.crud.insert import insert_batch, insert_samples, insert_user
+from NIPTool.API.internal.api.deps import get_nipt_adapter
 from NIPTool.crud import find
+from NIPTool.crud.insert import insert_batch, insert_samples, insert_user
 from NIPTool.models.database import Batch, Sample
 from NIPTool.models.server.load import BatchRequestBody, UserRequestBody
 from NIPTool.parse.batch import get_batch, get_samples
-from NIPTool.API.internal.api.deps import get_nipt_adapter
 
 router = APIRouter()
 
@@ -28,7 +28,7 @@ def batch(
     samples: List[Sample] = get_samples(nipt_results)
     batch: Batch = get_batch(nipt_results)
     if find.batch(adapter=adapter, batch_id=batch.batch_id):
-        return "batch allready in database"
+        return "batch already in database"
 
     insert_batch(adapter=adapter, batch=batch, batch_files=batch_files)
     insert_samples(adapter=adapter, samples=samples, segmental_calls=batch_files.segmental_calls)

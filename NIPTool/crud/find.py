@@ -45,13 +45,13 @@ def batches(adapter: NiptAdapter) -> List[Batch]:
 def sample_aggregate(adapter: NiptAdapter, pipe: list) -> list:
     """Aggregates a query pipeline on the sample collection"""
 
-    return adapter.sample_collection.aggregate(pipe)
+    return list(adapter.sample_collection.aggregate(pipe))
 
 
 def batch_aggregate(adapter: NiptAdapter, pipe: list) -> List[Batch]:
     """Aggregates a query pipeline on the sample collection"""
 
-    return adapter.batch_collection.aggregate(pipe)
+    return list(adapter.batch_collection.aggregate(pipe))
 
 
 def batch_samples(adapter: NiptAdapter, batch_id: str) -> List[Sample]:

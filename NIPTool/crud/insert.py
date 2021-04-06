@@ -22,7 +22,7 @@ def insert_batch(adapter: NiptAdapter, batch: Batch, batch_files: BatchRequestBo
         result: InsertOneResult = adapter.batch_collection.insert_one(batch_dict)
         LOG.info("Added document %s.", batch_dict["batch_id"])
     except:
-        raise InsertError(message=f"Batch {batch.batch_id} allready in database.")
+        raise InsertError(message=f"Batch {batch.batch_id} already in database.")
     return result.inserted_id
 
 
@@ -41,7 +41,7 @@ def insert_samples(
         result: InsertManyResult = adapter.sample_collection.insert_many(sample_dicts)
         LOG.info("Added sample documents.")
     except:
-        raise InsertError(f"Sample keys allready in database.")
+        raise InsertError(f"Sample keys already in database.")
     return result.inserted_ids
 
 
@@ -53,9 +53,13 @@ def insert_user(adapter: NiptAdapter, user: UserRequestBody) -> str:
         "username": user.username,
         "role": user.role,
     }
+    # Check that the username is unique, this should be controlled by creating a index with restrictions
+    existing_user: Optional[dict] = adapter.user_collection.find_one({"username": user.username})
+    if existing_user:
+        raise InsertError(f"User with username {user.username} already exist in database.")
     try:
         result: InsertOneResult = adapter.user_collection.insert_one(user_dict)
-        LOG.info("Added user documen %s.", user.email)
+        LOG.info("Added user document %s.", user.email)
     except:
         raise InsertError(f"User {user.email} already in database.")
     return result.inserted_id

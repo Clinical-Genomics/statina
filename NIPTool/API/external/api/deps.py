@@ -1,23 +1,14 @@
-from pydantic import BaseSettings
-
-from NIPTool.adapter.plugin import NiptAdapter
-from pymongo import MongoClient
-from fastapi.security import OAuth2PasswordBearer
-from fastapi import HTTPException, status
-from NIPTool.models.server.login import User, UserInDB, TokenData
-from fastapi import Depends
-from passlib.context import CryptContext
 from datetime import datetime, timedelta
 from typing import Optional
+
+from fastapi import Depends, HTTPException, status
+from fastapi.security import OAuth2PasswordBearer
 from jose import JWTError, jwt
-
-
-class Settings(BaseSettings):
-    db_uri: str = "test_uri"
-    db_name: str = "test_db"
-
-
-settings = Settings()
+from NIPTool.adapter.plugin import NiptAdapter
+from NIPTool.config import get_nipt_adapter
+from NIPTool.crud import find
+from NIPTool.models.server.login import TokenData, User, UserInDB
+from passlib.context import CryptContext
 
 
 def temp_get_config():
@@ -28,11 +19,6 @@ def temp_get_config():
         "ALGORITHM": "HS256",
         "ACCESS_TOKEN_EXPIRE_MINUTES": 30,
     }
-
-
-def get_nipt_adapter():
-    client = MongoClient(settings.db_uri)
-    return NiptAdapter(client, db_name=settings.db_name)
 
 
 oauth2_scheme = OAuth2PasswordBearer(
@@ -61,10 +47,10 @@ def get_current_user(
         token_data = TokenData(username=username)
     except JWTError:
         raise credentials_exception
-    user = adapter.user(token_data.username)
+    user: User = find.user(adapter=adapter, user_name=token_data.username)
     if not user:
         raise credentials_exception
-    return User(**user)
+    return user
 
 
 def get_current_active_user(current_user: User = Depends(get_current_user)) -> User:
@@ -81,26 +67,25 @@ def get_password_hash(password):
     return pwd_context.hash(password)
 
 
-def authenticate_user(username: str, password: str) -> UserInDB:
+def authenticate_user(username: str, password: str) -> Optional[UserInDB]:
     adapter = get_nipt_adapter()
-    user_dict = adapter.user(username)
-    if not user_dict:
-        return False
-    user = UserInDB(**user_dict)
+    user: User = find.user(adapter=adapter, user_name=username)
     if not user:
-        return False
-    if not verify_password(password, user.hashed_password):
-        return False
-    return user
+        return None
+    db_user = UserInDB(**user.dict())
+    if not db_user:
+        return None
+    if not verify_password(password, db_user.hashed_password):
+        return None
+    return db_user
 
 
 def create_access_token(data: dict, expires_delta: Optional[timedelta] = None):
-    config: dict = temp_get_config()
+    configs: dict = temp_get_config()
     to_encode = data.copy()
     if expires_delta:
         expire = datetime.utcnow() + expires_delta
     else:
         expire = datetime.utcnow() + timedelta(minutes=15)
     to_encode.update({"exp": expire})
-    encoded_jwt = jwt.encode(to_encode, config.get("SECRET_KEY"), algorithm=config.get("ALGORITHM"))
-    return encoded_jwt
+    return jwt.encode(to_encode, configs.get("SECRET_KEY"), algorithm=configs.get("ALGORITHM"))

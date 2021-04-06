@@ -1,15 +1,20 @@
 from typing import Iterable, List, Optional
 
+from NIPTool.adapter import NiptAdapter
+from NIPTool.models.database import Batch, Sample, User
 from pydantic import parse_obj_as
 
-from NIPTool.adapter import NiptAdapter
-from NIPTool.models.database import Batch, User, Sample
 
-
-def user(adapter: NiptAdapter, email: str) -> Optional[User]:
+def user(
+    adapter: NiptAdapter, email: Optional[str] = None, user_name: Optional[str] = None
+) -> Optional[User]:
     """Find user from user collection"""
-
-    raw_user: dict = adapter.user_collection.find_one({"email": email})  # ????? wierd
+    if email:
+        raw_user: dict = adapter.user_collection.find_one({"email": email})  # ????? wierd
+    elif user_name:
+        raw_user: dict = adapter.user_collection.find_one({"username": user_name})
+    else:
+        raise SyntaxError("Have to use email or user_name")
     if not raw_user:
         return None
 

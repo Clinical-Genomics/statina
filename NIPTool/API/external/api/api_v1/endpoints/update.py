@@ -1,17 +1,15 @@
 import logging
+from datetime import datetime
 from typing import Iterable
 
 from fastapi import APIRouter, Depends, Request
 from fastapi.responses import RedirectResponse
-from starlette.datastructures import FormData
-
 from NIPTool.adapter.plugin import NiptAdapter
-from NIPTool.crud import update
-
-from NIPTool.models.database import User
 from NIPTool.API.external.utils import *
-from NIPTool.API.external.api.deps import get_nipt_adapter, get_current_active_user
-from datetime import datetime
+from NIPTool.config import get_nipt_adapter
+from NIPTool.crud import update
+from NIPTool.models.database import User
+from starlette.datastructures import FormData
 
 router = APIRouter()
 

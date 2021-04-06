@@ -1,19 +1,18 @@
 click
 bumpversion
 pymongo
-flask
 mongo_adapter
-werkzeug<1.0.0
 coloredlogs
 pyyaml
-flask_login
-flask_debugtoolbar
-authlib
-requests
-flask_ldap3_login
-pandas
-pandas-schema
-cerberus
-fastapi
-python-multipart
 
+cerberus
+python-multipart
+python-dotenv
+email-validator
+jinja2
+
+# server stuff
+passlib
+fastapi
+uvicorn
+python-jose

@@ -3,6 +3,7 @@
 
 class SmallHelpers:
     """Hold small methods that might be helpful for the tests"""
+
     @staticmethod
     def batch(
         batch_id="201860",
@@ -28,7 +29,7 @@ class SmallHelpers:
             "Stdev_X": 0.029800076293786,
             "Stdev_Y": 0.0000653186791196846,
         }
-        
+
     @staticmethod
     def sample(
         batch_id: str = "201860",
@@ -113,4 +114,3 @@ class SmallHelpers:
             "CNVSegment": "Found",
             "comment": "None",
         }
-

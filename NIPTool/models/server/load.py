@@ -1,6 +1,6 @@
 from typing import Optional
 
-from pydantic import BaseModel
+from pydantic import BaseModel, EmailStr
 
 
 class BatchRequestBody(BaseModel):
@@ -10,6 +10,6 @@ class BatchRequestBody(BaseModel):
 
 
 class UserRequestBody(BaseModel):
-    email: str
+    email: EmailStr
     username: str
     role: str

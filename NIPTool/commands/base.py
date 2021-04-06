@@ -13,7 +13,7 @@ import uvicorn
 
 # Get version and doc decorator
 from NIPTool import __version__
-from NIPTool.commands.load_commands import load_command
+from NIPTool.commands.load_commands import load_commands
 from NIPTool.config import settings
 
 LOG_LEVELS = ["DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL"]
@@ -24,9 +24,11 @@ ENV_FILE = pkg_resources.resource_filename("NIPTool", ".env")
 
 @click.version_option(__version__)
 @click.group()
-def cli():
+@click.pass_context
+def cli(context: click.Context):
     """ Main entry point """
     logging.basicConfig(level=logging.INFO)
+    context.obj = {}
 
 
 @cli.command(name="serve")
@@ -46,4 +48,4 @@ def serve_command(reload: bool, api: str):
     uvicorn.run(app=app, host=settings.host, port=settings.port, reload=reload)
 
 
-cli.add_command(load_command)
+cli.add_command(load_commands)

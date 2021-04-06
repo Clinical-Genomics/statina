@@ -8,6 +8,8 @@ pyyaml
 cerberus
 python-multipart
 python-dotenv
+email-validator
+jinja2
 
 # server stuff
 passlib

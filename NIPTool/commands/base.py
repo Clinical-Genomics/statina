@@ -1,53 +1,51 @@
-#!/usr/bin/env python
+"""
+Module with CLI commands for NIPTool
+
+The CLI is intended for development/testing purpose only. To run in a production setting please refer to documentation
+for suggestions how.
+
+"""
 import logging
 
 import click
-
-from flask.cli import FlaskGroup, with_appcontext
-from flask import current_app
-
-# commands
-from NIPTool.server import create_app, configure_app
+import pkg_resources
+import uvicorn
 
 # Get version and doc decorator
 from NIPTool import __version__
+from NIPTool.commands.load_commands import load_commands
+from NIPTool.config import settings
 
 LOG_LEVELS = ["DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL"]
 LOG = logging.getLogger(__name__)
 
+ENV_FILE = pkg_resources.resource_filename("NIPTool", ".env")
+
 
 @click.version_option(__version__)
-@click.group(
-    cls=FlaskGroup,
-    create_app=create_app,
-    add_default_commands=True,
-    invoke_without_command=False,
-    add_version_option=False,
-)
-@click.option("-c", "--config", type=click.File(), help="Path to config yaml file")
-@with_appcontext
-def cli(config):
+@click.group()
+@click.pass_context
+def cli(context: click.Context):
     """ Main entry point """
-    if current_app.test:
-        return
-    configure_app(current_app, config)
-    pass
+    logging.basicConfig(level=logging.INFO)
+    context.obj = {}
 
 
-@cli.command()
-def test():
-    """Test server using CLI"""
-    click.echo("test")
-    pass
+@cli.command(name="serve")
+@click.option(
+    "--api", default="external", type=click.Choice(["external", "internal"]), show_default=True
+)
+@click.option("--reload", is_flag=True)
+def serve_command(reload: bool, api: str):
+    """Serve the NIPT app for testing purpose.
+
+    This command will serve the user interface (external) as default
+    """
+    app = "NIPTool.main:external_app"
+    if api == "internal":
+        app = "NIPTool.main:internal_app"
+    LOG.info("Running %s api on host:%s and port:%s", api, settings.host, settings.port)
+    uvicorn.run(app=app, host=settings.host, port=settings.port, reload=reload)
 
 
-@cli.command()
-@with_appcontext
-def name():
-    """Returns the app name, for testing purposes, mostly"""
-    click.echo(current_app.name)
-    return current_app.name
-
-
-cli.add_command(test)
-cli.add_command(name)
+cli.add_command(load_commands)

@@ -1,12 +1,14 @@
 from pathlib import Path
+
 import pytest
-from mongomock import MongoClient
-from .small_helpers import SmallHelpers
-from NIPTool.adapter.plugin import NiptAdapter
-from NIPTool.API.internal.api.api_v1.api import app
-from NIPTool.API.internal.api.deps import get_nipt_adapter
 from fastapi.testclient import TestClient
+from mongomock import MongoClient
+from NIPTool.adapter.plugin import NiptAdapter
+from NIPTool.config import get_nipt_adapter
+from NIPTool.main import internal_app as app
 from NIPTool.models.server.load import BatchRequestBody, UserRequestBody
+
+from .small_helpers import SmallHelpers
 
 DATABASE = "testdb"
 
@@ -16,8 +18,7 @@ def override_nipt_adapter():
 
     mongo_client = MongoClient()
     database = mongo_client[DATABASE]
-    adapter = NiptAdapter(database.client, db_name=DATABASE)
-    return adapter
+    return NiptAdapter(database.client, db_name=DATABASE)
 
 
 @pytest.fixture()

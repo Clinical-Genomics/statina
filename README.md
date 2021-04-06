@@ -15,6 +15,9 @@ pip install -r requirements.txt -e .
 
 ### Demo
 
+**The CLI is intended for development/testing purpose only. To run in a production setting please refer to documentation
+for suggestions how.**
+
 Once installed, you can set up NIPTool by running a few commands using the included command line interface. 
 Given you have a MongoDB server listening on the default port (27017), this is how you would set up a fully working 
 NIPTool demo:

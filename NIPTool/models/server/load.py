@@ -1,6 +1,7 @@
 from typing import Optional
 
 from pydantic import BaseModel, EmailStr
+from typing_extensions import Literal
 
 
 class BatchRequestBody(BaseModel):
@@ -12,4 +13,4 @@ class BatchRequestBody(BaseModel):
 class UserRequestBody(BaseModel):
     email: EmailStr
     username: str
-    role: str
+    role: Literal["R", "RW"]

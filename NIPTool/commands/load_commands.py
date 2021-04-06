@@ -52,7 +52,7 @@ def load_batch(
 @load_commands.command(name="user")
 @click.option("--email", required=True)
 @click.option("--user-name", required=True)
-@click.option("--role", type=click.Choice(["RW"]), default="RW", show_default=True)
+@click.option("--role", type=click.Choice(["RW", "R"]), default="RW", show_default=True)
 @click.pass_obj
 def load_user(context: dict, email: str, user_name: str, role: str):
     """Add a user to the database"""

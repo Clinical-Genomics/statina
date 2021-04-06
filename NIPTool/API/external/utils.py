@@ -250,7 +250,7 @@ def get_tris_control_normal(adapter, chr):
         {"$match": {f"status_{chr}": {"$eq": "Normal"}, "include": {"$eq": True}}},
         {
             "$group": {
-                "_id": {f"status_T{chr}": f"$status_T{chr}"},
+                "_id": {f"status_{chr}": f"$status_{chr}"},
                 "values": {"$push": f"$Zscore_{chr}"},
                 "names": {"$push": "$sample_id"},
                 "count": {"$sum": 1},
@@ -258,9 +258,8 @@ def get_tris_control_normal(adapter, chr):
         },
     ]
     if not list(find.sample_aggregate(pipe=pipe, adapter=adapter)):
-        return []
-    data = list(find.sample_aggregate(pipe=pipe, adapter=adapter))[0]
-
+        return {}
+    data = find.sample_aggregate(pipe=pipe, adapter=adapter)[0]
     data["values"] = [value for value in data.get("values", [])]
 
     return data
@@ -355,6 +354,7 @@ def get_normal_for_samp_tris_plot(adapter):
     data_per_abnormaliy = {}
     x_axis = 1
     for abn in ["13", "18", "21"]:
+
         data = get_tris_control_normal(adapter, abn)
         data["x_axis"] = [x_axis] * data.get("count", 0)
         data_per_abnormaliy[abn] = data

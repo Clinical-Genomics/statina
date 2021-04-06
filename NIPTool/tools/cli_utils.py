@@ -36,9 +36,7 @@ def dict_replace_dot(obj):
     if isinstance(obj, dict):
         for key in obj.keys():
             obj[convert_dot(key)] = obj.pop(key)
-            if isinstance(obj[convert_dot(key)], dict) or isinstance(
-                obj[convert_dot(key)], list
-            ):
+            if isinstance(obj[convert_dot(key)], dict) or isinstance(obj[convert_dot(key)], list):
                 obj[convert_dot(key)] = dict_replace_dot(obj[convert_dot(key)])
     elif isinstance(obj, list):
         for item in obj:
@@ -115,7 +113,6 @@ def convert_defaultdict_to_regular_dict(inputdict: dict):
     """
     if isinstance(inputdict, collections.defaultdict):
         inputdict = {
-            key: convert_defaultdict_to_regular_dict(value)
-            for key, value in inputdict.items()
+            key: convert_defaultdict_to_regular_dict(value) for key, value in inputdict.items()
         }
     return inputdict

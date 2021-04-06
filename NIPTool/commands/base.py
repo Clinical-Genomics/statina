@@ -22,7 +22,8 @@ LOG = logging.getLogger(__name__)
     create_app=create_app,
     add_default_commands=True,
     invoke_without_command=False,
-    add_version_option=False)
+    add_version_option=False,
+)
 @click.option("-c", "--config", type=click.File(), help="Path to config yaml file")
 @with_appcontext
 def cli(config):

@@ -32,7 +32,9 @@ def cli(context: click.Context):
 
 
 @cli.command(name="serve")
-@click.option("--api", type=click.Choice(["external", "internal"]), default="external")
+@click.option(
+    "--api", default="external", type=click.Choice(["external", "internal"]), show_default=True
+)
 @click.option("--reload", is_flag=True)
 def serve_command(reload: bool, api: str):
     """Serve the NIPT app for testing purpose.

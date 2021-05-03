@@ -26,4 +26,4 @@ jobs:
           name: clinicalgenomics/niptool-stage
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
-          tags: "${{ steps.get_branch_name.outputs.branch }}"
+          tags: "${{ steps.get_branch_name.outputs.branch }}, latest"

@@ -26,24 +26,20 @@ ENV_FILE = pkg_resources.resource_filename("NIPTool", ".env")
 @click.group()
 @click.pass_context
 def cli(context: click.Context):
-    """ Main entry point """
+    """Main entry point"""
     logging.basicConfig(level=logging.INFO)
     context.obj = {}
 
 
 @cli.command(name="serve")
-@click.option(
-    "--api", default="external", type=click.Choice(["external", "internal"]), show_default=True
-)
+@click.option("--api", type=click.Choice(["external", "internal"]), default="external")
 @click.option("--reload", is_flag=True)
 def serve_command(reload: bool, api: str):
     """Serve the NIPT app for testing purpose.
 
     This command will serve the user interface (external) as default
     """
-    app = "NIPTool.main:external_app"
-    if api == "internal":
-        app = "NIPTool.main:internal_app"
+    app = f"NIPTool.main:{api}_app"
     LOG.info("Running %s api on host:%s and port:%s", api, settings.host, settings.port)
     uvicorn.run(app=app, host=settings.host, port=settings.port, reload=reload)
 

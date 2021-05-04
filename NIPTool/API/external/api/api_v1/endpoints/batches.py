@@ -1,6 +1,7 @@
 from fastapi import APIRouter, Depends, Request
+
+from NIPTool.API.external.api.deps import get_current_active_user
 from NIPTool.adapter.plugin import NiptAdapter
-from NIPTool.API.external.constants import TRISOMI_TRESHOLDS
 from NIPTool.API.external.utils import *
 from NIPTool.config import get_nipt_adapter, templates
 from NIPTool.crud import find
@@ -12,9 +13,12 @@ CURRENT_USER = User(username="mayapapaya", email="mayabrandi@123.com", role="RW"
 
 @router.post("/")
 def batches(
-    request: Request, adapter: NiptAdapter = Depends(get_nipt_adapter)
-):  # , user: User = Depends(get_current_active_user)):
+    request: Request,
+    adapter: NiptAdapter = Depends(get_nipt_adapter),
+    user: User = Depends(get_current_active_user),
+):
     """List of all batches"""
+
     all_batches: List[Batch] = find.batches(adapter=adapter)
     return templates.TemplateResponse(
         "batches.html",
@@ -29,11 +33,12 @@ def batches(
 
 @router.get("/")
 def batches(
-    request: Request, adapter: NiptAdapter = Depends(get_nipt_adapter)
-):  # , user: User = Depends(get_current_active_user)):
+    request: Request,
+    adapter: NiptAdapter = Depends(get_nipt_adapter),
+    user: User = Depends(get_current_active_user),
+):
     """List of all batches"""
     all_batches: List[Batch] = find.batches(adapter=adapter)
-
     return templates.TemplateResponse(
         "batches.html",
         context={

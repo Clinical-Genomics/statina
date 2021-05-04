@@ -13,6 +13,9 @@ router = APIRouter()
 def login_for_access_token(
     form_data: OAuth2PasswordRequestForm = Depends(), config: dict = Depends(temp_get_config)
 ):
+    print("hoho")
+    print(form_data.username)
+    print(form_data.password)
     user: UserInDB = authenticate_user(form_data.username, form_data.password)
     if not user:
         raise HTTPException(
@@ -25,16 +28,21 @@ def login_for_access_token(
         data={"sub": user.username, "scopes": form_data.scopes},
         expires_delta=access_token_expires,
     )
+    print(access_token)
     return {"access_token": access_token, "token_type": "Bearer"}
 
 
 @router.post("/login")
 def login(token: Token = Depends(login_for_access_token)):
+    print("hehe")
+    print(token)
     if token:
         headers = {
             "Authorization": f"{token.get('token_type')} {token.get('access_token')}",
             "accept": "application/json",
         }
+    print(headers)
+    print("This is where it breaks")
     return RedirectResponse("../batches", headers=headers)
 
 

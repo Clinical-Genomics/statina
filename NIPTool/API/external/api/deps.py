@@ -39,11 +39,14 @@ def get_current_user(
         detail="Could not validate credentials",
         headers={"WWW-Authenticate": "Bearer"},
     )
+    print("debug1")
     try:
         payload = jwt.decode(token, config.get("SECRET_KEY"), algorithms=[config.get("ALGORITHM")])
+        print("debug2")
         username: str = payload.get("sub")
         if username is None:
             raise credentials_exception
+        print("debug3")
         token_data = TokenData(username=username)
     except JWTError:
         raise credentials_exception
@@ -70,14 +73,15 @@ def get_password_hash(password):
 def authenticate_user(username: str, password: str) -> Optional[UserInDB]:
     adapter = get_nipt_adapter()
     user: User = find.user(adapter=adapter, user_name=username)
+
     if not user:
         return None
-    db_user = UserInDB(**user.dict())
-    if not db_user:
+    user = UserInDB(**user.dict())
+    if not user:
         return None
-    if not verify_password(password, db_user.hashed_password):
+    if not verify_password(password, user.hashed_password):
         return None
-    return db_user
+    return user
 
 
 def create_access_token(data: dict, expires_delta: Optional[timedelta] = None):

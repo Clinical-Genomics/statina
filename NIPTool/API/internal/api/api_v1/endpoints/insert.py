@@ -6,7 +6,7 @@ from NIPTool.adapter.plugin import NiptAdapter
 from NIPTool.config import get_nipt_adapter
 from NIPTool.crud import find
 from NIPTool.crud.insert import insert_batch, insert_samples, insert_user
-from NIPTool.models.database import Batch, Sample
+from NIPTool.models.database import Batch, DataBaseSample
 from NIPTool.models.server.load import BatchRequestBody, UserRequestBody
 from NIPTool.parse.batch import get_batch, get_samples
 
@@ -24,7 +24,7 @@ def batch(
     if not nipt_results.exists():
         response.status_code = status.HTTP_422_UNPROCESSABLE_ENTITY
         return {"message": "Results file missing."}
-    samples: List[Sample] = get_samples(nipt_results)
+    samples: List[DataBaseSample] = get_samples(nipt_results)
     batch: Batch = get_batch(nipt_results)
     if find.batch(adapter=adapter, batch_id=batch.batch_id):
         return "batch already in database"

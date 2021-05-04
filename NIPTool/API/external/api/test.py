@@ -1,0 +1,15 @@
+{
+    "sample_id": "11c-2021-00354-05",
+    "FF": {"value": 1.16, "warn": "danger"},
+    "CNVSegment": {"value": "", "warn": "default"},
+    "FFX": {"value": 8.16, "warn": "default"},
+    "FFY": {"value": 11.9, "warn": "default"},
+    "Zscore_13": {"value": -1.51, "warn": "default"},
+    "Zscore_18": {"value": -2.45, "warn": "default"},
+    "Zscore_21": {"value": -1.27, "warn": "default"},
+    "Zscore_X": {"value": -13.3},
+    "Status": "",
+    "Include": True,
+    "Comment": "",
+    "Last_Change": "mayapapaya 2021/03/31 11:52:25",
+}

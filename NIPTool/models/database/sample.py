@@ -3,7 +3,7 @@ from typing import Optional
 from pydantic import BaseModel, Field
 
 
-class Sample(BaseModel):
+class DataBaseSample(BaseModel):
     sample_id: str = Field(..., alias="SampleID")
     batch_id: str = Field(..., alias="SampleProject")
     SampleType: Optional[str]

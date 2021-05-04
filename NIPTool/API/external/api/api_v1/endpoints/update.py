@@ -46,7 +46,7 @@ async def set_sample_status(request: Request, adapter: NiptAdapter = Depends(get
         sample[abnormality_key] = new_abnormality_status
         sample[f"status_change_{abnormality}"] = f"{USER.username} {time_stamp}"
 
-    update.sample(adapter=adapter, sample=Sample(**sample))
+    update.sample(adapter=adapter, sample=DataBaseSample(**sample))
     return RedirectResponse(request.headers.get("referer"))
 
 
@@ -60,7 +60,7 @@ async def sample_comment(request: Request, adapter: NiptAdapter = Depends(get_ni
         return RedirectResponse(request.headers.get("referer"))
 
     sample_id: str = form["sample_id"]
-    sample: Sample = find.sample(sample_id=sample_id, adapter=adapter)
+    sample: DataBaseSample = find.sample(sample_id=sample_id, adapter=adapter)
     comment: str = form.get("comment")
     if comment != sample.comment:
         sample.comment = comment
@@ -93,7 +93,7 @@ def save_samples(samples: Iterable[str], form: FormData, adapter: NiptAdapter):
 
     time_stamp: str = datetime.now().strftime("%Y/%m/%d %H:%M:%S")
     for sample_id in samples:
-        sample: Sample = find.sample(sample_id=sample_id, adapter=adapter)
+        sample: DataBaseSample = find.sample(sample_id=sample_id, adapter=adapter)
         comment: str = form.get(f"comment_{sample_id}")
         include: bool = form.get(f"include_{sample_id}")
         if comment != sample.comment:
@@ -111,7 +111,7 @@ def include_all_samples(samples: Iterable[str], adapter: NiptAdapter):
 
     time_stamp: str = datetime.now().strftime("%Y/%m/%d %H:%M:%S")
     for sample_id in samples:
-        sample: Sample = find.sample(sample_id=sample_id, adapter=adapter)
+        sample: DataBaseSample = find.sample(sample_id=sample_id, adapter=adapter)
         if sample.include:
             continue
         sample.include = True

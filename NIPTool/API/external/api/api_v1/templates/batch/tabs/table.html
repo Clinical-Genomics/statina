@@ -54,30 +54,30 @@
                                         <input type=text name="samples" value="{{ sample.sample_id }}" hidden>
                                         <tr>
                                             <td width="20%"> <a href={{ url_for('sample', sample_id=sample.sample_id) }}>{{ sample.sample_id }}</a></td>
-                                            <td width="4%" class = "{{ sample.Zscore_13.warn}}">{{ sample.Zscore_13.value }}</td>
-                                            <td width="4%" class = "{{ sample.Zscore_18.warn}}">{{ sample.Zscore_18.value }}</td>
-                                            <td width="4%" class = "{{ sample.Zscore_21.warn}}">{{ sample.Zscore_21.value }}</td>
-                                            <td width="4%" class = "{{ sample.Zscore_X.warn}}">{{ sample.Zscore_X.value }}</td>
-                                            <td width="4%" class = "{{sample.FF.warn}}">{{sample.FF.value}}</td>
-                                            <td width="4%" class = "{{sample.FFX.warn}}">{{sample.FFX.value}}</td>
-                                            <td width="4%" class = "{{sample.FFY.warn}}">{{sample.FFY.value}}</td>
-                                            <td width="4%" class = "{{sample.CNVSegment.warn}}">{{sample.CNVSegment.value}}</td>
+                                            <td width="4%" class = "{{ sample.warnings.Zscore_13}}">{{ sample.Zscore_13 }}</td>
+                                            <td width="4%" class = "{{ sample.warnings.Zscore_18}}">{{ sample.Zscore_18 }}</td>
+                                            <td width="4%" class = "{{ sample.warnings.Zscore_21}}">{{ sample.Zscore_21 }}</td>
+                                            <td width="4%" class = "{{ sample.warnings.Zscore_X}}">{{ sample.Zscore_X }}</td>
+                                            <td width="4%" class = "{{sample.warnings.FF_Formatted}}">{{sample.FF_Formatted}}</td>
+                                            <td width="4%" class = "default">{{sample.FFX}}</td>
+                                            <td width="4%" class = "default">{{sample.FFY}}</td>
+                                            <td width="4%" class = "default">{{sample.CNVSegment}}</td>
                                             <td><a class="dropdown-item" href="{{ url_for('sample_download', file_id='segmental_calls', sample_id=sample.sample_id) }}">segmental calls</a></td>
                                             <td><p> <small></small></p></td>
                                             <td><p> <small>{{ sample.Status }}</small></p></td>
                                             {% if current_user.role=='RW' %}
 
-                                            <td width="1%" {% if sample.Include %}class="success"{% endif %}> <input type="checkbox" name="include_{{ sample.sample_id }}" {% if sample.Include %}checked{% endif %}></td>
+                                            <td width="1%" {% if sample.include %}class="success"{% endif %}> <input type="checkbox" name="include_{{ sample.sample_id }}" {% if sample.include %}checked{% endif %}></td>
                                             <td width="18%">
                                                 <div class="form-group">
-                                                    <textarea class="form-control" rows="1" name = "comment_{{ sample.sample_id }}" >{{sample.Comment}}</textarea>
+                                                    <textarea class="form-control" rows="1" name = "comment_{{ sample.sample_id }}" >{{sample.comment}}</textarea>
                                                 </div>
                                             </td>
                                             {% else %}
-                                            <td width="1%" {% if sample.Include %}class="success"{% endif %}>{{sample.Include }}</td>
-                                            <td width="18%">{{sample.Comment}}</td>
+                                            <td width="1%" {% if sample.include %}class="success"{% endif %}>{{sample.include }}</td>
+                                            <td width="18%">{{sample.comment}}</td>
                                             {% endif %}
-                                            <td ><small>{{sample.Last_Change}}</small></td>
+                                            <td ><small>{{sample.change_include_date}}</small></td>
                                         </tr>
                                         {% endfor %}
                                     </tbody>

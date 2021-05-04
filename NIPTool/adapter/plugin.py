@@ -12,6 +12,7 @@ LOG = logging.getLogger(__name__)
 class NiptAdapter(MongoAdapter):
     def setup(self, db_name: str):
         """Setup connection to a database"""
+        print("niptadapterrrrrrr")
 
         if self.client is None:
             raise SyntaxError("No client is available")

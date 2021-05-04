@@ -2,7 +2,7 @@ from pathlib import Path
 from typing import List
 
 import pytest
-from NIPTool.models.database import Batch, Sample
+from NIPTool.models.database import Batch, DataBaseSample
 from NIPTool.parse.batch import get_batch, get_samples, parse_csv, parse_segmental_calls
 from pydantic import ValidationError
 
@@ -62,12 +62,12 @@ def test_get_samples(valid_csv: Path):
     nr_samples = get_nr_csv_entries(valid_csv)
 
     # WHEN running get_samples
-    results: List[Sample] = get_samples(valid_csv)
+    results: List[DataBaseSample] = get_samples(valid_csv)
 
     # THEN assert results is a list and it has length 3
     assert isinstance(results, list)
     # THEN assert that the objects are samples
-    assert isinstance(results[0], Sample)
+    assert isinstance(results[0], DataBaseSample)
 
 
 def test_get_samples_with_missing_sample_id_in_csv(csv_with_missing_sample_id):

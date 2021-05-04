@@ -3,7 +3,7 @@ from typing import Dict, List, Optional
 
 from NIPTool.adapter import NiptAdapter
 from NIPTool.exeptions import InsertError
-from NIPTool.models.database import Batch, Sample
+from NIPTool.models.database import Batch, DataBaseSample
 from NIPTool.models.server.load import BatchRequestBody, UserRequestBody
 from NIPTool.parse.batch import parse_segmental_calls
 from pymongo.results import InsertManyResult, InsertOneResult
@@ -27,7 +27,7 @@ def insert_batch(adapter: NiptAdapter, batch: Batch, batch_files: BatchRequestBo
 
 
 def insert_samples(
-    adapter: NiptAdapter, samples: List[Sample], segmental_calls: Optional[str]
+    adapter: NiptAdapter, samples: List[DataBaseSample], segmental_calls: Optional[str]
 ) -> List[str]:
     """Function to load data from fluffy result file."""
 

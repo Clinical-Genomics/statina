@@ -50,7 +50,7 @@
     {% endfor %}
 
     {% for abn  in abnormal.keys() %} 
-        {% for status  in abnormal[abn] %} 
+        {% for status  in abnormal[abn] %}
         var verif = {                                                                  
                 name: '{{abn}} {{status}} (N={{abnormal[abn][status]["count"]}})',                                                               
                 y: {{abnormal[abn][status]['FFY']}},                                        

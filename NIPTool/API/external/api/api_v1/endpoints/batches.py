@@ -15,6 +15,7 @@ def batches(
     request: Request, adapter: NiptAdapter = Depends(get_nipt_adapter)
 ):  # , user: User = Depends(get_current_active_user)):
     """List of all batches"""
+
     all_batches: List[Batch] = find.batches(adapter=adapter)
     return templates.TemplateResponse(
         "batches.html",
@@ -49,7 +50,7 @@ def batches(
 def batch(request: Request, batch_id: str, adapter: NiptAdapter = Depends(get_nipt_adapter)):
     """Batch view with table of all samples in the batch."""
 
-    samples: List[Sample] = find.batch_samples(batch_id=batch_id, adapter=adapter)
+    samples: List[DataBaseSample] = find.batch_samples(batch_id=batch_id, adapter=adapter)
     return templates.TemplateResponse(
         "batch/tabs/table.html",
         context={
@@ -66,7 +67,7 @@ def batch(request: Request, batch_id: str, adapter: NiptAdapter = Depends(get_ni
 def batch(request: Request, batch_id: str, adapter: NiptAdapter = Depends(get_nipt_adapter)):
     """Batch view with table of all samples in the batch."""
 
-    samples: List[Sample] = find.batch_samples(batch_id=batch_id, adapter=adapter)
+    samples: List[DataBaseSample] = find.batch_samples(batch_id=batch_id, adapter=adapter)
     return templates.TemplateResponse(
         "batch/tabs/table.html",
         context={
@@ -107,18 +108,28 @@ def fetal_fraction_XY(
     """Batch view with fetal fraction (X against Y) plot"""
     batch: Batch = find.batch(batch_id=batch_id, adapter=adapter)
 
-    control = get_ff_control_normal(adapter)
+    control: FetalFraction = get_ff_control_normal(adapter)
     abnormal = get_ff_control_abnormal(adapter)
+    abnormal_dict = abnormal.dict(
+        exclude_none=True,
+        exclude={
+            "X0": {"status_data_"},
+            "XXX": {"status_data_"},
+            "XXY": {"status_data_"},
+            "XYY": {"status_data_"},
+        },
+    )
+
     return templates.TemplateResponse(
         "batch/tabs/FF_XY.html",
         context=dict(
             request=request,
             current_user=CURRENT_USER,
             control=control,
-            abnormal=abnormal,
+            abnormal=abnormal_dict,
             cases=get_ff_cases(adapter, batch_id),
-            max_x=max(control["FFX"]) + 1,
-            min_x=min(control["FFX"]) - 1,
+            max_x=max(control.FFX) + 1,
+            min_x=min(control.FFX) - 1,
             batch=batch.dict(),
             page_id="batches_FF_XY",
         ),
@@ -149,7 +160,7 @@ def fetal_fraction(
 def coverage(request: Request, batch_id: str, adapter: NiptAdapter = Depends(get_nipt_adapter)):
     """Batch view with coverage plot"""
     batch: Batch = find.batch(batch_id=batch_id, adapter=adapter)
-    samples: List[Sample] = find.batch_samples(batch_id=batch_id, adapter=adapter)
+    samples: List[DataBaseSample] = find.batch_samples(batch_id=batch_id, adapter=adapter)
 
     scatter_data = get_scatter_data_for_coverage_plot(samples)
     box_data = get_box_data_for_coverage_plot(samples)
@@ -174,7 +185,7 @@ def report(
     """Report view, collecting all tables and plots from one batch."""
 
     batch: Batch = find.batch(batch_id=batch_id, adapter=adapter)
-    samples: List[Sample] = find.batch_samples(batch_id=batch_id, adapter=adapter)
+    samples: List[DataBaseSample] = find.batch_samples(batch_id=batch_id, adapter=adapter)
 
     scatter_data = get_scatter_data_for_coverage_plot(samples)
     box_data = get_box_data_for_coverage_plot(samples)

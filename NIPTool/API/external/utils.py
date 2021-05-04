@@ -1,157 +1,131 @@
-from typing import List
+from typing import List, Dict
 
+from NIPTool.API.external.api.models import (
+    SampleWarning,
+    CoveragePlotSampleData,
+    FetalFraction,
+    FetalFractionControlAbNormal,
+    FetalFractionStatus,
+    Sample,
+)
+from NIPTool.adapter import NiptAdapter
 from NIPTool.crud import find
-from NIPTool.models.database import Sample
+from NIPTool.models.database import DataBaseSample
 from NIPTool.API.external.constants import *
 
 
 ### Batch views:
 
+#    for key in sample_info_keys:
+#        val = sample.get(key)
+#        if isinstance(val, (float, int)):
+#            sample[key] = round(val, 2)
+#        else:
+#            sample[key] = ""
 
-def get_sample_info(sample: Sample):
+
+def get_sample_info(sample: DataBaseSample) -> DataBaseSample:
     """Sample info for sample table in batch view."""
 
-    sample_warnings = get_sample_warnings(sample)
-    sample = sample.dict()
+    samp = Sample(**sample.dict())
+    sample_warnings: SampleWarning = get_sample_warnings(sample=sample)
 
-    sample_info_keys = [
-        "Zscore_13",
-        "Zscore_18",
-        "Zscore_21",
-        "CNVSegment",
-        "FF_Formatted",
-        "FFX",
-        "FFY",
-        "Zscore_X",
-    ]
+    samp.warnings = sample_warnings
 
-    for key in sample_info_keys:
-        val = sample.get(key)
-        if isinstance(val, (float, int)):
-            sample[key] = round(val, 2)
-        else:
-            sample[key] = ""
-
-    return {
-        "sample_id": sample.get("sample_id"),
-        "FF": {"value": sample.get("FF_Formatted"), "warn": sample_warnings.get("FF_Formatted")},
-        "CNVSegment": {
-            "value": sample.get("CNVSegment"),
-            "warn": "default",
-        },
-        "FFX": {
-            "value": sample.get("FFX"),
-            "warn": "default",
-        },
-        "FFY": {
-            "value": sample.get("FFY"),
-            "warn": "default",
-        },
-        "Zscore_13": {"value": sample.get("Zscore_13"), "warn": sample_warnings.get("Zscore_13")},
-        "Zscore_18": {"value": sample.get("Zscore_18"), "warn": sample_warnings.get("Zscore_18")},
-        "Zscore_21": {"value": sample.get("Zscore_21"), "warn": sample_warnings.get("Zscore_21")},
-        "Zscore_X": {"value": sample.get("Zscore_X")},
-        "Status": _get_status(sample),
-        "Include": sample.get("include"),
-        "Comment": sample.get("comment", ""),
-        "Last_Change": sample.get("change_include_date"),
-    }
+    return samp
 
 
-def _get_status(sample):
-    """Get the manually defined sample status for batch table"""
+def _get_ff_warning(fetal_fraction: float) -> str:
+    """Get fetal fraction warning based on preset threshold"""
 
-    status_list = []
-    for key in TRIS_CHROM_ABNORM + SEX_CHROM_ABNORM:
-        status = sample.get(f"status_{key}")
-        if status and status != "Normal":
-            status_list.append(" ".join([status, key]))
-    return ", ".join(status_list)
-
-
-def _get_ff_warning(fetal_fraction):
-    """Get fetal fraction warning based on preset treshold"""
-    if fetal_fraction == "":
-        return "default"
-
-    if fetal_fraction and fetal_fraction <= FF_TRESHOLD:
+    if isinstance(fetal_fraction, float) and fetal_fraction <= FF_TRESHOLD:
         return "danger"
-    else:
-        return "default"
+
+    return "default"
 
 
-def get_sample_warnings(sample: Sample):
+def get_sample_warnings(sample: DataBaseSample) -> SampleWarning:
     """"""
-    sample = sample.dict()
 
+    sample = sample.dict()
     sample_warnings = {}
     fetal_fraction = sample.get("FF_Formatted")
-    sample_warnings["FF_Formatted"] = _get_ff_warning(fetal_fraction)
+    sample_warnings["FF_Formatted"]: str = _get_ff_warning(fetal_fraction=fetal_fraction)
     for key in ["Zscore_13", "Zscore_18", "Zscore_21"]:
         z_score = sample.get(key)
-        sample_warnings[key] = _get_tris_warning(z_score, fetal_fraction)
+        sample_warnings[key]: str = _get_tris_warning(
+            z_score=z_score, fetal_fraction=fetal_fraction
+        )
 
-    return sample_warnings
+    return SampleWarning(**sample_warnings)
 
 
-def _get_tris_warning(z_score: float, fetal_fraction):
-    """Get automated trisomi warning, based on preset Zscore thresholds"""
+def _get_tris_warning(z_score: float, fetal_fraction: float) -> str:
+    """Get automated trisomy warning, based on preset Zscore thresholds"""
 
     if fetal_fraction is None or z_score is None:
         return "default"
 
     if fetal_fraction <= 5:
-        smax = TRISOMI_TRESHOLDS["soft_max_ff"]["NCV"]
+        soft_max = TRISOMI_TRESHOLDS["soft_max_ff"]["NCV"]
     else:
-        smax = TRISOMI_TRESHOLDS["soft_max"]["NCV"]
-    hmin = TRISOMI_TRESHOLDS["hard_min"]["NCV"]
-    hmax = TRISOMI_TRESHOLDS["hard_max"]["NCV"]
-    smin = TRISOMI_TRESHOLDS["soft_min"]["NCV"]
+        soft_max = TRISOMI_TRESHOLDS["soft_max"]["NCV"]
+    hard_min = TRISOMI_TRESHOLDS["hard_min"]["NCV"]
+    hard_max = TRISOMI_TRESHOLDS["hard_max"]["NCV"]
+    soft_min = TRISOMI_TRESHOLDS["soft_min"]["NCV"]
 
-    if (smax <= z_score < hmax) or (hmin < z_score <= smin):
-        warn = "warning"
-    elif (z_score >= hmax) or (z_score <= hmin):
-        warn = "danger"
+    if (soft_max <= z_score < hard_max) or (hard_min < z_score <= soft_min):
+        return "warning"
+    elif (z_score >= hard_max) or (z_score <= hard_min):
+        return "danger"
     else:
-        warn = "default"
-    return warn
+        return "default"
 
 
-def get_scatter_data_for_coverage_plot(samples: List[Sample]):
-    """Coverage Ratio data for Coverage Plot."""
+def get_scatter_data_for_coverage_plot(
+    samples: List[DataBaseSample],
+) -> Dict["str", CoveragePlotSampleData]:
+    """Coverage Ratio data for Coverage Plot.
+    Only adding samples with a zscore warning"""
 
     data = {}
     for sample in samples:
-        warnings = get_sample_warnings(sample)
-        warnings.pop("FF_Formatted")
-        if set(warnings.values()) == {"default"}:
+        sample_warnings: SampleWarning = get_sample_warnings(sample=sample)
+        zscore_warnings = [
+            sample_warnings.Zscore_13,
+            sample_warnings.Zscore_18,
+            sample_warnings.Zscore_21,
+        ]
+        if set(zscore_warnings) == {"default"}:
             continue
 
-        sample_id = sample.sample_id
-        data[sample_id] = {"x": [], "y": []}
-        for chr in range(1, 23):
-            ratio = sample.dict().get(f"Chr{str(chr)}_Ratio")
+        x = []
+        y = []
+        for chromosome in range(1, 23):
+            ratio = sample.dict().get(f"Chr{chromosome}_Ratio")
             if ratio is None:
                 continue
-            data[sample_id]["y"].append(ratio)
-            data[sample_id]["x"].append(chr)
+            y.append(ratio)
+            x.append(chromosome)
+        data[sample.sample_id] = CoveragePlotSampleData(x_axis=x, y_axis=y)
     return data
 
 
-def get_box_data_for_coverage_plot(samples: List[Sample]):
+def get_box_data_for_coverage_plot(samples: List[DataBaseSample]) -> Dict[int, List[float]]:
     """Coverage Ratio data for Coverage Plot."""
+
     data = {}
-    for chr in range(1, 23):
-        data[chr] = []
+    for chromosome in range(1, 23):
+        data[chromosome] = []
         for sample in samples:
-            ratio = sample.dict().get(f"Chr{str(chr)}_Ratio")
+            ratio = sample.dict().get(f"Chr{chromosome}_Ratio")
             if ratio is None:
                 continue
-            data[chr].append(ratio)
+            data[chromosome].append(ratio)
     return data
 
 
-def get_ff_control_normal(adapter):
+def get_ff_control_normal(adapter: NiptAdapter):
     """Normal Control Samples for fetal fraction plots"""
 
     pipe = [
@@ -174,35 +148,44 @@ def get_ff_control_normal(adapter):
             }
         },
     ]
-    return list(find.sample_aggregate(pipe=pipe, adapter=adapter))[0]
+    relevant_aggregation_data = list(find.sample_aggregate(pipe=pipe, adapter=adapter))[0]
+    return FetalFraction(**relevant_aggregation_data)
 
 
-def get_ff_control_abnormal(adapter):
+def ff_control_abnormal_pipe(abn: str) -> List[Dict]:
+    return [
+        {
+            "$match": {
+                f"status_{abn}": {"$ne": "Normal", "$exists": "True"},
+                "include": {"$eq": True},
+            }
+        },
+        {
+            "$group": {
+                "_id": {f"status_{abn}": f"$status_{abn}"},
+                "FFX": {"$push": "$FFX"},
+                "FFY": {"$push": "$FFY"},
+                "names": {"$push": "$sample_id"},
+                "count": {"$sum": 1},
+            }
+        },
+    ]
+
+
+def get_ff_control_abnormal(adapter: NiptAdapter) -> FetalFractionControlAbNormal:
     """Abnormal Control Samples for fetal_fraction_XY plot"""
+
     plot_data = {}
-    for abn in SEX_CHROM_ABNORM:
+    for abn in CHROM_ABNORM:
         plot_data[abn] = {}
-        pipe = [
-            {
-                "$match": {
-                    f"status_{abn}": {"$ne": "Normal", "$exists": "True"},
-                    "include": {"$eq": True},
-                }
-            },
-            {
-                "$group": {
-                    "_id": {f"status_{abn}": f"$status_{abn}"},
-                    "FFX": {"$push": "$FFX"},
-                    "FFY": {"$push": "$FFY"},
-                    "names": {"$push": "$sample_id"},
-                    "count": {"$sum": 1},
-                }
-            },
-        ]
+        pipe = ff_control_abnormal_pipe(abn)
+        statuses = {}
         for status_dict in find.sample_aggregate(pipe=pipe, adapter=adapter):
-            status = status_dict["_id"][f"status_{abn}"]
-            plot_data[abn][status] = status_dict
-    return plot_data
+            status: str = status_dict["_id"][f"status_{abn}"]
+            statuses[status] = status_dict
+
+        plot_data[abn] = FetalFractionStatus(status_data_=statuses)
+    return FetalFractionControlAbNormal(**plot_data)
 
 
 def get_ff_cases(adapter, batch_id):
@@ -288,7 +271,6 @@ def get_tris_control_abnormal(adapter, chr, x_axis):
     ]
 
     for status_dict in find.sample_aggregate(pipe=pipe, adapter=adapter):
-
         status = status_dict["_id"][f"status_{chr}"]
         plot_data[status] = {
             "values": [value for value in status_dict.get("values")],
@@ -354,7 +336,6 @@ def get_normal_for_samp_tris_plot(adapter):
     data_per_abnormaliy = {}
     x_axis = 1
     for abn in ["13", "18", "21"]:
-
         data = get_tris_control_normal(adapter, abn)
         data["x_axis"] = [x_axis] * data.get("count", 0)
         data_per_abnormaliy[abn] = data

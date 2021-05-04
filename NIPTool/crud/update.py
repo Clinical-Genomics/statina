@@ -1,12 +1,12 @@
 import logging
 
 from NIPTool.adapter import NiptAdapter
-from NIPTool.models.database import Sample
+from NIPTool.models.database import DataBaseSample
 
 LOG = logging.getLogger(__name__)
 
 
-def sample(adapter: NiptAdapter, sample: Sample) -> dict:
+def sample(adapter: NiptAdapter, sample: DataBaseSample) -> dict:
     """Update a sample object in the database"""
 
     sample_dict: dict = sample.dict(exclude_none=True)

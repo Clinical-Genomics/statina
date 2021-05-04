@@ -21,7 +21,7 @@ class Settings(BaseSettings):
     port: int = 8000
 
     class Config:
-        from_file = str(ENV_FILE)
+        env_file = str(ENV_FILE)
 
 
 settings = Settings()

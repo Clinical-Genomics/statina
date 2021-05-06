@@ -12,7 +12,7 @@ CURRENT_USER = User(username="mayapapaya", email="mayabrandi@123.com", role="RW"
 
 
 @router.post("/")
-async def batches(
+def batches(
     request: Request,
     adapter: NiptAdapter = Depends(get_nipt_adapter),
     user=Depends(get_current_user),
@@ -32,7 +32,7 @@ async def batches(
 
 
 @router.get("/")
-async def batches(
+def batches(
     request: Request,
     adapter: NiptAdapter = Depends(get_nipt_adapter),
     user=Depends(get_current_user),
@@ -51,7 +51,7 @@ async def batches(
 
 
 @router.post("/{batch_id}/")
-async def batch(
+def batch(
     request: Request,
     batch_id: str,
     adapter: NiptAdapter = Depends(get_nipt_adapter),
@@ -73,7 +73,7 @@ async def batch(
 
 
 @router.get("/{batch_id}/")
-async def batch(
+def batch(
     request: Request,
     batch_id: str,
     adapter: NiptAdapter = Depends(get_nipt_adapter),
@@ -94,7 +94,7 @@ async def batch(
 
 
 @router.get("/{batch_id}/{ncv}")
-async def NCV(
+def NCV(
     request: Request,
     batch_id: str,
     ncv,
@@ -121,7 +121,7 @@ async def NCV(
 
 
 @router.get("/batches/{batch_id}/fetal_fraction_XY")
-async def fetal_fraction_XY(
+def fetal_fraction_XY(
     request: Request,
     batch_id: str,
     adapter: NiptAdapter = Depends(get_nipt_adapter),
@@ -149,7 +149,7 @@ async def fetal_fraction_XY(
 
 
 @router.get("/batches/{batch_id}/fetal_fraction")
-async def fetal_fraction(
+def fetal_fraction(
     request: Request,
     batch_id: str,
     adapter: NiptAdapter = Depends(get_nipt_adapter),
@@ -172,7 +172,7 @@ async def fetal_fraction(
 
 
 @router.get("/batches/{batch_id}/coverage")
-async def coverage(
+def coverage(
     request: Request,
     batch_id: str,
     adapter: NiptAdapter = Depends(get_nipt_adapter),
@@ -199,7 +199,7 @@ async def coverage(
 
 
 @router.get("/batches/{batch_id}/report/{coverage}")
-async def report(
+def report(
     request: Request,
     batch_id: str,
     coverage: str,

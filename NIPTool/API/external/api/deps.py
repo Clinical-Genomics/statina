@@ -54,15 +54,15 @@ def get_current_user(
     return user
 
 
-async def verify_password(plain_password, hashed_password):
+def verify_password(plain_password, hashed_password):
     return pwd_context.verify(plain_password, hashed_password)
 
 
-async def get_password_hash(password):
+def get_password_hash(password):
     return pwd_context.hash(password)
 
 
-async def authenticate_user(username: str, password: str) -> Optional[User]:
+def authenticate_user(username: str, password: str) -> Optional[User]:
     adapter = get_nipt_adapter()
     user: User = find.user(adapter=adapter, user_name=username)
 
@@ -73,7 +73,7 @@ async def authenticate_user(username: str, password: str) -> Optional[User]:
     return user
 
 
-async def create_access_token(data: dict, expires_delta: Optional[timedelta] = None):
+def create_access_token(data: dict, expires_delta: Optional[timedelta] = None) -> str:
     configs: dict = temp_get_config()
     to_encode = data.copy()
     if expires_delta:

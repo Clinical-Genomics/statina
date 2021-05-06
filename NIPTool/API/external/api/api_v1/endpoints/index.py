@@ -5,7 +5,7 @@ router = APIRouter()
 
 
 @router.post("/")
-async def index(request: Request):
+def index(request: Request):
     """Log in view."""
     return templates.TemplateResponse(
         "index.html", context={"request": request, "current_user": ""}
@@ -13,7 +13,7 @@ async def index(request: Request):
 
 
 @router.get("/")
-async def index(request: Request):
+def index(request: Request):
     """Log in view."""
     return templates.TemplateResponse(
         "index.html", context={"request": request, "current_user": ""}

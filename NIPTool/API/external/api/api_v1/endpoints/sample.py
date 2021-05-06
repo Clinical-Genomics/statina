@@ -41,7 +41,7 @@ def sample(
     request: Request,
     sample_id: str,
     adapter: NiptAdapter = Depends(get_nipt_adapter),
-    user=Depends(get_current_user),
+    user: User = Depends(get_current_user),
 ):
     """Post sample with id"""
 

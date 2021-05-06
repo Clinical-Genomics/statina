@@ -6,7 +6,8 @@ from jose import JWTError, jwt
 from NIPTool.adapter.plugin import NiptAdapter
 from NIPTool.config import get_nipt_adapter
 from NIPTool.crud import find
-from NIPTool.models.server.login import TokenData, User
+from NIPTool.models.server.login import TokenData
+from NIPTool.models.database import User
 from passlib.context import CryptContext
 
 

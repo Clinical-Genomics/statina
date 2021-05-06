@@ -7,7 +7,8 @@ from NIPTool.API.external.api.deps import (
     create_access_token,
     temp_get_config,
 )
-from NIPTool.models.server.login import Token, User
+from NIPTool.models.server.login import Token
+from NIPTool.models.database import User
 
 router = APIRouter()
 

@@ -77,7 +77,7 @@ def batch(
     request: Request,
     batch_id: str,
     adapter: NiptAdapter = Depends(get_nipt_adapter),
-    user=Depends(get_current_user),
+    user: User = Depends(get_current_user),
 ):
     """Batch view with table of all samples in the batch."""
     samples: List[Sample] = find.batch_samples(batch_id=batch_id, adapter=adapter)

@@ -19,7 +19,7 @@ def sample(
 ):
     """Get sample with id"""
 
-    sample: dict = find.sample(sample_id=sample_id, adapter=adapter).dict()
+    sample: Sample = find.sample(sample_id=sample_id, adapter=adapter).dict()
     batch: Batch = find.batch(batch_id=sample.get("batch_id"), adapter=adapter)
 
     return templates.TemplateResponse(

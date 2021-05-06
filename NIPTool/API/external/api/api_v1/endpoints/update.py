@@ -83,7 +83,7 @@ async def sample_comment(
 async def include_samples(
     request: Request,
     adapter: NiptAdapter = Depends(get_nipt_adapter),
-    user=Depends(get_current_user),
+    user: User = Depends(get_current_user),
 ):
     """Update include status and comment for samples in batch"""
 

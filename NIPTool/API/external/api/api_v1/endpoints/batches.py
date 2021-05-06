@@ -15,7 +15,7 @@ CURRENT_USER = User(username="mayapapaya", email="mayabrandi@123.com", role="RW"
 def batches(
     request: Request,
     adapter: NiptAdapter = Depends(get_nipt_adapter),
-    user=Depends(get_current_user),
+    user: User = Depends(get_current_user),
 ):
     """List of all batches"""
 

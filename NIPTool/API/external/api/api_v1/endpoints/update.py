@@ -24,7 +24,7 @@ USER = User(username="mayapapaya", email="mayapapaya@mail.com", role="RW")
 async def set_sample_status(
     request: Request,
     adapter: NiptAdapter = Depends(get_nipt_adapter),
-    user=Depends(get_current_user),
+    user: User = Depends(get_current_user),
 ):
     """Update the manualy interpreted chromosome abnormality status for a sample."""
 

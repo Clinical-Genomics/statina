@@ -204,7 +204,7 @@ def report(
     batch_id: str,
     coverage: str,
     adapter: NiptAdapter = Depends(get_nipt_adapter),
-    user=Depends(get_current_user),
+    user: User = Depends(get_current_user),
 ):
     """Report view, collecting all tables and plots from one batch."""
 

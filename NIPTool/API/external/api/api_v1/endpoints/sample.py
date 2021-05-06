@@ -67,7 +67,7 @@ def sample_tris(
     request: Request,
     sample_id: str,
     adapter: NiptAdapter = Depends(get_nipt_adapter),
-    user=Depends(get_current_user),
+    user: User = Depends(get_current_user),
 ):
     """Sample view with trisomi plot."""
     sample: dict = find.sample(sample_id=sample_id, adapter=adapter).dict()

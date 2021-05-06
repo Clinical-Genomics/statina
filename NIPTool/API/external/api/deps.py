@@ -63,7 +63,7 @@ def get_password_hash(password):
 
 
 def authenticate_user(username: str, password: str) -> Optional[User]:
-    adapter = get_nipt_adapter()
+    adapter: NiptAdatper = get_nipt_adapter()
     user: User = find.user(adapter=adapter, user_name=username)
 
     if not user:

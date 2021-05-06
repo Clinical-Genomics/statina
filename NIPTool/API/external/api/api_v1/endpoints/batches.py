@@ -35,7 +35,7 @@ def batches(
 def batches(
     request: Request,
     adapter: NiptAdapter = Depends(get_nipt_adapter),
-    user=Depends(get_current_user),
+    user: User = Depends(get_current_user),
 ):
     """List of all batches"""
     all_batches: List[Batch] = find.batches(adapter=adapter)

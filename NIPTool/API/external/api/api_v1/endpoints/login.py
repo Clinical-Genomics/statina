@@ -7,7 +7,7 @@ from NIPTool.API.external.api.deps import (
     create_access_token,
     temp_get_config,
 )
-from NIPTool.models.server.login import Token, UserInDB
+from NIPTool.models.server.login import Token, User
 
 router = APIRouter()
 
@@ -17,7 +17,7 @@ async def login_for_access_token(
     form_data: OAuth2PasswordRequestForm = Depends(), config: dict = Depends(temp_get_config)
 ):
 
-    user: UserInDB = await authenticate_user(form_data.username, form_data.password)
+    user: User = await authenticate_user(form_data.username, form_data.password)
     if not user:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,

@@ -6,7 +6,7 @@ from jose import JWTError, jwt
 from NIPTool.adapter.plugin import NiptAdapter
 from NIPTool.config import get_nipt_adapter
 from NIPTool.crud import find
-from NIPTool.models.server.login import TokenData, User, UserInDB
+from NIPTool.models.server.login import TokenData, User
 from passlib.context import CryptContext
 
 
@@ -53,12 +53,6 @@ def get_current_user(
     return user
 
 
-async def get_current_active_user(current_user: User = Depends(get_current_user)) -> User:
-    if current_user.disabled:
-        raise HTTPException(status_code=400, detail="Inactive user")
-    return current_user
-
-
 async def verify_password(plain_password, hashed_password):
     return pwd_context.verify(plain_password, hashed_password)
 
@@ -71,9 +65,6 @@ async def authenticate_user(username: str, password: str) -> Optional[User]:
     adapter = get_nipt_adapter()
     user: User = find.user(adapter=adapter, user_name=username)
 
-    if not user:
-        return None
-    user = UserInDB(**user.dict())
     if not user:
         return None
     if not verify_password(password, user.hashed_password):

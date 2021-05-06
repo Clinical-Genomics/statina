@@ -1,7 +1,6 @@
 from fastapi import APIRouter, Depends, Request
 
-from NIPTool.API.external.api.api_v1.endpoints.login import login_for_access_token
-from NIPTool.API.external.api.deps import get_current_active_user, get_current_user
+from NIPTool.API.external.api.deps import get_current_user
 from NIPTool.adapter.plugin import NiptAdapter
 from NIPTool.API.external.utils import *
 from NIPTool.config import get_nipt_adapter, templates
@@ -40,7 +39,6 @@ async def batches(
 ):
     """List of all batches"""
     all_batches: List[Batch] = find.batches(adapter=adapter)
-    print("get")
     return templates.TemplateResponse(
         "batches.html",
         context={
@@ -61,7 +59,6 @@ async def batch(
 ):
     """Batch view with table of all samples in the batch."""
 
-    print("hejjjjj")
     samples: List[Sample] = find.batch_samples(batch_id=batch_id, adapter=adapter)
     return templates.TemplateResponse(
         "batch/tabs/table.html",
@@ -83,8 +80,6 @@ async def batch(
     user=Depends(get_current_user),
 ):
     """Batch view with table of all samples in the batch."""
-    print(user)
-    print("hejjjjj")
     samples: List[Sample] = find.batch_samples(batch_id=batch_id, adapter=adapter)
     return templates.TemplateResponse(
         "batch/tabs/table.html",

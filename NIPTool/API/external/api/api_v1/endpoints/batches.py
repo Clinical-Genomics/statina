@@ -153,7 +153,7 @@ def fetal_fraction(
     request: Request,
     batch_id: str,
     adapter: NiptAdapter = Depends(get_nipt_adapter),
-    user=Depends(get_current_user),
+    user: User = Depends(get_current_user),
 ):
     """Batch view with fetal fraction plot"""
     batch: Batch = find.batch(batch_id=batch_id, adapter=adapter)

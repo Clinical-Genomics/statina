@@ -29,7 +29,7 @@ oauth2_scheme = OAuth2PasswordBearer(
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 
-def get_current_user(
+async def get_current_user(
     token: str = Depends(oauth2_scheme),
     adapter: NiptAdapter = Depends(get_nipt_adapter),
     config: dict = Depends(temp_get_config),
@@ -56,21 +56,21 @@ def get_current_user(
     return user
 
 
-def get_current_active_user(current_user: User = Depends(get_current_user)) -> User:
+async def get_current_active_user(current_user: User = Depends(get_current_user)) -> User:
     if current_user.disabled:
         raise HTTPException(status_code=400, detail="Inactive user")
     return current_user
 
 
-def verify_password(plain_password, hashed_password):
+async def verify_password(plain_password, hashed_password):
     return pwd_context.verify(plain_password, hashed_password)
 
 
-def get_password_hash(password):
+async def get_password_hash(password):
     return pwd_context.hash(password)
 
 
-def authenticate_user(username: str, password: str) -> Optional[UserInDB]:
+async def authenticate_user(username: str, password: str) -> Optional[UserInDB]:
     adapter = get_nipt_adapter()
     user: User = find.user(adapter=adapter, user_name=username)
 
@@ -84,7 +84,7 @@ def authenticate_user(username: str, password: str) -> Optional[UserInDB]:
     return user
 
 
-def create_access_token(data: dict, expires_delta: Optional[timedelta] = None):
+async def create_access_token(data: dict, expires_delta: Optional[timedelta] = None):
     configs: dict = temp_get_config()
     to_encode = data.copy()
     if expires_delta:

@@ -10,6 +10,7 @@ class User(BaseModel):
     added: Optional[datetime] = None
     role: Optional[str] = None
     hashed_password: str
+    token: Optional[str]
 
 
 class UserInDB(User):

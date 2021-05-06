@@ -2,6 +2,8 @@ from pathlib import Path
 
 from fastapi import APIRouter, Depends, Request
 from fastapi.responses import FileResponse, RedirectResponse
+
+from NIPTool.API.external.api.deps import get_current_user
 from NIPTool.adapter.plugin import NiptAdapter
 from NIPTool.config import get_nipt_adapter, templates
 from NIPTool.crud import find
@@ -12,7 +14,11 @@ router = APIRouter()
 
 @router.get("/batch_download/{batch_id}/{file_id}")
 def batch_download(
-    request: Request, batch_id: str, file_id: str, adapter: NiptAdapter = Depends(get_nipt_adapter)
+    request: Request,
+    batch_id: str,
+    file_id: str,
+    adapter: NiptAdapter = Depends(get_nipt_adapter),
+    user=Depends(get_current_user),
 ):
     """View for batch downloads"""
 
@@ -32,7 +38,11 @@ def batch_download(
 
 @router.get("/sample_download/{sample_id}/{file_id}")
 def sample_download(
-    request: Request, sample_id: str, file_id: str, adapter: NiptAdapter = Depends(get_nipt_adapter)
+    request: Request,
+    sample_id: str,
+    file_id: str,
+    adapter: NiptAdapter = Depends(get_nipt_adapter),
+    user=Depends(get_current_user),
 ):
     """View for sample downloads"""
 

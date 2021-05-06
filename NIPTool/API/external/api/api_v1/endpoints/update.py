@@ -4,6 +4,8 @@ from typing import Iterable
 
 from fastapi import APIRouter, Depends, Request
 from fastapi.responses import RedirectResponse
+
+from NIPTool.API.external.api.deps import get_current_user
 from NIPTool.adapter.plugin import NiptAdapter
 from NIPTool.API.external.utils import *
 from NIPTool.config import get_nipt_adapter
@@ -19,7 +21,11 @@ USER = User(username="mayapapaya", email="mayapapaya@mail.com", role="RW")
 
 
 @router.post("/set_sample_status")
-async def set_sample_status(request: Request, adapter: NiptAdapter = Depends(get_nipt_adapter)):
+async def set_sample_status(
+    request: Request,
+    adapter: NiptAdapter = Depends(get_nipt_adapter),
+    user=Depends(get_current_user),
+):
     """Update the manualy interpreted chromosome abnormality status for a sample."""
 
     form = await request.form()
@@ -51,7 +57,11 @@ async def set_sample_status(request: Request, adapter: NiptAdapter = Depends(get
 
 
 @router.post("/sample_comment")
-async def sample_comment(request: Request, adapter: NiptAdapter = Depends(get_nipt_adapter)):
+async def sample_comment(
+    request: Request,
+    adapter: NiptAdapter = Depends(get_nipt_adapter),
+    user=Depends(get_current_user),
+):
     """Update sample comment"""
 
     form = await request.form()
@@ -70,7 +80,11 @@ async def sample_comment(request: Request, adapter: NiptAdapter = Depends(get_ni
 
 
 @router.post("/include_samples")
-async def include_samples(request: Request, adapter: NiptAdapter = Depends(get_nipt_adapter)):
+async def include_samples(
+    request: Request,
+    adapter: NiptAdapter = Depends(get_nipt_adapter),
+    user=Depends(get_current_user),
+):
     """Update include status and comment for samples in batch"""
 
     form = await request.form()

@@ -1,6 +1,6 @@
 from typing import Literal, List, Optional
 
-from pydantic import BaseModel, validator
+from pydantic import BaseModel, validator, condecimal, confloat
 
 from NIPTool.API.external.constants import (
     TRIS_CHROM_ABNORM,
@@ -149,6 +149,7 @@ class FetalFractionControlAbNormal(BaseModel):
 
 class Sample(DataBaseSample):
     warnings: Optional[SampleWarning]
+    text_warning: Optional[str]
     status: Optional[str]
 
     @validator("status", always=True)
@@ -161,8 +162,8 @@ class Sample(DataBaseSample):
                 status_list.append(" ".join([status, key]))
         return ", ".join(status_list)
 
-    @validator("status", always=True)
-    def set_status(cls, v, values: dict) -> SampleWarning:
+    @validator("warnings", always=True)
+    def set_warnings(cls, v, values: dict) -> SampleWarning:
 
         """"""
 
@@ -177,6 +178,14 @@ class Sample(DataBaseSample):
 
         return SampleWarning(**sample_warnings)
 
+    @validator("text_warning", always=True)
+    def set_text_warning(cls, v, values: dict) -> str:
+
+        """"""
+
+        return ""
+
+    @classmethod
     def get_tris_warning(cls, z_score: float, fetal_fraction: float) -> str:
         """Get automated trisomy warning, based on preset Zscore thresholds"""
 
@@ -198,6 +207,7 @@ class Sample(DataBaseSample):
         else:
             return "default"
 
+    @classmethod
     def get_ff_warning(cls, fetal_fraction: float) -> str:
         """Get fetal fraction warning based on preset threshold"""
 

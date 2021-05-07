@@ -15,4 +15,7 @@ jinja2
 passlib
 fastapi
 uvicorn
+uvloop
+httptools
+gunicorn
 python-jose

@@ -63,8 +63,8 @@
                                             <td width="4%" class = "default">{{sample.FFY}}</td>
                                             <td width="4%" class = "default">{{sample.CNVSegment}}</td>
                                             <td><a class="dropdown-item" href="{{ url_for('sample_download', file_id='segmental_calls', sample_id=sample.sample_id) }}">segmental calls</a></td>
-                                            <td><p> <small></small></p></td>
-                                            <td><p> <small>{{ sample.Status }}</small></p></td>
+                                            <td><p> <small>{{ sample.text_warning }}</small></p></td>
+                                            <td><p> <small>{{ sample.status }}</small></p></td>
                                             {% if current_user.role=='RW' %}
 
                                             <td width="1%" {% if sample.include %}class="success"{% endif %}> <input type="checkbox" name="include_{{ sample.sample_id }}" {% if sample.include %}checked{% endif %}></td>

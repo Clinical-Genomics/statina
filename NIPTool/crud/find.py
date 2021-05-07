@@ -17,7 +17,6 @@ def user(
         raise SyntaxError("Have to use email or user_name")
     if not raw_user:
         return None
-
     return User(**raw_user)
 
 

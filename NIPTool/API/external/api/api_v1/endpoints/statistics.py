@@ -1,6 +1,8 @@
 from fastapi import APIRouter, Depends, Request
+
+from NIPTool.API.external.api.deps import get_current_user
 from NIPTool.adapter.plugin import NiptAdapter
-from NIPTool.API.external.utils import (
+from NIPTool.API.external.api.utils import (
     get_last_batches,
     get_statistics_for_box_plot,
     get_statistics_for_scatter_plot,
@@ -12,7 +14,11 @@ router = APIRouter()
 
 
 @router.get("/statistics")
-def statistics(request: Request, adapter: NiptAdapter = Depends(get_nipt_adapter)):
+def statistics(
+    request: Request,
+    adapter: NiptAdapter = Depends(get_nipt_adapter),
+    user: User = Depends(get_current_user),
+):
     """Statistics view."""
 
     nr_batches = 3
@@ -36,7 +42,7 @@ def statistics(request: Request, adapter: NiptAdapter = Depends(get_nipt_adapter
         "statistics.html",
         context=dict(
             request=request,
-            current_user=User(username="mayapapaya", email="mayabrandi@123.com", role="RW"),
+            current_user=user,
             ticks=list(range(1, nr_batches + 1)),
             nr_batches=nr_batches,
             batch_ids=batch_ids,

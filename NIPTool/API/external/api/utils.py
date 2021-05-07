@@ -14,83 +14,15 @@ from NIPTool.models.database import DataBaseSample
 from NIPTool.API.external.constants import *
 
 
-### Batch views:
-
-#    for key in sample_info_keys:
-#        val = sample.get(key)
-#        if isinstance(val, (float, int)):
-#            sample[key] = round(val, 2)
-#        else:
-#            sample[key] = ""
-
-
-def get_sample_info(sample: DataBaseSample) -> DataBaseSample:
-    """Sample info for sample table in batch view."""
-
-    samp = Sample(**sample.dict())
-    sample_warnings: SampleWarning = get_sample_warnings(sample=sample)
-
-    samp.warnings = sample_warnings
-
-    return samp
-
-
-def _get_ff_warning(fetal_fraction: float) -> str:
-    """Get fetal fraction warning based on preset threshold"""
-
-    if isinstance(fetal_fraction, float) and fetal_fraction <= FF_TRESHOLD:
-        return "danger"
-
-    return "default"
-
-
-def get_sample_warnings(sample: DataBaseSample) -> SampleWarning:
-    """"""
-
-    sample = sample.dict()
-    sample_warnings = {}
-    fetal_fraction = sample.get("FF_Formatted")
-    sample_warnings["FF_Formatted"]: str = _get_ff_warning(fetal_fraction=fetal_fraction)
-    for key in ["Zscore_13", "Zscore_18", "Zscore_21"]:
-        z_score = sample.get(key)
-        sample_warnings[key]: str = _get_tris_warning(
-            z_score=z_score, fetal_fraction=fetal_fraction
-        )
-
-    return SampleWarning(**sample_warnings)
-
-
-def _get_tris_warning(z_score: float, fetal_fraction: float) -> str:
-    """Get automated trisomy warning, based on preset Zscore thresholds"""
-
-    if fetal_fraction is None or z_score is None:
-        return "default"
-
-    if fetal_fraction <= 5:
-        soft_max = TRISOMI_TRESHOLDS["soft_max_ff"]["NCV"]
-    else:
-        soft_max = TRISOMI_TRESHOLDS["soft_max"]["NCV"]
-    hard_min = TRISOMI_TRESHOLDS["hard_min"]["NCV"]
-    hard_max = TRISOMI_TRESHOLDS["hard_max"]["NCV"]
-    soft_min = TRISOMI_TRESHOLDS["soft_min"]["NCV"]
-
-    if (soft_max <= z_score < hard_max) or (hard_min < z_score <= soft_min):
-        return "warning"
-    elif (z_score >= hard_max) or (z_score <= hard_min):
-        return "danger"
-    else:
-        return "default"
-
-
 def get_scatter_data_for_coverage_plot(
-    samples: List[DataBaseSample],
+    samples: List[Sample],
 ) -> Dict["str", CoveragePlotSampleData]:
     """Coverage Ratio data for Coverage Plot.
     Only adding samples with a zscore warning"""
 
     data = {}
     for sample in samples:
-        sample_warnings: SampleWarning = get_sample_warnings(sample=sample)
+        sample_warnings: SampleWarning = sample.warnings
         zscore_warnings = [
             sample_warnings.Zscore_13,
             sample_warnings.Zscore_18,
@@ -125,7 +57,7 @@ def get_box_data_for_coverage_plot(samples: List[DataBaseSample]) -> Dict[int, L
     return data
 
 
-def get_ff_control_normal(adapter: NiptAdapter):
+def get_ff_control_normal(adapter: NiptAdapter) -> FetalFraction:
     """Normal Control Samples for fetal fraction plots"""
 
     pipe = [
@@ -188,7 +120,7 @@ def get_ff_control_abnormal(adapter: NiptAdapter) -> FetalFractionControlAbNorma
     return FetalFractionControlAbNormal(**plot_data)
 
 
-def get_ff_cases(adapter, batch_id):
+def get_ff_cases(adapter: NiptAdapter, batch_id: str):
     """Cases for fetal fraction plot"""
 
     pipe = [
@@ -226,7 +158,7 @@ def get_ff_cases(adapter, batch_id):
     return massaged_data
 
 
-def get_tris_control_normal(adapter, chr):
+def get_tris_control_normal(adapter: NiptAdapter, chr):
     """Normal Control Samples for trisomi plots"""
 
     pipe = [
@@ -248,7 +180,7 @@ def get_tris_control_normal(adapter, chr):
     return data
 
 
-def get_tris_control_abnormal(adapter, chr, x_axis):
+def get_tris_control_abnormal(adapter: NiptAdapter, chr, x_axis):
     """Abnormal Control Samples for trisomi plots"""
 
     plot_data = {}
@@ -281,7 +213,7 @@ def get_tris_control_abnormal(adapter, chr, x_axis):
     return plot_data
 
 
-def get_tris_cases(adapter, chr, batch_id):
+def get_tris_cases(adapter: NiptAdapter, chr, batch_id: str):
     """Cases for trisomi plots."""
 
     pipe = [
@@ -308,7 +240,7 @@ def get_tris_cases(adapter, chr, batch_id):
 ### Sample Trisomi Plot:
 
 
-def get_abn_for_samp_tris_plot(adapter):
+def get_abn_for_samp_tris_plot(adapter: NiptAdapter):
     """Format abnormal Control Samples for Sample trisomi plot"""
 
     plot_data = {}
@@ -330,7 +262,7 @@ def get_abn_for_samp_tris_plot(adapter):
     return plot_data, data_per_abnormaliy
 
 
-def get_normal_for_samp_tris_plot(adapter):
+def get_normal_for_samp_tris_plot(adapter: NiptAdapter):
     """Format normal Control Samples for Sample trisomi plot"""
 
     data_per_abnormaliy = {}
@@ -343,17 +275,17 @@ def get_normal_for_samp_tris_plot(adapter):
     return data_per_abnormaliy
 
 
-def get_sample_for_samp_tris_plot(sample):
+def get_sample_for_samp_tris_plot(sample: DataBaseSample):
     """Case data for Sample trisomi plot"""
 
     return {
-        "13": {"value": sample.get("Zscore_13"), "x_axis": 1},
-        "18": {"value": sample.get("Zscore_18"), "x_axis": 2},
-        "21": {"value": sample.get("Zscore_21"), "x_axis": 3},
+        "13": {"value": sample.Zscore_13, "x_axis": 1},
+        "18": {"value": sample.Zscore_18, "x_axis": 2},
+        "21": {"value": sample.Zscore_21, "x_axis": 3},
     }
 
 
-def get_last_batches(adapter, nr: int) -> list:
+def get_last_batches(adapter: NiptAdapter, nr: int) -> list:
     """geting the <nr> last batches based on SequencingDate"""
 
     batch_sort_aggregation = [{"$sort": {"SequencingDate": -1}}]
@@ -381,7 +313,7 @@ def get_statistics_for_scatter_plot(batches: list, fields: list) -> dict:
     return scatter_plot_data
 
 
-def get_statistics_for_box_plot(adapter, batches: list, fields: list):
+def get_statistics_for_box_plot(adapter: NiptAdapter, batches: list, fields: list):
     """Getting and formating data for box plot"""
 
     match = {"$match": {"batch_id": {"$in": batches}}}

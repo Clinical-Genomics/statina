@@ -13,4 +13,5 @@ class BatchRequestBody(BaseModel):
 class UserRequestBody(BaseModel):
     email: EmailStr
     username: str
+    password: str
     role: Literal["R", "RW"]

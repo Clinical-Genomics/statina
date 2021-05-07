@@ -8,7 +8,6 @@ from NIPTool.crud import find
 from NIPTool.models.database import Batch, User
 
 router = APIRouter()
-CURRENT_USER = User(username="mayapapaya", email="mayabrandi@123.com", role="RW").dict()
 
 
 @router.post("/")
@@ -115,7 +114,7 @@ def NCV(
             normal_data=get_tris_control_normal(adapter, ncv),
             abnormal_data=get_tris_control_abnormal(adapter, ncv, 0),
             page_id=f"batches_NCV{ncv}",
-            current_user=CURRENT_USER,
+            current_user=user,
         ),
     )
 
@@ -136,7 +135,7 @@ def fetal_fraction_XY(
         "batch/tabs/FF_XY.html",
         context=dict(
             request=request,
-            current_user=CURRENT_USER,
+            current_user=user,
             control=control,
             abnormal=abnormal,
             cases=get_ff_cases(adapter, batch_id),
@@ -162,7 +161,7 @@ def fetal_fraction(
         "batch/tabs/FF.html",
         context=dict(
             request=request,
-            current_user=CURRENT_USER,
+            current_user=user,
             control=get_ff_control_normal(adapter),
             cases=get_ff_cases(adapter, batch_id),
             batch=batch.dict(),
@@ -188,7 +187,7 @@ def coverage(
         "batch/tabs/coverage.html",
         context=dict(
             request=request,
-            current_user=CURRENT_USER,
+            current_user=user,
             batch=batch.dict(),
             x_axis=list(range(1, 23)),
             scatter_data=scatter_data,
@@ -218,7 +217,7 @@ def report(
         "batch/report.html",
         context=dict(
             request=request,
-            current_user=CURRENT_USER,
+            current_user=user,
             batch=batch.dict(),
             # NCV
             ncv_chrom_data={

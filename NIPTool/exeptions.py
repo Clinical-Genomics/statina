@@ -31,3 +31,10 @@ class InsertError(NIPToolRestError):
         self.message = message
         self.code = code
         super().__init__(message, code)
+
+
+class CredentialsError(NIPToolError):
+    def __init__(self, message: str, code: Optional[int] = status.HTTP_401_UNAUTHORIZED):
+        self.message = message
+        self.code = code
+        super().__init__(message)

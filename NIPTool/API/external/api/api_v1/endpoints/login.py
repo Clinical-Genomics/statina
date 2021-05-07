@@ -8,8 +8,8 @@ from fastapi.security import OAuth2PasswordRequestForm
 from NIPTool.API.external.api.deps import (
     authenticate_user,
     create_access_token,
-    temp_get_config,
 )
+from NIPTool.config import settings
 from NIPTool.models.server.login import Token
 from NIPTool.models.database import User
 
@@ -17,9 +17,7 @@ router = APIRouter()
 
 
 @router.post("/token", response_model=Token)
-def login_for_access_token(
-    form_data: OAuth2PasswordRequestForm = Depends(), config: dict = Depends(temp_get_config)
-) -> Optional[str]:
+def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends()) -> Optional[str]:
     """Creating a time delimited access token if the user is found in the database."""
 
     user: User = authenticate_user(form_data.username, form_data.password)
@@ -27,7 +25,7 @@ def login_for_access_token(
     if not user:
         return None
 
-    access_token_expires = datetime.timedelta(minutes=config.get("ACCESS_TOKEN_EXPIRE_MINUTES"))
+    access_token_expires = datetime.timedelta(minutes=settings.access_token_expire_minutes)
 
     return create_access_token(
         username=user.username,

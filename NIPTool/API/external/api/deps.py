@@ -12,16 +12,7 @@ from NIPTool.exeptions import CredentialsError
 from NIPTool.models.server.login import TokenData
 from NIPTool.models.database import User
 from passlib.context import CryptContext
-
-
-def temp_get_config():
-    return {
-        "DB_URI": "mongodb://localhost:27030",
-        "DB_NAME": "nipt-stage",
-        "SECRET_KEY": "97f30d198c86a604f12c22c74077a22cc223009f78fbb8de2065c26cca68e9a5",
-        "ALGORITHM": "HS256",
-        "ACCESS_TOKEN_EXPIRE_MINUTES": 10,
-    }
+from NIPTool.config import settings
 
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
@@ -29,7 +20,6 @@ pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 def get_current_user(
     request: Request,
-    config: dict = Depends(temp_get_config),
     adapter: NiptAdapter = Depends(get_nipt_adapter),
 ) -> User:
     """Decoding user from token stored in cookies."""
@@ -37,8 +27,8 @@ def get_current_user(
     try:
         payload = jwt.decode(
             request.cookies.get("token"),
-            config.get("SECRET_KEY"),
-            algorithms=[config.get("ALGORITHM")],
+            settings.secret_key,
+            algorithms=[settings.algorithm],
         )
         username: str = payload.get("sub")
         if username is None:
@@ -74,11 +64,10 @@ def authenticate_user(username: str, password: str) -> Optional[User]:
 def create_access_token(
     username: str, form_data: OAuth2PasswordRequestForm, expires_delta: Optional[timedelta] = None
 ) -> str:
-    configs: dict = temp_get_config()
     to_encode = {"sub": username, "scopes": form_data.scopes}
     if expires_delta:
         expire = datetime.utcnow() + expires_delta
     else:
         expire = datetime.utcnow() + timedelta(minutes=15)
     to_encode.update({"exp": expire})
-    return jwt.encode(to_encode, configs.get("SECRET_KEY"), algorithm=configs.get("ALGORITHM"))
+    return jwt.encode(to_encode, settings.secret_key, algorithm=settings.algorithm)

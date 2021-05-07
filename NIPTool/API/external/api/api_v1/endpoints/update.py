@@ -17,8 +17,6 @@ router = APIRouter()
 
 LOG = logging.getLogger(__name__)
 
-USER = User(username="mayapapaya", email="mayapapaya@mail.com", role="RW")
-
 
 @router.post("/set_sample_status")
 async def set_sample_status(
@@ -30,7 +28,7 @@ async def set_sample_status(
 
     form = await request.form()
 
-    if USER.role != "RW":
+    if user.role != "RW":
         return RedirectResponse(request.headers.get("referer"))
 
     sample_id: str = form["sample_id"]
@@ -50,7 +48,7 @@ async def set_sample_status(
         )
         time_stamp: str = datetime.now().strftime("%Y/%m/%d %H:%M:%S")
         sample[abnormality_key] = new_abnormality_status
-        sample[f"status_change_{abnormality}"] = f"{USER.username} {time_stamp}"
+        sample[f"status_change_{abnormality}"] = f"{user.username} {time_stamp}"
 
     update.sample(adapter=adapter, sample=Sample(**sample))
     return RedirectResponse(request.headers.get("referer"))
@@ -66,7 +64,7 @@ async def sample_comment(
 
     form = await request.form()
 
-    if USER.role != "RW":
+    if user.role != "RW":
         return RedirectResponse(request.headers.get("referer"))
 
     sample_id: str = form["sample_id"]
@@ -89,20 +87,20 @@ async def include_samples(
 
     form = await request.form()
 
-    if USER.role != "RW":
+    if user.role != "RW":
         return RedirectResponse(request.headers.get("referer"))
 
     button_id = form.get("button_id")
     samples: Iterable[str] = form.getlist("samples")
     if button_id == "include all samples":
-        include_all_samples(samples=samples, adapter=adapter)
+        include_all_samples(samples=samples, adapter=adapter, user=user)
     elif button_id == "Save":
-        save_samples(samples=samples, form=form, adapter=adapter)
+        save_samples(samples=samples, form=form, adapter=adapter, user=user)
 
     return RedirectResponse(request.headers.get("referer"))
 
 
-def save_samples(samples: Iterable[str], form: FormData, adapter: NiptAdapter):
+def save_samples(samples: Iterable[str], form: FormData, adapter: NiptAdapter, user: User):
     """Function to update sample.comment and sample.include."""
 
     time_stamp: str = datetime.now().strftime("%Y/%m/%d %H:%M:%S")
@@ -114,13 +112,13 @@ def save_samples(samples: Iterable[str], form: FormData, adapter: NiptAdapter):
             sample.comment = comment
         if include and not sample.include:
             sample.include = True
-            sample.change_include_date = f"{USER.username} {time_stamp}"
+            sample.change_include_date = f"{user.username} {time_stamp}"
         elif not include and sample.include:
             sample.include = False
         update.sample(adapter=adapter, sample=sample)
 
 
-def include_all_samples(samples: Iterable[str], adapter: NiptAdapter):
+def include_all_samples(samples: Iterable[str], adapter: NiptAdapter, user: User):
     """Function to set sample.include=True for all samples."""
 
     time_stamp: str = datetime.now().strftime("%Y/%m/%d %H:%M:%S")
@@ -129,5 +127,5 @@ def include_all_samples(samples: Iterable[str], adapter: NiptAdapter):
         if sample.include:
             continue
         sample.include = True
-        sample.change_include_date = f"{USER.username} {time_stamp}"
+        sample.change_include_date = f"{user.username} {time_stamp}"
         update.sample(adapter=adapter, sample=sample)

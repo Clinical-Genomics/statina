@@ -50,8 +50,8 @@ def sample_download(
     sample: dict = find.sample(adapter=adapter, sample_id=sample_id).dict()
     file_path = sample.get(file_id)
     if not validate_file_path(file_path):
-        # handle the redirect response!
-        return RedirectResponse(request.url)
+        # warn file missing!
+        return RedirectResponse(request.headers.get("referer"))
 
     file = Path(file_path)
     return FileResponse(

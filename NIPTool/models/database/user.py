@@ -1,13 +1,12 @@
 from datetime import datetime
-from typing import Optional
+from typing import Literal
 
-from pydantic import BaseModel
+from pydantic import BaseModel, EmailStr
 
 
 class User(BaseModel):
     username: str
-    email: Optional[str] = None
-    disabled: Optional[bool] = None
-    added: Optional[datetime] = None
-    role: Optional[str] = None
-    hashed_password: Optional[str]
+    email: EmailStr
+    added: datetime
+    role: Literal["R", "RW"]
+    hashed_password: str

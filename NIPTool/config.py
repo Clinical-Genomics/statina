@@ -17,7 +17,10 @@ class Settings(BaseSettings):
 
     db_uri: str = "mongodb://localhost:27017/nipt-demo"
     db_name: str = "nipt-demo"
+    secret_key: str = "dummy"
+    algorithm: str = "ABC"
     host: str = "localhost"
+    access_token_expire_minutes: int = 30
     port: int = 8000
 
     class Config:

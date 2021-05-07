@@ -1,9 +1,11 @@
 import logging
+from datetime import datetime
 from typing import Dict, List, Optional
 
+from NIPTool.API.external.api.deps import get_password_hash
 from NIPTool.adapter import NiptAdapter
 from NIPTool.exeptions import InsertError
-from NIPTool.models.database import Batch, Sample
+from NIPTool.models.database import Batch, Sample, User
 from NIPTool.models.server.load import BatchRequestBody, UserRequestBody
 from NIPTool.parse.batch import parse_segmental_calls
 from pymongo.results import InsertManyResult, InsertOneResult
@@ -45,20 +47,15 @@ def insert_samples(
     return result.inserted_ids
 
 
-def insert_user(adapter: NiptAdapter, user: UserRequestBody) -> str:
+def insert_user(adapter: NiptAdapter, user: User) -> str:
     """Function to load a new user to the database."""
 
-    user_dict = {
-        "email": user.email,
-        "username": user.username,
-        "role": user.role,
-    }
     # Check that the username is unique, this should be controlled by creating a index with restrictions
     existing_user: Optional[dict] = adapter.user_collection.find_one({"username": user.username})
     if existing_user:
         raise InsertError(f"User with username {user.username} already exist in database.")
     try:
-        result: InsertOneResult = adapter.user_collection.insert_one(user_dict)
+        result: InsertOneResult = adapter.user_collection.insert_one(user.dict())
         LOG.info("Added user document %s.", user.email)
     except:
         raise InsertError(f"User {user.email} already in database.")

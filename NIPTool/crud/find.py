@@ -2,6 +2,7 @@ from typing import Iterable, List, Optional
 
 from NIPTool.adapter import NiptAdapter
 from NIPTool.models.database import Batch, Sample, User
+
 from pydantic import parse_obj_as
 
 
@@ -17,7 +18,6 @@ def user(
         raise SyntaxError("Have to use email or user_name")
     if not raw_user:
         return None
-
     return User(**raw_user)
 
 

@@ -1,27 +1,30 @@
 from fastapi import APIRouter, Depends, Request
+
+from NIPTool.API.external.api.deps import get_current_user
 from NIPTool.adapter.plugin import NiptAdapter
-from NIPTool.API.external.constants import TRISOMI_TRESHOLDS
 from NIPTool.API.external.utils import *
 from NIPTool.config import get_nipt_adapter, templates
 from NIPTool.crud import find
 from NIPTool.models.database import Batch, User
 
 router = APIRouter()
-CURRENT_USER = User(username="mayapapaya", email="mayabrandi@123.com", role="RW").dict()
 
 
 @router.post("/")
 def batches(
-    request: Request, adapter: NiptAdapter = Depends(get_nipt_adapter)
-):  # , user: User = Depends(get_current_active_user)):
+    request: Request,
+    adapter: NiptAdapter = Depends(get_nipt_adapter),
+    user: User = Depends(get_current_user),
+):
     """List of all batches"""
+
     all_batches: List[Batch] = find.batches(adapter=adapter)
     return templates.TemplateResponse(
         "batches.html",
         context={
             "request": request,
             "batches": all_batches,
-            "current_user": CURRENT_USER,
+            "current_user": user,
             "page_id": "all_batches",
         },
     )
@@ -29,24 +32,30 @@ def batches(
 
 @router.get("/")
 def batches(
-    request: Request, adapter: NiptAdapter = Depends(get_nipt_adapter)
-):  # , user: User = Depends(get_current_active_user)):
+    request: Request,
+    adapter: NiptAdapter = Depends(get_nipt_adapter),
+    user: User = Depends(get_current_user),
+):
     """List of all batches"""
     all_batches: List[Batch] = find.batches(adapter=adapter)
-
     return templates.TemplateResponse(
         "batches.html",
         context={
             "request": request,
             "batches": all_batches,
-            "current_user": CURRENT_USER,
+            "current_user": user,
             "page_id": "all_batches",
         },
     )
 
 
-@router.get("/{batch_id}/")
-def batch(request: Request, batch_id: str, adapter: NiptAdapter = Depends(get_nipt_adapter)):
+@router.post("/{batch_id}/")
+def batch(
+    request: Request,
+    batch_id: str,
+    adapter: NiptAdapter = Depends(get_nipt_adapter),
+    user: User = Depends(get_current_user),
+):
     """Batch view with table of all samples in the batch."""
 
     samples: List[Sample] = find.batch_samples(batch_id=batch_id, adapter=adapter)
@@ -57,15 +66,19 @@ def batch(request: Request, batch_id: str, adapter: NiptAdapter = Depends(get_ni
             "batch": find.batch(batch_id=batch_id, adapter=adapter),
             "sample_info": [get_sample_info(sample) for sample in samples],
             "page_id": "batches",
-            "current_user": CURRENT_USER,
+            "current_user": user,
         },
     )
 
 
-@router.post("/{batch_id}/")
-def batch(request: Request, batch_id: str, adapter: NiptAdapter = Depends(get_nipt_adapter)):
+@router.get("/{batch_id}/")
+def batch(
+    request: Request,
+    batch_id: str,
+    adapter: NiptAdapter = Depends(get_nipt_adapter),
+    user: User = Depends(get_current_user),
+):
     """Batch view with table of all samples in the batch."""
-
     samples: List[Sample] = find.batch_samples(batch_id=batch_id, adapter=adapter)
     return templates.TemplateResponse(
         "batch/tabs/table.html",
@@ -74,13 +87,19 @@ def batch(request: Request, batch_id: str, adapter: NiptAdapter = Depends(get_ni
             "batch": find.batch(batch_id=batch_id, adapter=adapter),
             "sample_info": [get_sample_info(sample) for sample in samples],
             "page_id": "batches",
-            "current_user": CURRENT_USER,
+            "current_user": user,
         },
     )
 
 
 @router.get("/{batch_id}/{ncv}")
-def NCV(request: Request, batch_id: str, ncv, adapter: NiptAdapter = Depends(get_nipt_adapter)):
+def NCV(
+    request: Request,
+    batch_id: str,
+    ncv,
+    adapter: NiptAdapter = Depends(get_nipt_adapter),
+    user: User = Depends(get_current_user),
+):
     """Batch view with with NCV plot"""
     batch: Batch = find.batch(batch_id=batch_id, adapter=adapter)
 
@@ -95,14 +114,17 @@ def NCV(request: Request, batch_id: str, ncv, adapter: NiptAdapter = Depends(get
             normal_data=get_tris_control_normal(adapter, ncv),
             abnormal_data=get_tris_control_abnormal(adapter, ncv, 0),
             page_id=f"batches_NCV{ncv}",
-            current_user=CURRENT_USER,
+            current_user=user,
         ),
     )
 
 
 @router.get("/batches/{batch_id}/fetal_fraction_XY")
 def fetal_fraction_XY(
-    request: Request, batch_id: str, adapter: NiptAdapter = Depends(get_nipt_adapter)
+    request: Request,
+    batch_id: str,
+    adapter: NiptAdapter = Depends(get_nipt_adapter),
+    user: User = Depends(get_current_user),
 ):
     """Batch view with fetal fraction (X against Y) plot"""
     batch: Batch = find.batch(batch_id=batch_id, adapter=adapter)
@@ -113,7 +135,7 @@ def fetal_fraction_XY(
         "batch/tabs/FF_XY.html",
         context=dict(
             request=request,
-            current_user=CURRENT_USER,
+            current_user=user,
             control=control,
             abnormal=abnormal,
             cases=get_ff_cases(adapter, batch_id),
@@ -127,7 +149,10 @@ def fetal_fraction_XY(
 
 @router.get("/batches/{batch_id}/fetal_fraction")
 def fetal_fraction(
-    request: Request, batch_id: str, adapter: NiptAdapter = Depends(get_nipt_adapter)
+    request: Request,
+    batch_id: str,
+    adapter: NiptAdapter = Depends(get_nipt_adapter),
+    user: User = Depends(get_current_user),
 ):
     """Batch view with fetal fraction plot"""
     batch: Batch = find.batch(batch_id=batch_id, adapter=adapter)
@@ -136,7 +161,7 @@ def fetal_fraction(
         "batch/tabs/FF.html",
         context=dict(
             request=request,
-            current_user=CURRENT_USER,
+            current_user=user,
             control=get_ff_control_normal(adapter),
             cases=get_ff_cases(adapter, batch_id),
             batch=batch.dict(),
@@ -146,7 +171,12 @@ def fetal_fraction(
 
 
 @router.get("/batches/{batch_id}/coverage")
-def coverage(request: Request, batch_id: str, adapter: NiptAdapter = Depends(get_nipt_adapter)):
+def coverage(
+    request: Request,
+    batch_id: str,
+    adapter: NiptAdapter = Depends(get_nipt_adapter),
+    user: User = Depends(get_current_user),
+):
     """Batch view with coverage plot"""
     batch: Batch = find.batch(batch_id=batch_id, adapter=adapter)
     samples: List[Sample] = find.batch_samples(batch_id=batch_id, adapter=adapter)
@@ -157,7 +187,7 @@ def coverage(request: Request, batch_id: str, adapter: NiptAdapter = Depends(get
         "batch/tabs/coverage.html",
         context=dict(
             request=request,
-            current_user=CURRENT_USER,
+            current_user=user,
             batch=batch.dict(),
             x_axis=list(range(1, 23)),
             scatter_data=scatter_data,
@@ -169,7 +199,11 @@ def coverage(request: Request, batch_id: str, adapter: NiptAdapter = Depends(get
 
 @router.get("/batches/{batch_id}/report/{coverage}")
 def report(
-    request: Request, batch_id: str, coverage: str, adapter: NiptAdapter = Depends(get_nipt_adapter)
+    request: Request,
+    batch_id: str,
+    coverage: str,
+    adapter: NiptAdapter = Depends(get_nipt_adapter),
+    user: User = Depends(get_current_user),
 ):
     """Report view, collecting all tables and plots from one batch."""
 
@@ -183,7 +217,7 @@ def report(
         "batch/report.html",
         context=dict(
             request=request,
-            current_user=CURRENT_USER,
+            current_user=user,
             batch=batch.dict(),
             # NCV
             ncv_chrom_data={

@@ -10,13 +10,12 @@ from NIPTool.API.external.api.deps import (
     create_access_token,
 )
 from NIPTool.config import settings
-from NIPTool.models.server.login import Token
 from NIPTool.models.database import User
 
 router = APIRouter()
 
 
-@router.post("/token", response_model=Token)
+@router.post("/token")
 def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends()) -> Optional[str]:
     """Creating a time delimited access token if the user is found in the database."""
 

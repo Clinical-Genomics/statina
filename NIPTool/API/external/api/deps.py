@@ -9,7 +9,6 @@ from NIPTool.crud import find
 from NIPTool.adapter.plugin import NiptAdapter
 from NIPTool.exeptions import CredentialsError
 
-from NIPTool.models.server.login import TokenData
 from NIPTool.models.database import User
 from passlib.context import CryptContext
 from NIPTool.config import settings
@@ -33,10 +32,9 @@ def get_current_user(
         username: str = payload.get("sub")
         if username is None:
             raise CredentialsError(message="Could not validate credentials")
-        token_data = TokenData(username=username)
     except JWTError:
         raise CredentialsError(message="Could not validate credentials")
-    user: User = find.user(adapter=adapter, user_name=token_data.username)
+    user: User = find.user(adapter=adapter, user_name=username)
     if not user:
         raise CredentialsError(message="User not found in database.")
     return user

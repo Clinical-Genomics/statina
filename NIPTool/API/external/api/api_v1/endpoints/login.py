@@ -1,7 +1,7 @@
 import datetime
 from typing import Optional
 
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, Request
 from fastapi.responses import RedirectResponse
 from fastapi.security import OAuth2PasswordRequestForm
 
@@ -32,6 +32,15 @@ def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends()) -> 
         form_data=form_data,
         expires_delta=access_token_expires,
     )
+
+
+@router.get("/logout")
+def logout():
+    """Drop token from cookie and redirects back to index"""
+
+    response = RedirectResponse("../")
+    response.set_cookie(key="token", value="")
+    return response
 
 
 @router.post("/login")

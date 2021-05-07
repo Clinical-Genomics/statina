@@ -152,6 +152,34 @@ class Sample(DataBaseSample):
     text_warning: Optional[str]
     status: Optional[str]
 
+    @validator("Zscore_13")
+    def round_zscore_13(cls, v):
+        return round(v, 2)
+
+    @validator("Zscore_18")
+    def round_zscore_18(cls, v):
+        return round(v, 2)
+
+    @validator("Zscore_21")
+    def round_zscore_21(cls, v):
+        return round(v, 2)
+
+    @validator("Zscore_X")
+    def round_zscore_x(cls, v):
+        return round(v, 2)
+
+    @validator("FF_Formatted")
+    def round_ff(cls, v):
+        return round(v, 2)
+
+    @validator("FFX")
+    def round_ffx(cls, v):
+        return round(v, 2)
+
+    @validator("FFY")
+    def round_ffy(cls, v):
+        return round(v, 2)
+
     @validator("status", always=True)
     def set_status(cls, v, values: dict) -> str:
 

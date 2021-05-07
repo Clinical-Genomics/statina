@@ -18,7 +18,7 @@ def sample(
 ):
     """Get sample with id"""
 
-    sample: Sample = find.sample(sample_id=sample_id, adapter=adapter)
+    sample: DataBaseSample = find.sample(sample_id=sample_id, adapter=adapter)
     batch: Batch = find.batch(batch_id=sample.batch_id, adapter=adapter)
 
     return templates.TemplateResponse(
@@ -44,7 +44,7 @@ def sample(
 ):
     """Post sample with id"""
 
-    sample: Sample = find.sample(sample_id=sample_id, adapter=adapter)
+    sample: DataBaseSample = find.sample(sample_id=sample_id, adapter=adapter)
     batch: Batch = find.batch(batch_id=sample.batch_id, adapter=adapter)
 
     return templates.TemplateResponse(
@@ -69,7 +69,7 @@ def sample_tris(
     user: User = Depends(get_current_user),
 ):
     """Sample view with trisomi plot."""
-    sample: Sample = find.sample(sample_id=sample_id, adapter=adapter)
+    sample: DataBaseSample = find.sample(sample_id=sample_id, adapter=adapter)
     batch: Batch = find.batch(batch_id=sample.batch_id, adapter=adapter)
     abnormal_data, data_per_abnormaliy = get_abn_for_samp_tris_plot(adapter=adapter)
     normal_data = get_normal_for_samp_tris_plot(adapter=adapter)
@@ -99,8 +99,8 @@ def sample_tris(
     user: User = Depends(get_current_user),
 ):
     """Sample view with trisomi plot."""
-    sample: dict = find.sample(sample_id=sample_id, adapter=adapter).dict()
-    batch: Batch = find.batch(batch_id=sample.get("batch_id"), adapter=adapter)
+    sample: DataBaseSample = find.sample(sample_id=sample_id, adapter=adapter)
+    batch: Batch = find.batch(batch_id=sample.batch_id, adapter=adapter)
     abnormal_data, data_per_abnormaliy = get_abn_for_samp_tris_plot(adapter=adapter)
     normal_data = get_normal_for_samp_tris_plot(adapter=adapter)
     sample_data = get_sample_for_samp_tris_plot(sample)
@@ -113,7 +113,7 @@ def sample_tris(
             normal_data=normal_data,
             abnormal_data=abnormal_data,
             sample_data=sample_data,
-            sample=sample,
+            sample=sample.dict(),
             batch=batch,
             status_colors=STATUS_COLORS,
             page_id="sample_tris",

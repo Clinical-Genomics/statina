@@ -2,7 +2,7 @@ from typing import List
 
 from fastapi import APIRouter, Depends, Request
 
-from NIPTool.API.external.api.api_v1.models.sample import Sample
+from NIPTool.models.server.sample import Sample
 from NIPTool.crud.find import find
 import NIPTool.crud.find.aggregations.fetal_fraction_plot_data as get_fetal_fraction
 from NIPTool.crud.find.aggregations.coverage_plot_data import (
@@ -14,7 +14,7 @@ from NIPTool.crud.find.aggregations.ncv_plot_data import (
     get_tris_control_abnormal,
     get_tris_cases,
 )
-from NIPTool.API.external.api.api_v1.models.plots.fetal_fraction import (
+from NIPTool.models.server.plots import (
     FetalFraction,
     FetalFractionControlAbNormal,
 )

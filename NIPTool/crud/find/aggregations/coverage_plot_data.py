@@ -1,10 +1,10 @@
 from typing import List, Dict
 
-from NIPTool.API.external.api.api_v1.models.sample import (
+from NIPTool.models.server.sample import (
     SampleWarning,
     Sample,
 )
-from NIPTool.API.external.api.api_v1.models.plots.coverage import CoveragePlotSampleData
+from NIPTool.models.server.plots.coverage import CoveragePlotSampleData
 from NIPTool.models.database import DataBaseSample
 
 

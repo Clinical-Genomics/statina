@@ -1,4 +1,4 @@
-from NIPTool.API.external.api.api_v1.models.plots.ncv import NCVSamples
+from NIPTool.models.server.plots.ncv import NCVSamples
 from NIPTool.API.external.constants import STATUS_CLASSES
 from NIPTool.adapter import NiptAdapter
 from NIPTool.crud.find import find

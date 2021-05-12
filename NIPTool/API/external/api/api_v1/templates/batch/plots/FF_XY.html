@@ -38,13 +38,13 @@
         var i = 0
 
 
-    {% for sample in cases %}
+    {% for name in cases['names'] %}
         var NCVXYsamps = {
-            y: [{{cases[sample]['FFY']}}],
-            x: [{{cases[sample]['FFX']}}],
-            name: "{{sample}}",
+            y: [{{cases['FFY'][loop.index]}}],
+            x: [{{cases['FFX'][loop.index]}}],
+            name: {{name|tojson}},
             mode: 'markers',
-            text: "{{sample}}",
+            text: {{name|tojson}},
             type: 'scatter'}
         data.push(NCVXYsamps);
     {% endfor %}

@@ -6,7 +6,7 @@ from fastapi.responses import FileResponse, RedirectResponse
 from NIPTool.API.external.api.deps import get_current_user
 from NIPTool.adapter.plugin import NiptAdapter
 from NIPTool.config import get_nipt_adapter, templates
-from NIPTool.crud import find
+from NIPTool.crud.find import find
 from NIPTool.models.database import User
 from NIPTool.parse.batch import validate_file_path
 

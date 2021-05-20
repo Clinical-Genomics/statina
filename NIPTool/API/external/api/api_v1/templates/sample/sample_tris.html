@@ -26,7 +26,7 @@
         legend:{hovermode:'closest' },
         hovermode:'closest',
         annotations : [],
-        xaxisnormal_data :{showline: true,
+        xaxis :{showline: true,
             tickvals : [1,2,3],
             ticktext : ['NCV13','NCV18','NCV21'],
             linecolor: '#636363',
@@ -46,12 +46,12 @@
 
     var data = []
 
-    {% for status  in abnormal_data %} 
+    {% for status, data  in abnormal_data.items() %}
         var abnormal = {                                                                  
             name: "{{status}}",                                                               
-            y: {{abnormal_data[status]['values']}},                                        
-            x: {{abnormal_data[status]['x_axis']}},
-            text: {{abnormal_data[status]['names']|tojson}},
+            y: {{data.ncv_values}},
+            x: {{data.x_axis}},
+            text: {{data.names|tojson}},
             mode: 'markers',
             marker: {symbol :"circle-open",
                 line: {width:2}, 
@@ -62,37 +62,36 @@
         data.push(abnormal)
     {% endfor %}
 
-    var colors = ['#1a1aff','#00bfff','#1affff']
 
-    {% for chrom  in ['13','18','21'] %}
+    var sample_data = {
+            name: "{{sample.sample_id}}",
+            y: {{sample_data.ncv_values}},
+            x: {{sample_data.x_axis}},
+            mode: 'markers',
+            type: 'scatter',
+            marker: {size: 11}
+            };
+        data.push(sample_data)
+
+    {% for chrom, data  in normal_data.items() %}
 
         var normal = {
-            y: {{normal_data[chrom]['values']}},
-            x: {{[loop.index] * normal_data[chrom]['values']|length}},
+            y: {{data.ncv_values}},
+            x: {{data.x_axis}},
             pointpos: 30,
             type: 'box',
             showlegend: true,
             marker: {
                 color: '#ccccb3'},
-                name: 'Negative T{{chrom}} (N={{normal_data[chrom]['count']}})',
+                name: 'Negative T{{chrom}} (N={{data.count}})',
                 hoverinfo:'none',
                 boxpoints: 'suspectedoutliers',
             };
                     
-        var sample = {
-            y: [{{sample_data[chrom]['value']}}],
-            x: [{{sample_data[chrom]['x_axis']}}],
-            name: "{{chrom}}",
-            mode: 'markers',
-            type: 'scatter',
-            marker: {
 
-                size: 11}
-            };
                 
                 
         data.push(normal); 
-        data.push(sample); 
     {% endfor %}
 
     Plotly.newPlot('plot_131821' ,data,  layout);

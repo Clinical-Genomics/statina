@@ -1,7 +1,8 @@
-from typing import List
+from typing import List, Dict
 
 from fastapi import APIRouter, Depends, Request
 
+from NIPTool.models.server.plots.coverage import CoveragePlotSampleData
 from NIPTool.models.server.sample import Sample
 from NIPTool.crud.find import find
 import NIPTool.crud.find.plots.fetal_fraction_plot_data as get_fetal_fraction
@@ -12,7 +13,8 @@ from NIPTool.crud.find.plots.coverage_plot_data import (
 from NIPTool.crud.find.plots.ncv_plot_data import (
     get_tris_control_normal,
     get_tris_control_abnormal,
-    get_tris_cases,
+    get_tris_samples,
+    get_samples_for_report_ncv_plot,
 )
 from NIPTool.models.server.plots.fetal_fraction import (
     FetalFraction,
@@ -114,7 +116,7 @@ def batch(
 def NCV(
     request: Request,
     batch_id: str,
-    ncv,
+    ncv: str,
     adapter: NiptAdapter = Depends(get_nipt_adapter),
     user: User = Depends(get_current_user),
 ):
@@ -129,7 +131,7 @@ def NCV(
             tris_thresholds=TRISOMI_TRESHOLDS,
             batch=batch.dict(),
             chr=ncv,
-            ncv_chrom_data={ncv: get_tris_cases(adapter, ncv, batch_id)},
+            ncv_chrom_data={ncv: get_tris_samples(adapter, ncv, batch_id)},
             normal_data=get_tris_control_normal(adapter, ncv),
             abnormal_data=get_tris_control_abnormal(adapter, ncv, 0),
             page_id=f"batches_NCV{ncv}",
@@ -146,6 +148,7 @@ def fetal_fraction_XY(
     user: User = Depends(get_current_user),
 ):
     """Batch view with fetal fraction (X against Y) plot"""
+
     batch: Batch = find.batch(batch_id=batch_id, adapter=adapter)
 
     control: FetalFraction = get_fetal_fraction.samples(adapter)
@@ -185,7 +188,6 @@ def fetal_fraction(
 ):
     """Batch view with fetal fraction plot"""
     batch: Batch = find.batch(batch_id=batch_id, adapter=adapter)
-    print(get_fetal_fraction.samples(adapter, batch_id=batch_id))
     return templates.TemplateResponse(
         "batch/tabs/FF.html",
         context=dict(
@@ -211,8 +213,8 @@ def coverage(
     db_samples: List[DataBaseSample] = find.batch_samples(batch_id=batch_id, adapter=adapter)
     samples: List[Sample] = [Sample(**db_sample.dict()) for db_sample in db_samples]
 
-    scatter_data = get_scatter_data_for_coverage_plot(samples)
-    box_data = get_box_data_for_coverage_plot(samples)
+    scatter_data: Dict[str, CoveragePlotSampleData] = get_scatter_data_for_coverage_plot(samples)
+    box_data: Dict[int, List[float]] = get_box_data_for_coverage_plot(samples)
     return templates.TemplateResponse(
         "batch/tabs/coverage.html",
         context=dict(
@@ -237,13 +239,12 @@ def report(
 ):
     """Report view, collecting all tables and plots from one batch."""
 
-    batch: Batch = find.batch(batch_id=batch_id, adapter=adapter)
     db_samples: List[DataBaseSample] = find.batch_samples(batch_id=batch_id, adapter=adapter)
     samples: List[Sample] = [Sample(**db_sample.dict()) for db_sample in db_samples]
 
-    scatter_data = get_scatter_data_for_coverage_plot(samples)
-    box_data = get_box_data_for_coverage_plot(samples)
-    control = get_fetal_fraction.samples(adapter)
+    scatter_data: Dict[str, CoveragePlotSampleData] = get_scatter_data_for_coverage_plot(samples)
+    box_data: Dict[int, List[float]] = get_box_data_for_coverage_plot(samples)
+    control: FetalFraction = get_fetal_fraction.samples(adapter)
     abnormal: FetalFractionControlAbNormal = get_fetal_fraction.control_abnormal(adapter)
     abnormal_dict = abnormal.dict(
         exclude_none=True,
@@ -262,11 +263,9 @@ def report(
             current_user=user,
             batch=find.batch(batch_id=batch_id, adapter=adapter),
             # NCV
-            ncv_chrom_data={
-                "13": get_tris_cases(adapter, "13", batch_id),
-                "18": get_tris_cases(adapter, "18", batch_id),
-                "21": get_tris_cases(adapter, "21", batch_id),
-            },
+            ncv_chrom_data=get_samples_for_report_ncv_plot(adapter, batch_id).dict(
+                exclude_none=True, by_alias=True
+            ),
             normal_data=get_tris_control_normal(adapter, "21"),  ####?????????????????????
             abnormal_data=get_tris_control_abnormal(adapter, "21", 0),
             # FF

@@ -5,7 +5,7 @@ from fastapi.responses import FileResponse, RedirectResponse
 
 from NIPTool.API.external.api.deps import get_current_user
 from NIPTool.adapter.plugin import NiptAdapter
-from NIPTool.config import get_nipt_adapter, templates
+from NIPTool.config import get_nipt_adapter
 from NIPTool.crud.find import find
 from NIPTool.models.database import User
 from NIPTool.parse.batch import validate_file_path
@@ -27,7 +27,6 @@ def batch_download(
     file_path = batch.get(file_id)
 
     if not validate_file_path(file_path):
-        # handle the redirect response!
         return RedirectResponse(request.url)
 
     path = Path(file_path)

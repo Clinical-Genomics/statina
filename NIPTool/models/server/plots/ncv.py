@@ -5,9 +5,13 @@ from pydantic import BaseModel, Field
 class NCVSamples(BaseModel):
     """validate length of all lists the same"""
 
-    values: List[float]
+    ncv_values: List[float]
     names: List[str]
-    count: int
+    count: Optional[int]
+    x_axis: Optional[List[int]]
+
+    class Config:
+        validate_assignment = True
 
 
 class NCVStatus(BaseModel):
@@ -20,7 +24,10 @@ class NCVStatus(BaseModel):
     failed: Optional[NCVSamples] = Field(alias="Failed")
 
 
-class NCVControl(BaseModel):
-    ncv_13: Optional[NCVStatus] = Field(..., alias="13")
-    ncv_18: Optional[NCVStatus] = Field(..., alias="18")
-    ncv_21: Optional[NCVStatus] = Field(..., alias="21")
+class NCV131821(BaseModel):
+    ncv_13: NCVSamples = Field(..., alias="13")
+    ncv_18: NCVSamples = Field(..., alias="18")
+    ncv_21: NCVSamples = Field(..., alias="21")
+
+    class Config:
+        allow_population_by_field_name = True

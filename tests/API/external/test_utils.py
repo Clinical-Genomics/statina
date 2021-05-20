@@ -1,8 +1,8 @@
 from NIPTool.adapter import NiptAdapter
-from NIPTool.API.external.utils import (
+from NIPTool.crud.find.get import (
     get_last_batches,
-    get_statistics_for_box_plot,
     get_statistics_for_scatter_plot,
+    get_statistics_for_box_plot,
 )
 
 

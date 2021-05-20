@@ -1,4 +1,4 @@
-from NIPTool.models.server.plots.ncv import NCVSamples
+from NIPTool.models.server.plots.ncv import NCVSamples, NCVControl, NCVStatus
 from NIPTool.API.external.constants import STATUS_CLASSES
 from NIPTool.adapter import NiptAdapter
 from NIPTool.crud.find import find
@@ -26,7 +26,7 @@ def get_tris_control_normal(adapter: NiptAdapter, chr) -> NCVSamples:
     return NCVSamples(**data)
 
 
-def get_tris_control_abnormal(adapter: NiptAdapter, chr, x_axis):
+def get_tris_control_abnormal(adapter: NiptAdapter, chr):
     """Abnormal Control Samples for trisomi plots"""
 
     ##Continue here
@@ -52,12 +52,12 @@ def get_tris_control_abnormal(adapter: NiptAdapter, chr, x_axis):
 
     for status_dict in find.sample_aggregate(pipe=pipe, adapter=adapter):
         status = status_dict["_id"][f"status_{chr}"]
-        plot_data[status] = {
-            "values": [value for value in status_dict.get("values")],
-            "names": status_dict.get("names"),
-            "count": status_dict.get("count"),
-            "x_axis": [x_axis] * status_dict.get("count"),
-        }
+        plot_data[status] = NCVSamples(
+            values=[value for value in status_dict.get("values")],
+            names=status_dict.get("names"),
+            count=status_dict.get("count"),
+        )
+
     return plot_data
 
 
@@ -94,7 +94,7 @@ def get_abn_for_samp_tris_plot(adapter: NiptAdapter):
         plot_data[status] = {"values": [], "names": [], "count": 0, "x_axis": []}
     x_axis = 1
     for abn in ["13", "18", "21"]:
-        data = get_tris_control_abnormal(adapter, abn, x_axis)
+        data: NCVStatus = get_tris_control_abnormal(adapter, abn)
         data_per_abnormaliy[abn] = data
 
         for status, status_dict in data.items():
@@ -104,20 +104,19 @@ def get_abn_for_samp_tris_plot(adapter: NiptAdapter):
             plot_data[status]["x_axis"] += status_dict.get("x_axis", [])
         x_axis += 1
 
+    print(data_per_abnormaliy)
+    print(plot_data)
     return plot_data, data_per_abnormaliy
 
 
 def get_normal_for_samp_tris_plot(adapter: NiptAdapter):
     """Format normal Control Samples for Sample trisomi plot"""
 
-    data_per_abnormaliy = {}
-    x_axis = 1
-    for abn in ["13", "18", "21"]:
-        data = get_tris_control_normal(adapter, abn)
-        data["x_axis"] = [x_axis] * data.get("count", 0)
-        data_per_abnormaliy[abn] = data
-        x_axis += 1
-    return data_per_abnormaliy
+    return {
+        "13": get_tris_control_normal(adapter, "13"),
+        "18": get_tris_control_normal(adapter, "18"),
+        "21": get_tris_control_normal(adapter, "21"),
+    }
 
 
 def get_sample_for_samp_tris_plot(sample: DataBaseSample):

@@ -4,17 +4,17 @@ from fastapi import APIRouter, Depends, Request
 
 from NIPTool.models.server.sample import Sample
 from NIPTool.crud.find import find
-import NIPTool.crud.find.aggregations.fetal_fraction_plot_data as get_fetal_fraction
-from NIPTool.crud.find.aggregations.coverage_plot_data import (
+import NIPTool.crud.find.plots.fetal_fraction_plot_data as get_fetal_fraction
+from NIPTool.crud.find.plots.coverage_plot_data import (
     get_scatter_data_for_coverage_plot,
     get_box_data_for_coverage_plot,
 )
-from NIPTool.crud.find.aggregations.ncv_plot_data import (
+from NIPTool.crud.find.plots.ncv_plot_data import (
     get_tris_control_normal,
     get_tris_control_abnormal,
     get_tris_cases,
 )
-from NIPTool.models.server.plots import (
+from NIPTool.models.server.plots.fetal_fraction import (
     FetalFraction,
     FetalFractionControlAbNormal,
 )

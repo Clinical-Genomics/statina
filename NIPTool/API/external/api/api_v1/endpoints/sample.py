@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Depends, Request
 
-from NIPTool.crud.find.aggregations.ncv_plot_data import (
+from NIPTool.crud.find.plots.ncv_plot_data import (
     get_abn_for_samp_tris_plot,
     get_normal_for_samp_tris_plot,
     get_sample_for_samp_tris_plot,
@@ -10,7 +10,7 @@ from NIPTool.API.external.constants import CHROM_ABNORM, STATUS_CLASSES, STATUS_
 from NIPTool.adapter import NiptAdapter
 from NIPTool.config import get_nipt_adapter, templates
 from NIPTool.crud.find import find
-from NIPTool.models.database import Batch, User
+from NIPTool.models.database import Batch, User, DataBaseSample
 
 router = APIRouter()
 

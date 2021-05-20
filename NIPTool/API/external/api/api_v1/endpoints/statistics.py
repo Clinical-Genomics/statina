@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends, Request
 
 from NIPTool.API.external.api.deps import get_current_user
 from NIPTool.adapter.plugin import NiptAdapter
-from NIPTool.crud.find.aggregations.statistics_plot_data import (
+from NIPTool.crud.find.plots.statistics_plot_data import (
     get_last_batches,
     get_statistics_for_scatter_plot,
     get_statistics_for_box_plot,

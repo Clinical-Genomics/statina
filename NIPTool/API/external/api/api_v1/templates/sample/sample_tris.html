@@ -26,7 +26,7 @@
         legend:{hovermode:'closest' },
         hovermode:'closest',
         annotations : [],
-        xaxis :{showline: true,
+        xaxisnormal_data :{showline: true,
             tickvals : [1,2,3],
             ticktext : ['NCV13','NCV18','NCV21'],
             linecolor: '#636363',
@@ -68,7 +68,7 @@
 
         var normal = {
             y: {{normal_data[chrom]['values']}},
-            x: {{normal_data[chrom]['x_axis']}},
+            x: {{[loop.index] * normal_data[chrom]['values']|length}},
             pointpos: 30,
             type: 'box',
             showlegend: true,

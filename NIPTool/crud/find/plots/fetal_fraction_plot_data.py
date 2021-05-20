@@ -1,6 +1,6 @@
 from typing import List, Dict, Optional
 
-from NIPTool.models.server.plots import (
+from NIPTool.models.server.plots.fetal_fraction import (
     FetalFraction,
     FetalFractionControlAbNormal,
     FetalFractionStatus,

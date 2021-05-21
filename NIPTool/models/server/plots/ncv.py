@@ -1,24 +1,37 @@
 from typing import List, Optional
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, validator
 
 
 class NCVSamples(BaseModel):
     """validate length of all lists the same"""
 
-    ncv_values: List[float]
-    names: List[str]
     count: Optional[int]
     x_axis: Optional[List[int]]
+    names: List[str]
+    ncv_values: List[float]
+
+    @validator("ncv_values")
+    def check_list_lengths(cls, v, values: dict) -> List[int]:
+
+        if len(v) != len(values["names"]):
+            raise ValueError("Axis lengths do not match 1")
+
+        if values["x_axis"] is not None and len(v) != len(values["x_axis"]):
+            raise ValueError("Axis lengths do not match 2")
+
+        if values["count"] is not None and len(v) != values["count"]:
+            raise ValueError("Axis lengths do not match 3")
+        return v
 
     class Config:
         validate_assignment = True
 
 
 class NCVStatus(BaseModel):
-    suspected: Optional[NCVSamples] = Field(alias="Susspected")
+    suspected: Optional[NCVSamples] = Field(alias="Suspected")
     probable: Optional[NCVSamples] = Field(alias="Probable")
     verified: Optional[NCVSamples] = Field(alias="Verified")
-    false_positive: Optional[NCVSamples] = Field(alias="False Posetive")
+    false_positive: Optional[NCVSamples] = Field(alias="False Positive")
     false_negative: Optional[NCVSamples] = Field(alias="False Negative")
     other: Optional[NCVSamples] = Field(alias="Other")
     failed: Optional[NCVSamples] = Field(alias="Failed")

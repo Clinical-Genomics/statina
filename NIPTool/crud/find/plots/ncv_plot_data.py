@@ -1,3 +1,4 @@
+from copy import deepcopy
 from typing import Dict, Optional
 
 from NIPTool.models.server.plots.ncv import NCVSamples, NCV131821
@@ -30,7 +31,6 @@ def get_tris_control_abnormal(adapter: NiptAdapter, chr, x_axis) -> Dict[str, NC
 
     for status_dict in find.sample_aggregate(pipe=pipe, adapter=adapter):
         status = status_dict["_id"][f"status_{chr}"]
-
         plot_data[status] = NCVSamples(
             ncv_values=[value for value in status_dict.get("ncv_values")],
             names=status_dict.get("names"),
@@ -52,12 +52,14 @@ def get_abn_for_samp_tris_plot(adapter: NiptAdapter) -> Dict[str, NCVSamples]:
         )
         for status, data in tris_control_abnormal.items():
             if status not in plot_data:
-                plot_data[status] = data
-            plot_data[status].ncv_values += data.ncv_values
-            plot_data[status].names += data.names
-            plot_data[status].count += data.count
-            plot_data[status].x_axis += data.x_axis
-
+                plot_data[status] = deepcopy(data)
+                continue
+            plot_data[status] = NCVSamples(
+                ncv_values=plot_data[status].ncv_values + data.ncv_values,
+                names=plot_data[status].names + data.names,
+                count=plot_data[status].count + data.count,
+                x_axis=plot_data[status].x_axis + data.x_axis,
+            )
     return plot_data
 
 
@@ -124,12 +126,12 @@ def get_tris_samples(adapter: NiptAdapter, chr, batch_id: str) -> NCVSamples:
 
     data = list(find.sample_aggregate(pipe=pipe, adapter=adapter))[0]
     data["x_axis"] = list(range(1, data.get("count") + 1))
+
     return NCVSamples(**data)
 
 
 def get_sample_for_samp_tris_plot(sample: DataBaseSample) -> NCVSamples:
     """Case data for Sample trisomi plot"""
-
     return NCVSamples(
         ncv_values=[sample.Zscore_13, sample.Zscore_18, sample.Zscore_21],
         names=[sample.sample_id, sample.sample_id, sample.sample_id],

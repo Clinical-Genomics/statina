@@ -1,7 +1,7 @@
 from typing import Optional
 
 from NIPTool.models.server.plots.fetal_fraction import (
-    FetalFraction,
+    FetalFractionSamples,
     FetalFractionControlAbNormal,
     AbNormalityClasses,
 )
@@ -10,7 +10,7 @@ from NIPTool.adapter import NiptAdapter
 from NIPTool.crud.find import find
 
 
-def samples(adapter: NiptAdapter, batch_id: Optional[str] = None) -> FetalFraction:
+def samples(adapter: NiptAdapter, batch_id: Optional[str] = None) -> FetalFractionSamples:
     """Cases for fetal fraction plot"""
 
     match = {
@@ -40,7 +40,7 @@ def samples(adapter: NiptAdapter, batch_id: Optional[str] = None) -> FetalFracti
     #        match["$match"]["batch_id"] ={f"status_{abn}": {"$eq": "Normal", "$exists": "True"}
 
     relevant_aggregation_data = list(find.sample_aggregate(pipe=[match, group], adapter=adapter))[0]
-    return FetalFraction(**relevant_aggregation_data)
+    return FetalFractionSamples(**relevant_aggregation_data)
 
 
 def control_abnormal(adapter: NiptAdapter) -> FetalFractionControlAbNormal:

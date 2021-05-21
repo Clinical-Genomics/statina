@@ -17,7 +17,7 @@ from NIPTool.crud.find.plots.ncv_plot_data import (
     get_samples_for_report_ncv_plot,
 )
 from NIPTool.models.server.plots.fetal_fraction import (
-    FetalFraction,
+    FetalFractionSamples,
     FetalFractionControlAbNormal,
 )
 from NIPTool.API.external.api.deps import get_current_user
@@ -151,7 +151,7 @@ def fetal_fraction_XY(
 
     batch: Batch = find.batch(batch_id=batch_id, adapter=adapter)
 
-    control: FetalFraction = get_fetal_fraction.samples(adapter)
+    control: FetalFractionSamples = get_fetal_fraction.samples(adapter)
     abnormal: FetalFractionControlAbNormal = get_fetal_fraction.control_abnormal(adapter)
     abnormal_dict = abnormal.dict(
         exclude_none=True,
@@ -244,7 +244,7 @@ def report(
 
     scatter_data: Dict[str, CoveragePlotSampleData] = get_scatter_data_for_coverage_plot(samples)
     box_data: Dict[int, List[float]] = get_box_data_for_coverage_plot(samples)
-    control: FetalFraction = get_fetal_fraction.samples(adapter)
+    control: FetalFractionSamples = get_fetal_fraction.samples(adapter)
     abnormal: FetalFractionControlAbNormal = get_fetal_fraction.control_abnormal(adapter)
     abnormal_dict = abnormal.dict(
         exclude_none=True,

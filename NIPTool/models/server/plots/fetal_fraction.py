@@ -3,7 +3,7 @@ from typing import List, Optional
 from pydantic import BaseModel, validator
 
 
-class FetalFraction(BaseModel):
+class FetalFractionSamples(BaseModel):
     """Data points for fetal fraction plots.
 
     Samples within this model will be part of the same series in a plot."""
@@ -22,49 +22,49 @@ class FetalFraction(BaseModel):
         return v
 
 
-class Suspected(FetalFraction):
+class Suspected(FetalFractionSamples):
     """Color code for suspected sample"""
 
     color: Optional[str] = "#DBA901"
     color_group: Optional[str] = "warning"
 
 
-class Probable(FetalFraction):
+class Probable(FetalFractionSamples):
     """Color code for probable sample"""
 
     color: Optional[str] = "#0000FF"
     color_group: Optional[str] = "warning"
 
 
-class FalseNegative(FetalFraction):
+class FalseNegative(FetalFractionSamples):
     """Color code for false negative sample"""
 
     color: Optional[str] = "#ff6699"
     color_group: Optional[str] = "danger"
 
 
-class Verified(FetalFraction):
+class Verified(FetalFractionSamples):
     """Color code for verified sample"""
 
     color: Optional[str] = "#00CC00"
     color_group: Optional[str] = "danger"
 
 
-class Other(FetalFraction):
+class Other(FetalFractionSamples):
     """Color code for other sample"""
 
     color: Optional[str] = "#603116"
     color_group: Optional[str] = "warning"
 
 
-class FalsePositive(FetalFraction):
+class FalsePositive(FetalFractionSamples):
     """Color code for false positive sample"""
 
     color: Optional[str] = "#E74C3C"
     color_group: Optional[str] = "success"
 
 
-class Failed(FetalFraction):
+class Failed(FetalFractionSamples):
     """Color code for failed sample"""
 
     color_group: Optional[str] = "danger"

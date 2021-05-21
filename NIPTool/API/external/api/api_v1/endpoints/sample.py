@@ -13,7 +13,7 @@ from NIPTool.adapter import NiptAdapter
 from NIPTool.config import get_nipt_adapter, templates
 from NIPTool.crud.find import find
 from NIPTool.models.database import Batch, User, DataBaseSample
-from NIPTool.models.server.plots.ncv import NCVStatus, NCVSamples, NCV131821
+from NIPTool.models.server.plots.ncv import NCVSamples, NCV131821
 
 router = APIRouter()
 

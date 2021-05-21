@@ -3,7 +3,13 @@ from pydantic import BaseModel, Field, validator
 
 
 class NCVSamples(BaseModel):
-    """validate length of all lists the same"""
+    """Data points for NCV plots.
+
+    Samples within this model will be part of the same series in a plot.
+
+    The x-axis is of type int because:
+        NCV plots for a batch have samples on the x-axis.
+        NCV plot for a sample have chromosome abnormalities (13 18 21)"""
 
     count: Optional[int]
     x_axis: Optional[List[int]]
@@ -27,17 +33,11 @@ class NCVSamples(BaseModel):
         validate_assignment = True
 
 
-class NCVStatus(BaseModel):
-    suspected: Optional[NCVSamples] = Field(alias="Suspected")
-    probable: Optional[NCVSamples] = Field(alias="Probable")
-    verified: Optional[NCVSamples] = Field(alias="Verified")
-    false_positive: Optional[NCVSamples] = Field(alias="False Positive")
-    false_negative: Optional[NCVSamples] = Field(alias="False Negative")
-    other: Optional[NCVSamples] = Field(alias="Other")
-    failed: Optional[NCVSamples] = Field(alias="Failed")
-
-
 class NCV131821(BaseModel):
+    """Model for samples classified as normal chromosome 13, 18, 21.
+
+    Samples are grouped by chromosome."""
+
     ncv_13: NCVSamples = Field(..., alias="13")
     ncv_18: NCVSamples = Field(..., alias="18")
     ncv_21: NCVSamples = Field(..., alias="21")

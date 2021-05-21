@@ -4,7 +4,9 @@ from pydantic import BaseModel, validator
 
 
 class FetalFraction(BaseModel):
-    """validate length of all lists the same"""
+    """Data points for fetal fraction plots.
+
+    Samples within this model will be part of the same series in a plot."""
 
     FFY: List[float]
     FFX: List[float]
@@ -12,43 +14,72 @@ class FetalFraction(BaseModel):
     names: List[str]
     count: int
 
+    @validator("count")
+    def check_list_lengths(cls, v, values: dict) -> List[int]:
+        for key, plot_list in values.items():
+            if plot_list is not None and v != len(plot_list):
+                raise ValueError("Axis lengths do not match")
+        return v
+
 
 class Suspected(FetalFraction):
+    """Color code for suspected sample"""
+
     color: Optional[str] = "#DBA901"
     color_group: Optional[str] = "warning"
 
 
 class Probable(FetalFraction):
+    """Color code for probable sample"""
+
     color: Optional[str] = "#0000FF"
     color_group: Optional[str] = "warning"
 
 
 class FalseNegative(FetalFraction):
+    """Color code for false negative sample"""
+
     color: Optional[str] = "#ff6699"
     color_group: Optional[str] = "danger"
 
 
 class Verified(FetalFraction):
+    """Color code for verified sample"""
+
     color: Optional[str] = "#00CC00"
     color_group: Optional[str] = "danger"
 
 
 class Other(FetalFraction):
+    """Color code for other sample"""
+
     color: Optional[str] = "#603116"
     color_group: Optional[str] = "warning"
 
 
 class FalsePositive(FetalFraction):
+    """Color code for false positive sample"""
+
     color: Optional[str] = "#E74C3C"
     color_group: Optional[str] = "success"
 
 
 class Failed(FetalFraction):
+    """Color code for failed sample"""
+
     color_group: Optional[str] = "danger"
 
 
-class FetalFractionStatus(BaseModel):
-    """validate length of all lists the same"""
+class AbNormalityClasses(BaseModel):
+    """A sample can be classified with eg probable X0. False Negative XXY, etc.
+
+    This model is for grouping a set of samples by classification of a specific abnormality, eg XXY.
+
+    All classes are optional since, eg, it can be the case that none of the samples in the set are classified as
+    False Positive XXY.
+
+    The status_data_ is a dict of all samples in the set, grouped by classification.
+    """
 
     status_data_: dict
     probable: Optional[Probable]
@@ -110,12 +141,20 @@ class FetalFractionStatus(BaseModel):
 
 
 class FetalFractionControlAbNormal(BaseModel):
-    """validate length of all lists the same"""
+    """Model for sex chromosome abnormalities.
 
-    X0: FetalFractionStatus
-    XXX: FetalFractionStatus
-    XXY: FetalFractionStatus
-    XYY: FetalFractionStatus
+    This model is only for samples that have ben classified as abnormal sex chromosomes in some sense.
+
+    Samples are grouped by sex chromosome abnormality. Samples within a abnormality group are then grouped by
+    abnormality classification, defined by AbNormalityClasses.
+
+    Eg; Each sample in XO have been classified as not normal for sex chromosome abnormality X0.
+    The samples within X0 are then grouped by Verified X0, False Positive X0, etc"""
+
+    X0: AbNormalityClasses
+    XXX: AbNormalityClasses
+    XXY: AbNormalityClasses
+    XYY: AbNormalityClasses
 
     class Config:
         validate_assignment = True

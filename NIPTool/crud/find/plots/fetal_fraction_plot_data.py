@@ -1,9 +1,9 @@
-from typing import List, Dict, Optional
+from typing import Optional
 
 from NIPTool.models.server.plots.fetal_fraction import (
     FetalFraction,
     FetalFractionControlAbNormal,
-    FetalFractionStatus,
+    AbNormalityClasses,
 )
 from NIPTool.API.external.constants import CHROM_ABNORM
 from NIPTool.adapter import NiptAdapter
@@ -71,5 +71,5 @@ def control_abnormal(adapter: NiptAdapter) -> FetalFractionControlAbNormal:
             status: str = status_dict["_id"][f"status_{abn}"]
             statuses[status] = status_dict
 
-        plot_data[abn] = FetalFractionStatus(status_data_=statuses)
+        plot_data[abn] = AbNormalityClasses(status_data_=statuses)
     return FetalFractionControlAbNormal(**plot_data)

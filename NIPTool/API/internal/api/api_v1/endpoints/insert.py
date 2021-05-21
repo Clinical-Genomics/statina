@@ -6,7 +6,7 @@ from datetime import datetime
 from NIPTool.API.external.api.deps import get_password_hash
 from NIPTool.adapter.plugin import NiptAdapter
 from NIPTool.config import get_nipt_adapter
-from NIPTool.crud import find
+from NIPTool.crud.find import find
 from NIPTool.crud.insert import insert_batch, insert_samples, insert_user
 from NIPTool.models.database import Batch, DataBaseSample, User
 from NIPTool.models.server.load import BatchRequestBody, UserRequestBody

@@ -5,19 +5,21 @@ from NIPTool.models.server.plots.fetal_fraction import (
     FetalFractionControlAbNormal,
     AbNormalityClasses,
 )
-from NIPTool.API.external.constants import CHROM_ABNORM
+from NIPTool.API.external.constants import CHROM_ABNORM, SEX_CHROM_ABNORM
 from NIPTool.adapter import NiptAdapter
 from NIPTool.crud.find import find
 
 
-def samples(adapter: NiptAdapter, batch_id: Optional[str] = None) -> FetalFractionSamples:
-    """Cases for fetal fraction plot"""
+def samples(
+    adapter: NiptAdapter, batch_id: Optional[str] = None, control_samples: Optional[bool] = False
+) -> FetalFractionSamples:
+    """Samples for fetal fraction plot"""
 
     match = {
         "$match": {
-            "FF_Formatted": {"$ne": "None", "$exists": "True"},
-            "FFY": {"$ne": "None", "$exists": "True"},
-            "FFX": {"$ne": "None", "$exists": "True"},
+            "FF_Formatted": {"$ne": "None", "$exists": True},
+            "FFY": {"$ne": "None", "$exists": True},
+            "FFX": {"$ne": "None", "$exists": True},
             "include": {"$eq": True},
         }
     }
@@ -32,12 +34,12 @@ def samples(adapter: NiptAdapter, batch_id: Optional[str] = None) -> FetalFracti
         }
     }
 
-    if batch_id:
+    if control_samples:
+        match["$match"]["batch_id"] = {"$ne": batch_id}
+        for abn in SEX_CHROM_ABNORM:
+            match["$match"][f"status_{abn}"] = {"$eq": "Normal"}
+    else:
         match["$match"]["batch_id"] = {"$eq": batch_id}
-
-    # else:!!!!!!! Normal samples. Also exclude samples from batch?
-    #    for abn in CHROM_ABNORM:
-    #        match["$match"]["batch_id"] ={f"status_{abn}": {"$eq": "Normal", "$exists": "True"}
 
     relevant_aggregation_data = list(find.sample_aggregate(pipe=[match, group], adapter=adapter))[0]
     return FetalFractionSamples(**relevant_aggregation_data)
@@ -52,7 +54,7 @@ def control_abnormal(adapter: NiptAdapter) -> FetalFractionControlAbNormal:
         pipe = [
             {
                 "$match": {
-                    f"status_{abn}": {"$ne": "Normal", "$exists": "True"},
+                    f"status_{abn}": {"$ne": "Normal", "$exists": True},
                     "include": {"$eq": True},
                 }
             },

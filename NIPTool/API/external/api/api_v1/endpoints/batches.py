@@ -151,7 +151,9 @@ def fetal_fraction_XY(
 
     batch: Batch = find.batch(batch_id=batch_id, adapter=adapter)
 
-    control: FetalFractionSamples = get_fetal_fraction.samples(adapter)
+    control: FetalFractionSamples = get_fetal_fraction.samples(
+        batch_id=batch_id, adapter=adapter, control_samples=True
+    )
     abnormal: FetalFractionControlAbNormal = get_fetal_fraction.control_abnormal(adapter)
     abnormal_dict = abnormal.dict(
         exclude_none=True,
@@ -170,7 +172,7 @@ def fetal_fraction_XY(
             current_user=user,
             control=control,
             abnormal=abnormal_dict,
-            cases=get_fetal_fraction.samples(adapter, batch_id=batch_id),
+            cases=get_fetal_fraction.samples(adapter=adapter, batch_id=batch_id),
             max_x=max(control.FFX) + 1,
             min_x=min(control.FFX) - 1,
             batch=batch.dict(),
@@ -193,8 +195,10 @@ def fetal_fraction(
         context=dict(
             request=request,
             current_user=user,
-            control=get_fetal_fraction.samples(adapter),
-            cases=get_fetal_fraction.samples(adapter, batch_id=batch_id),
+            control=get_fetal_fraction.samples(
+                adapter=adapter, batch_id=batch_id, control_samples=True
+            ),
+            cases=get_fetal_fraction.samples(adapter=adapter, batch_id=batch_id),
             batch=batch.dict(),
             page_id="batches_FF",
         ),
@@ -244,7 +248,9 @@ def report(
 
     scatter_data: Dict[str, CoveragePlotSampleData] = get_scatter_data_for_coverage_plot(samples)
     box_data: Dict[int, List[float]] = get_box_data_for_coverage_plot(samples)
-    control: FetalFractionSamples = get_fetal_fraction.samples(adapter)
+    control: FetalFractionSamples = get_fetal_fraction.samples(
+        adapter=adapter, batch_id=batch_id, control_samples=True
+    )
     abnormal: FetalFractionControlAbNormal = get_fetal_fraction.control_abnormal(adapter)
     abnormal_dict = abnormal.dict(
         exclude_none=True,
@@ -270,7 +276,7 @@ def report(
             abnormal_data=get_tris_control_abnormal(adapter, "21", 0),
             # FF
             control=control,
-            cases=get_fetal_fraction.samples(adapter, batch_id=batch_id),
+            cases=get_fetal_fraction.samples(adapter=adapter, batch_id=batch_id),
             abnormal=abnormal_dict,
             max_x=max(control.FFX) + 1,
             min_x=min(control.FFX) - 1,

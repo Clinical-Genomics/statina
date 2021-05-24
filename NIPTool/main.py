@@ -17,6 +17,7 @@ external_app = FastAPI(
         {"url": "https://nipttool.scilifelab.se", "description": "Production environment"},
     ],
     root_path="/api/v1",
+    root_path_in_servers=False,
 )
 external_app.include_router(login.router, prefix="/login", tags=["login"])
 external_app.include_router(batches.router, prefix="/batches", tags=["batches"])

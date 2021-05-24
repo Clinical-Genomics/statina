@@ -11,16 +11,14 @@ from NIPTool.API.external.api.api_v1.endpoints import (
 )
 from NIPTool.API.internal.api.api_v1.endpoints import insert
 
-external_app = FastAPI(
-    root_path="/api/v1",
-)
-external_app.include_router(login.router, prefix="/login", tags=["login"])
-external_app.include_router(batches.router, prefix="/batches", tags=["batches"])
-external_app.include_router(index.router, tags=["index"])
-external_app.include_router(sample.router, tags=["sample"])
-external_app.include_router(update.router, tags=["update"])
-external_app.include_router(download.router, tags=["download"])
-external_app.include_router(statistics.router, tags=["statistics"])
+external_app = FastAPI()
+external_app.include_router(login.router, prefix="/api/v1/login", tags=["login"])
+external_app.include_router(batches.router, prefix="/api/v1/batches", tags=["batches"])
+external_app.include_router(index.router, prefix="/api/v1", tags=["index"])
+external_app.include_router(sample.router, prefix="/api/v1", tags=["sample"])
+external_app.include_router(update.router, prefix="/api/v1", tags=["update"])
+external_app.include_router(download.router, prefix="/api/v1", tags=["download"])
+external_app.include_router(statistics.router, prefix="/api/v1", tags=["statistics"])
 
-internal_app = FastAPI(root_path="/api/v1")
-internal_app.include_router(insert.router, prefix="/insert", tags=["insert"])
+internal_app = FastAPI()
+internal_app.include_router(insert.router, prefix="/api/v1/insert", tags=["insert"])

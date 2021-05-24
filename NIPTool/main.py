@@ -10,8 +10,10 @@ from NIPTool.API.external.api.api_v1.endpoints import (
     update,
 )
 from NIPTool.API.internal.api.api_v1.endpoints import insert
+from fastapi.middleware.httpsredirect import HTTPSRedirectMiddleware
 
 external_app = FastAPI()
+external_app.add_middleware(HTTPSRedirectMiddleware)
 external_app.include_router(login.router, prefix="/api/v1/login", tags=["login"])
 external_app.include_router(batches.router, prefix="/api/v1/batches", tags=["batches"])
 external_app.include_router(index.router, prefix="/api/v1", tags=["index"])

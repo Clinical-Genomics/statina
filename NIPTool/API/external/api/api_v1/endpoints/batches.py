@@ -131,7 +131,7 @@ def NCV(
             tris_thresholds=TRISOMI_TRESHOLDS,
             batch=batch.dict(),
             chr=ncv,
-            ncv_chrom_data={ncv: get_tris_samples(adapter, ncv, batch_id)},
+            ncv_chrom_data={ncv: get_tris_samples(adapter=adapter, chr=ncv, batch_id=batch_id)},
             normal_data=get_tris_control_normal(adapter, ncv),
             abnormal_data=get_tris_control_abnormal(adapter, ncv, 0),
             page_id=f"batches_NCV{ncv}",

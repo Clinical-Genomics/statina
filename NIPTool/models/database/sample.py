@@ -1,6 +1,17 @@
-from typing import Optional
+from typing import Optional, Literal
 
 from pydantic import BaseModel, Field
+
+status_options = Literal[
+    "Probable",
+    "Suspected",
+    "False Positive",
+    "Verified",
+    "False Negative",
+    "Other",
+    "Failed",
+    "Normal",
+]
 
 
 class DataBaseSample(BaseModel):
@@ -79,13 +90,13 @@ class DataBaseSample(BaseModel):
     include: Optional[bool]
     change_include_date: Optional[str] = ""
     comment: Optional[str] = ""
-    status_13: Optional[str] = "Normal"
-    status_18: Optional[str] = "Normal"
-    status_21: Optional[str] = "Normal"
-    status_X0: Optional[str] = "Normal"
-    status_XXX: Optional[str] = "Normal"
-    status_XXY: Optional[str] = "Normal"
-    status_XYY: Optional[str] = "Normal"
+    status_13: Optional[status_options] = "Normal"
+    status_18: Optional[status_options] = "Normal"
+    status_21: Optional[status_options] = "Normal"
+    status_X0: Optional[status_options] = "Normal"
+    status_XXX: Optional[status_options] = "Normal"
+    status_XXY: Optional[status_options] = "Normal"
+    status_XYY: Optional[status_options] = "Normal"
     status_change_13: Optional[str] = ""
     status_change_18: Optional[str] = ""
     status_change_21: Optional[str] = ""

@@ -19,3 +19,4 @@ uvloop
 httptools
 gunicorn
 python-jose
+bcrypt

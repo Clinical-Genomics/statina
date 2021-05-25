@@ -6,7 +6,7 @@ from NIPTool.models.database import DataBaseSample
 LOG = logging.getLogger(__name__)
 
 
-def sample(adapter: NiptAdapter, sample: DataBaseSample):
+def sample(adapter: NiptAdapter, sample: DataBaseSample) -> None:
     """Update a sample object in the database"""
 
     sample_dict: dict = sample.dict(exclude_none=True)

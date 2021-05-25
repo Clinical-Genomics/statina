@@ -33,7 +33,7 @@ def statistics(
         "GC_Dropout",
     ]
 
-    batches = get_last_batches(adapter=adapter, nr=nr_batches)
+    batches = get_last_batches(adapter=adapter, nr_of_batches=nr_batches)
     batch_ids = [batch.get("batch_id") for batch in batches]
     box_stat = get_statistics_for_box_plot(adapter=adapter, batches=batch_ids, fields=box_plots)
     scatter_stat = get_statistics_for_scatter_plot(batches=batches, fields=scatter_plots)

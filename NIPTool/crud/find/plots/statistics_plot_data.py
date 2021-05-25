@@ -1,16 +1,16 @@
+from typing import Optional, List
+
+import pymongo
+
 from NIPTool.adapter import NiptAdapter
 from NIPTool.crud.find import find
 
 
-def get_last_batches(adapter: NiptAdapter, nr: int) -> list:
-    """geting the <nr> last batches based on SequencingDate"""
+def get_last_batches(adapter, nr_of_batches: int) -> list:
+    """getting the <nr_of_batches> last batches based on SequencingDate"""
 
-    batch_sort_aggregation = [{"$sort": {"SequencingDate": -1}}]
-    sorted_batches = list(find.batch_aggregate(pipe=batch_sort_aggregation, adapter=adapter))
-    if len(sorted_batches) > nr:
-        sorted_batches = sorted_batches[0:nr]
-
-    return sorted_batches
+    batches: pymongo.cursor = adapter.batch_collection.find().sort([("SequencingDate", -1)])
+    return list(batches.limit(nr_of_batches))
 
 
 def get_statistics_for_scatter_plot(batches: list, fields: list) -> dict:

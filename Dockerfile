@@ -30,7 +30,7 @@ CMD gunicorn \
     --threads=$GUNICORN_THREADS \
     --timeout=$GUNICORN_TIMEOUT \
     --proxy-protocol \
-    --forwarded-allow-ips="*" \
+    --forwarded-allow-ips="10.0.2.100" \
     --log-syslog \
     --log-level="debug" \
     --worker-class=uvicorn.workers.UvicornWorker \

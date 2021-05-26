@@ -31,5 +31,6 @@ CMD gunicorn \
     --timeout=$GUNICORN_TIMEOUT \
     --proxy-protocol \
     --forwarded-allow-ips="*" \
+    --log-syslog \
     --worker-class=uvicorn.workers.UvicornWorker \
     NIPTool.main:$SERVICE_SCOPE\_app

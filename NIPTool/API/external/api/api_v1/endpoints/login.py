@@ -77,7 +77,7 @@ async def add_new_user(request: Request, adapter: NiptAdapter = Depends(get_nipt
         insert_user(adapter=adapter, user=user)
         response.set_cookie(
             key="user_info",
-            value=f"An eamil will be sent to {new_user.email} when your user has been confirmed and activated.",
+            value=f"An email will be sent to {new_user.email} when your user has been confirmed and activated.",
         )
     except Exception as error:
         response.set_cookie(key="user_info", value=f"{error}")

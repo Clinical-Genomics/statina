@@ -13,7 +13,7 @@ from NIPTool.crud import update
 from NIPTool.models.database import User
 from starlette.datastructures import FormData
 
-router = APIRouter()
+router = APIRouter(prefix="/api/v1")
 
 LOG = logging.getLogger(__name__)
 

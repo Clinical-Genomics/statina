@@ -19,6 +19,10 @@ class FileValidationError(NIPToolError):
     pass
 
 
+class MissMatchingUserNamesError(NIPToolError):
+    pass
+
+
 class NIPToolRestError(NIPToolError):
     def __init__(self, message: str, code: Optional[int] = None):
         self.message = message

@@ -12,7 +12,7 @@ from NIPTool.API.external.api.deps import (
 from NIPTool.config import settings
 from NIPTool.models.database import User
 
-router = APIRouter()
+router = APIRouter(prefix="/api/v1")
 
 
 @router.post("/token")
@@ -44,7 +44,7 @@ def logout():
 
 @router.post("/login")
 def login(token: Optional[str] = Depends(login_for_access_token)):
-    """Redirects back to index, if invalid username or password """
+    """Redirects back to index, if invalid username or password"""
 
     if not token:
         response = RedirectResponse("../")

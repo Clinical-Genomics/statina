@@ -10,7 +10,7 @@ from NIPTool.API.external.utils import (
 from NIPTool.config import get_nipt_adapter, templates
 from NIPTool.models.database import User
 
-router = APIRouter()
+router = APIRouter(prefix="/api/v1")
 
 
 @router.get("/statistics")

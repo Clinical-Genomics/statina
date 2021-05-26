@@ -12,7 +12,7 @@ from NIPTool.models.database import Batch, Sample, User
 from NIPTool.models.server.load import BatchRequestBody, UserRequestBody
 from NIPTool.parse.batch import get_batch, get_samples
 
-router = APIRouter()
+router = APIRouter(prefix="/api/v1")
 
 
 @router.post("/batch")

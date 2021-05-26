@@ -32,5 +32,6 @@ CMD gunicorn \
     --proxy-protocol \
     --forwarded-allow-ips="*" \
     --log-syslog \
+    --log-level="debug" \
     --worker-class=uvicorn.workers.UvicornWorker \
     NIPTool.main:$SERVICE_SCOPE\_app

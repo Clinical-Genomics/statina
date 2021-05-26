@@ -12,7 +12,7 @@ from NIPTool.API.external.api.deps import (
 from NIPTool.config import settings
 from NIPTool.models.database import User
 
-router = APIRouter(prefix="/api/v1")
+router = APIRouter()
 
 
 @router.post("/token")

@@ -24,4 +24,4 @@ external_app.include_router(download.router, tags=["download"])
 external_app.include_router(statistics.router, tags=["statistics"])
 
 internal_app = FastAPI()
-internal_app.include_router(insert.router, prefix="/insert", tags=["insert"])
+internal_app.include_router(insert.router, prefix="/api/v1/insert", tags=["insert"])

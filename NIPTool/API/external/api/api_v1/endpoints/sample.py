@@ -7,7 +7,7 @@ from NIPTool.config import get_nipt_adapter, templates
 from NIPTool.crud import find
 from NIPTool.models.database import Batch, User
 
-router = APIRouter(prefix="/api/v1")
+router = APIRouter()
 
 
 @router.get("/samples/{sample_id}/")

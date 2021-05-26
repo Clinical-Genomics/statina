@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Request
 from NIPTool.config import templates
 
-router = APIRouter(prefix="/api/v1")
+router = APIRouter()
 
 
 @router.post("/")

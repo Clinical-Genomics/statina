@@ -10,7 +10,7 @@ from NIPTool.crud import find
 from NIPTool.models.database import User
 from NIPTool.parse.batch import validate_file_path
 
-router = APIRouter(prefix="/api/v1")
+router = APIRouter()
 
 
 @router.get("/batch_download/{batch_id}/{file_id}")

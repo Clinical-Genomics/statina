@@ -1,3 +1,3 @@
 from .batch import Batch
-from .sample import Sample
+from .sample import DataBaseSample
 from .user import User

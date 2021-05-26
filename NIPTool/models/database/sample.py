@@ -1,9 +1,20 @@
-from typing import Optional
+from typing import Optional, Literal
 
 from pydantic import BaseModel, Field
 
+status_options = Literal[
+    "Probable",
+    "Suspected",
+    "False Positive",
+    "Verified",
+    "False Negative",
+    "Other",
+    "Failed",
+    "Normal",
+]
 
-class Sample(BaseModel):
+
+class DataBaseSample(BaseModel):
     sample_id: str = Field(..., alias="SampleID")
     batch_id: str = Field(..., alias="SampleProject")
     SampleType: Optional[str]
@@ -79,13 +90,13 @@ class Sample(BaseModel):
     include: Optional[bool]
     change_include_date: Optional[str] = ""
     comment: Optional[str] = ""
-    status_13: Optional[str]
-    status_18: Optional[str]
-    status_21: Optional[str]
-    status_X0: Optional[str]
-    status_XXX: Optional[str]
-    status_XXY: Optional[str]
-    status_XYY: Optional[str]
+    status_13: Optional[status_options] = "Normal"
+    status_18: Optional[status_options] = "Normal"
+    status_21: Optional[status_options] = "Normal"
+    status_X0: Optional[status_options] = "Normal"
+    status_XXX: Optional[status_options] = "Normal"
+    status_XXY: Optional[status_options] = "Normal"
+    status_XYY: Optional[status_options] = "Normal"
     status_change_13: Optional[str] = ""
     status_change_18: Optional[str] = ""
     status_change_21: Optional[str] = ""

@@ -57,8 +57,12 @@ def database(request, pymongo_client):
 
 @pytest.fixture(scope="function")
 def valid_load_user():
-    user = UserRequestBody(email="maya.papaya@something.se", username="Maya Papaya", role="RW")
-    return user
+    return UserRequestBody(
+        email="maya.papaya@something.se",
+        username="Maya Papaya",
+        role="RW",
+        password="123",
+    )
 
 
 @pytest.fixture(scope="function")

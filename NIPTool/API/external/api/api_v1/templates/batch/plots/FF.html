@@ -35,15 +35,16 @@
     marker: {color: '#ccccb3'}}
     data.push(backstat);
 
-    {% for sample in cases %}
-    var trace = {
-    y: [{{cases[sample]['FF']}}],
-    x: [{{cases[sample]['FFY']}}],
-    name: "{{sample}}",
-    mode: 'markers',
-    text: "{{sample}}",
-    type: 'scatter'}
-    data.push(trace);
+
+    {% for name in cases['names'] %}
+        var NCVXYsamps = {
+            y: [{{cases['FF'][loop.index]}}],
+            x: [{{cases['FFY'][loop.index]}}],
+            name: {{name|tojson}},
+            mode: 'markers',
+            text: {{name|tojson}},
+            type: 'scatter'}
+        data.push(NCVXYsamps);
     {% endfor %}
 
     Plotly.newPlot('FFY', data, layout);
@@ -84,16 +85,17 @@
     marker: {color: '#ccccb3'}}
     data.push(backstat);
 
-    {% for sample in cases %}
-    var trace = {
-    y: [{{cases[sample]['FF']}}],
-    x: [{{cases[sample]['FFX']}}],
-    name: "{{sample}}",
-    mode: 'markers',
-    text: "{{sample}}",
-    type: 'scatter'}
-    data.push(trace);
+    {% for name in cases['names'] %}
+        var NCVXYsamps = {
+            y: [{{cases['FF'][loop.index]}}],
+            x: [{{cases['FFX'][loop.index]}}],
+            name: {{name|tojson}},
+            mode: 'markers',
+            text: {{name|tojson}},
+            type: 'scatter'}
+        data.push(NCVXYsamps);
     {% endfor %}
+
 
     Plotly.newPlot('FFX', data, layout);
 </script>

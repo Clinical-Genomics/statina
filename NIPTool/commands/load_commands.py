@@ -7,7 +7,7 @@ from NIPTool.adapter import NiptAdapter
 from NIPTool.config import settings
 from NIPTool.crud import find, insert
 from NIPTool.exeptions import InsertError
-from NIPTool.models.database import Batch, Sample
+from NIPTool.models.database import Batch, DataBaseSample
 from NIPTool.models.server.load import BatchRequestBody, UserRequestBody
 from NIPTool.parse.batch import get_batch, get_samples
 from pymongo import MongoClient
@@ -39,7 +39,7 @@ def load_batch(
     )
     adapter: NiptAdapter = context["adapter"]
     nipt_results = Path(str(result_file))
-    samples: List[Sample] = get_samples(nipt_results)
+    samples: List[DataBaseSample] = get_samples(nipt_results)
     batch: Batch = get_batch(nipt_results)
     if find.batch(adapter=adapter, batch_id=batch.batch_id):
         return "batch already in database"

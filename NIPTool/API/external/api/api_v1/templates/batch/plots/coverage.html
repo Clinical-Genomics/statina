@@ -24,8 +24,8 @@
         {% for samp, samp_data in scatter_data.items() %}
         var scatter_plot = {
             name: {{samp|tojson}},
-            y: {{samp_data.y}},
-            x: {{samp_data.x}},
+            y: {{samp_data.y_axis}},
+            x: {{samp_data.x_axis}},
             mode: 'markers',
             text: {{samp|tojson}},
             type: 'scatter'};

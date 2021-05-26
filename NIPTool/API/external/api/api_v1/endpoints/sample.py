@@ -1,11 +1,19 @@
+from typing import Dict
+
 from fastapi import APIRouter, Depends, Request
 
+from NIPTool.crud.find.plots.ncv_plot_data import (
+    get_abn_for_samp_tris_plot,
+    get_normal_for_samp_tris_plot,
+    get_sample_for_samp_tris_plot,
+)
 from NIPTool.API.external.api.deps import get_current_user
-from NIPTool.adapter.plugin import NiptAdapter
-from NIPTool.API.external.utils import *
+from NIPTool.API.external.constants import CHROM_ABNORM, STATUS_CLASSES, STATUS_COLORS
+from NIPTool.adapter import NiptAdapter
 from NIPTool.config import get_nipt_adapter, templates
-from NIPTool.crud import find
-from NIPTool.models.database import Batch, User
+from NIPTool.crud.find import find
+from NIPTool.models.database import Batch, User, DataBaseSample
+from NIPTool.models.server.plots.ncv import NCVSamples, NCV131821
 
 router = APIRouter()
 
@@ -19,7 +27,7 @@ def sample(
 ):
     """Get sample with id"""
 
-    sample: Sample = find.sample(sample_id=sample_id, adapter=adapter)
+    sample: DataBaseSample = find.sample(sample_id=sample_id, adapter=adapter)
     batch: Batch = find.batch(batch_id=sample.batch_id, adapter=adapter)
 
     return templates.TemplateResponse(
@@ -45,7 +53,7 @@ def sample(
 ):
     """Post sample with id"""
 
-    sample: Sample = find.sample(sample_id=sample_id, adapter=adapter)
+    sample: DataBaseSample = find.sample(sample_id=sample_id, adapter=adapter)
     batch: Batch = find.batch(batch_id=sample.batch_id, adapter=adapter)
 
     return templates.TemplateResponse(
@@ -70,21 +78,20 @@ def sample_tris(
     user: User = Depends(get_current_user),
 ):
     """Sample view with trisomi plot."""
-    sample: dict = find.sample(sample_id=sample_id, adapter=adapter).dict()
-    batch: Batch = find.batch(batch_id=sample.get("batch_id"), adapter=adapter)
-    abnormal_data, data_per_abnormaliy = get_abn_for_samp_tris_plot(adapter=adapter)
-    normal_data = get_normal_for_samp_tris_plot(adapter=adapter)
-    sample_data = get_sample_for_samp_tris_plot(sample)
+    sample: DataBaseSample = find.sample(sample_id=sample_id, adapter=adapter)
+    batch: Batch = find.batch(batch_id=sample.batch_id, adapter=adapter)
+    abnormal_data: Dict[str, NCVSamples] = get_abn_for_samp_tris_plot(adapter=adapter)
+    normal_data: NCV131821 = get_normal_for_samp_tris_plot(adapter=adapter)
+    sample_data: NCVSamples = get_sample_for_samp_tris_plot(sample)
     return templates.TemplateResponse(
         "sample/sample_tris.html",
         context=dict(
             request=request,
             current_user=user,
-            tris_abn=data_per_abnormaliy,
-            normal_data=normal_data,
+            normal_data=normal_data.dict(exclude_none=True, by_alias=True),
             abnormal_data=abnormal_data,
             sample_data=sample_data,
-            sample=sample,
+            sample=sample.dict(),
             batch=batch,
             status_colors=STATUS_COLORS,
             page_id="sample_tris",
@@ -100,21 +107,20 @@ def sample_tris(
     user: User = Depends(get_current_user),
 ):
     """Sample view with trisomi plot."""
-    sample: dict = find.sample(sample_id=sample_id, adapter=adapter).dict()
-    batch: Batch = find.batch(batch_id=sample.get("batch_id"), adapter=adapter)
-    abnormal_data, data_per_abnormaliy = get_abn_for_samp_tris_plot(adapter=adapter)
-    normal_data = get_normal_for_samp_tris_plot(adapter=adapter)
-    sample_data = get_sample_for_samp_tris_plot(sample)
+    sample: DataBaseSample = find.sample(sample_id=sample_id, adapter=adapter)
+    batch: Batch = find.batch(batch_id=sample.batch_id, adapter=adapter)
+    abnormal_data: Dict[str, NCVSamples] = get_abn_for_samp_tris_plot(adapter=adapter)
+    normal_data: NCV131821 = get_normal_for_samp_tris_plot(adapter=adapter)
+    sample_data: NCVSamples = get_sample_for_samp_tris_plot(sample)
     return templates.TemplateResponse(
         "sample/sample_tris.html",
         context=dict(
             request=request,
             current_user=user,
-            tris_abn=data_per_abnormaliy,
             normal_data=normal_data,
             abnormal_data=abnormal_data,
             sample_data=sample_data,
-            sample=sample,
+            sample=sample.dict(),
             batch=batch,
             status_colors=STATUS_COLORS,
             page_id="sample_tris",

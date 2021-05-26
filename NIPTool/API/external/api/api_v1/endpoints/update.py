@@ -6,11 +6,12 @@ from fastapi import APIRouter, Depends, Request
 from fastapi.responses import RedirectResponse
 
 from NIPTool.API.external.api.deps import get_current_user
-from NIPTool.adapter.plugin import NiptAdapter
-from NIPTool.API.external.utils import *
+from NIPTool.API.external.constants import CHROM_ABNORM
+from NIPTool.adapter import NiptAdapter
 from NIPTool.config import get_nipt_adapter
 from NIPTool.crud import update
-from NIPTool.models.database import User
+from NIPTool.crud.find import find
+from NIPTool.models.database import User, DataBaseSample
 from starlette.datastructures import FormData
 
 router = APIRouter()
@@ -50,7 +51,7 @@ async def set_sample_status(
         sample[abnormality_key] = new_abnormality_status
         sample[f"status_change_{abnormality}"] = f"{user.username} {time_stamp}"
 
-    update.sample(adapter=adapter, sample=Sample(**sample))
+    update.sample(adapter=adapter, sample=DataBaseSample(**sample))
     return RedirectResponse(request.headers.get("referer"))
 
 
@@ -68,7 +69,7 @@ async def sample_comment(
         return RedirectResponse(request.headers.get("referer"))
 
     sample_id: str = form["sample_id"]
-    sample: Sample = find.sample(sample_id=sample_id, adapter=adapter)
+    sample: DataBaseSample = find.sample(sample_id=sample_id, adapter=adapter)
     comment: str = form.get("comment")
     if comment != sample.comment:
         sample.comment = comment
@@ -105,7 +106,7 @@ def save_samples(samples: Iterable[str], form: FormData, adapter: NiptAdapter, u
 
     time_stamp: str = datetime.now().strftime("%Y/%m/%d %H:%M:%S")
     for sample_id in samples:
-        sample: Sample = find.sample(sample_id=sample_id, adapter=adapter)
+        sample: DataBaseSample = find.sample(sample_id=sample_id, adapter=adapter)
         comment: str = form.get(f"comment_{sample_id}")
         include: bool = form.get(f"include_{sample_id}")
         if comment != sample.comment:
@@ -123,7 +124,7 @@ def include_all_samples(samples: Iterable[str], adapter: NiptAdapter, user: User
 
     time_stamp: str = datetime.now().strftime("%Y/%m/%d %H:%M:%S")
     for sample_id in samples:
-        sample: Sample = find.sample(sample_id=sample_id, adapter=adapter)
+        sample: DataBaseSample = find.sample(sample_id=sample_id, adapter=adapter)
         if sample.include:
             continue
         sample.include = True

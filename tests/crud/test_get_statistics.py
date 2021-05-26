@@ -1,8 +1,8 @@
 from NIPTool.adapter import NiptAdapter
-from NIPTool.API.external.utils import (
+from NIPTool.crud.find.plots.statistics_plot_data import (
     get_last_batches,
-    get_statistics_for_box_plot,
     get_statistics_for_scatter_plot,
+    get_statistics_for_box_plot,
 )
 
 
@@ -18,7 +18,7 @@ def test_get_last_batches(database):
     nipt_adapter.batch_collection.insert_many([batch4, batch1, batch3, batch2])
 
     # WHEN running get_last_batches with nr=3
-    results = get_last_batches(adapter=nipt_adapter, nr=3)
+    results = get_last_batches(adapter=nipt_adapter, nr_of_batches=3)
 
     # THEN the results should contain the thre batches with the latest
     # SequencingDate, sorted by SequencingDate
@@ -37,7 +37,7 @@ def test_get_last_batches_to_fiew_batches_in_database(database):
     nipt_adapter.batch_collection.insert_many([batch4, batch1, batch3, batch2])
 
     # WHEN running get_last_batches with nr=5
-    results = get_last_batches(adapter=nipt_adapter, nr=5)
+    results = get_last_batches(adapter=nipt_adapter, nr_of_batches=5)
 
     # THEN the results should contain the four batches in the
     # database sorted by SequencingDate

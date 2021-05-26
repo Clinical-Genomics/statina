@@ -5,7 +5,7 @@ from pathlib import Path
 from typing import Optional, List, Dict
 from pydantic import parse_obj_as
 
-from NIPTool.models.database import Sample, Batch
+from NIPTool.models.database import DataBaseSample, Batch
 
 LOG = logging.getLogger(__name__)
 
@@ -58,10 +58,10 @@ def parse_csv(infile: Path) -> List[Dict[str, str]]:
     return entries
 
 
-def get_samples(nipt_results_path: Path) -> List[Sample]:
+def get_samples(nipt_results_path: Path) -> List[DataBaseSample]:
     """Parse NIPT result file into samples"""
 
-    return parse_obj_as(List[Sample], parse_csv(nipt_results_path))
+    return parse_obj_as(List[DataBaseSample], parse_csv(nipt_results_path))
 
 
 def get_batch(nipt_results_path: Path) -> Batch:

@@ -5,7 +5,7 @@ from fastapi import Depends, Request
 from fastapi.security import OAuth2PasswordRequestForm
 from jose import JWTError, jwt
 from NIPTool.config import get_nipt_adapter
-from NIPTool.crud import find
+from NIPTool.crud.find import find
 from NIPTool.adapter.plugin import NiptAdapter
 from NIPTool.exeptions import CredentialsError
 

@@ -31,7 +31,7 @@
 
                 var cases = {
                     name: "Current batch (N =" + "{{cases['count']}}" + ")",
-                    y: {{cases['values']}},
+                    y: {{cases['ncv_values']}},
                     x: {{cases['x_axis']}},
                     text: {{cases['names']|tojson}},
                     mode: 'markers',
@@ -40,13 +40,13 @@
                 data.push(cases)
 
                 var box = {
-                    y: {{ normal_data['values'] }},
+                    y: {{ normal_data.ncv_values }},
                     pointpos: 30,
                     type: 'box',
                     marker: {
                         color: '#ccccb3'
                     },
-                    name: 'Negative (N='+{{normal_data['count']}}+')',
+                    name: 'Negative (N={{normal_data.count}})',
                     hoverinfo: 'none'
                 }
                 data.push(box)
@@ -69,12 +69,12 @@
                     data.push(line);
                 {% endfor %}
 
-                {% for status  in abnormal_data.keys() %}
+                {% for status, data  in abnormal_data.items() %}
                     var verif = {
-                        name: "{{status}} T{{chrom}} (N="+{{abnormal_data[status]['count']}}+")",
-                        y: {{abnormal_data[status]['values']}},
-                        x: {{abnormal_data[status]['x_axis']}},
-                        text: {{abnormal_data[status]['names']|tojson}},
+                        name: "{{status}} T{{chrom}} (N={{data.count}})",
+                        y: {{data.ncv_values}},
+                        x: {{data.x_axis}},
+                        text: {{data.names|tojson}},
                         mode: 'markers',
                         type: 'scatter'
                     };

@@ -33,14 +33,14 @@
                             <input type=text name="samples" value="{{ sample.sample_id }}" hidden>
                             <tr>
                                 <td width="20%">{{ sample.sample_id }}</td>
-                                <td width="4%" class="{{ sample.Zscore_13.warn}}">{{ sample.Zscore_13.value }}</td>
-                                <td width="4%" class="{{ sample.Zscore_18.warn}}">{{ sample.Zscore_18.value }}</td>
-                                <td width="4%" class="{{ sample.Zscore_21.warn}}">{{ sample.Zscore_21.value }}</td>
-                                <td width="4%" class="{{ sample.Zscore_X.warn}}">{{ sample.Zscore_X.value }}</td>
-                                <td width="4%" class="{{sample.FF.warn}}">{{sample.FF.value}}</td>
-                                <td width="4%" class="{{sample.FFX.warn}}">{{sample.FFX.value}}</td>
-                                <td width="4%" class="{{sample.FFY.warn}}">{{sample.FFY.value}}</td>
-                                <td width="4%" class="{{sample.CNVSegment.warn}}">{{sample.CNVSegment.value}}</td>
+                                            <td width="4%" class = "{{ sample.warnings.Zscore_13}}">{{ sample.Zscore_13 }}</td>
+                                            <td width="4%" class = "{{ sample.warnings.Zscore_18}}">{{ sample.Zscore_18 }}</td>
+                                            <td width="4%" class = "{{ sample.warnings.Zscore_21}}">{{ sample.Zscore_21 }}</td>
+                                            <td width="4%" class = "{{ sample.warnings.Zscore_X}}">{{ sample.Zscore_X }}</td>
+                                            <td width="4%" class = "{{sample.warnings.FF_Formatted}}">{{sample.FF_Formatted}}</td>
+                                            <td width="4%" class = "default">{{sample.FFX}}</td>
+                                            <td width="4%" class = "default">{{sample.FFY}}</td>
+                                            <td width="4%" class = "default">{{sample.CNVSegment}}</td>
                                 <th>
                                     <p> <small></small></p>
                                 </th>

@@ -1,8 +1,7 @@
 from typing import Iterable, List, Optional
 
 from NIPTool.adapter import NiptAdapter
-from NIPTool.models.database import Batch, Sample, User
-
+from NIPTool.models.database import Batch, DataBaseSample, User
 from pydantic import parse_obj_as
 
 
@@ -21,14 +20,14 @@ def user(
     return User(**raw_user)
 
 
-def sample(adapter: NiptAdapter, sample_id: str) -> Optional[Sample]:
+def sample(adapter: NiptAdapter, sample_id: str) -> Optional[DataBaseSample]:
     """Find one sample from the sample collection"""
 
     raw_sample = adapter.sample_collection.find_one({"sample_id": sample_id})
     if not raw_sample:
         return None
 
-    return Sample(**raw_sample)
+    return DataBaseSample(**raw_sample)
 
 
 def batch(adapter: NiptAdapter, batch_id: str) -> Optional[Batch]:
@@ -59,8 +58,8 @@ def batch_aggregate(adapter: NiptAdapter, pipe: list) -> List[Batch]:
     return list(adapter.batch_collection.aggregate(pipe))
 
 
-def batch_samples(adapter: NiptAdapter, batch_id: str) -> List[Sample]:
+def batch_samples(adapter: NiptAdapter, batch_id: str) -> List[DataBaseSample]:
     """All samples within the batch"""
 
     raw_samples: Iterable[dict] = adapter.sample_collection.find({"batch_id": batch_id})
-    return parse_obj_as(List[Sample], list(raw_samples))
+    return parse_obj_as(List[DataBaseSample], list(raw_samples))

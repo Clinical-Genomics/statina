@@ -29,5 +29,6 @@ CMD gunicorn \
     --bind=$GUNICORN_BIND  \
     --threads=$GUNICORN_THREADS \
     --timeout=$GUNICORN_TIMEOUT \
+    --proxy-protocol \
     --worker-class=uvicorn.workers.UvicornWorker \
     NIPTool.main:$SERVICE_SCOPE\_app

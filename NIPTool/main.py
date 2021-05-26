@@ -12,7 +12,7 @@ from NIPTool.API.external.api.api_v1.endpoints import (
 from NIPTool.API.internal.api.api_v1.endpoints import insert
 
 external_app = FastAPI(
-    servers=[{"url": "https://nipttol-stage.scilifelab.se", "description": "Staging environment"}]
+    servers=[{"url": "https://nipttol-stage.scilifelab.se", "description": "Staging environment"}],
 )
 external_app.include_router(login.router, prefix="/api/v1/login", tags=["login"])
 external_app.include_router(batches.router, prefix="/api/v1/batches", tags=["batches"])

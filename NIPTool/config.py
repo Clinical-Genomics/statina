@@ -1,7 +1,7 @@
 from pathlib import Path
 
 from fastapi.templating import Jinja2Templates
-from pydantic import BaseSettings
+from pydantic import BaseSettings, EmailStr
 from pymongo import MongoClient
 
 from NIPTool.adapter.plugin import NiptAdapter
@@ -22,6 +22,22 @@ class Settings(BaseSettings):
     host: str = "localhost"
     access_token_expire_minutes: int = 30
     port: int = 8000
+    sll_port: int = 465
+    smtp_server: str = "smtp.gmail.com"
+    sender_email: EmailStr = "testkontopython@gmail.com"
+    sender_password: str = "TestkontoPython1!"
+
+    class Config:
+        env_file = str(ENV_FILE)
+
+
+class EmailSettings(BaseSettings):
+    """Settings for sending email"""
+
+    sll_port: int = 465
+    smtp_server: str = "smtp.gmail.com"
+    sender_email: EmailStr = "testkontopython@gmail.com"
+    sender_password: str = "TestkontoPython1!"
 
     class Config:
         env_file = str(ENV_FILE)

@@ -5,6 +5,7 @@ from NIPTool.API.external.api.api_v1.endpoints import (
     download,
     index,
     login,
+    new_user,
     sample,
     statistics,
     update,
@@ -13,6 +14,7 @@ from NIPTool.API.internal.api.api_v1.endpoints import insert
 
 external_app = FastAPI()
 external_app.include_router(login.router, prefix="/api/v1/login", tags=["login"])
+external_app.include_router(login.router, prefix="/api/v1/new_user", tags=["new_user"])
 external_app.include_router(batches.router, prefix="/api/v1/batches", tags=["batches"])
 external_app.include_router(index.router, prefix="/api/v1", tags=["index"])
 external_app.include_router(sample.router, prefix="/api/v1", tags=["sample"])

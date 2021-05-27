@@ -1,20 +1,16 @@
 import datetime
 from typing import Optional
 
-from fastapi import APIRouter, Depends, Request
+from fastapi import APIRouter, Depends
 from fastapi.responses import RedirectResponse
 from fastapi.security import OAuth2PasswordRequestForm
 
 from NIPTool.API.external.api.deps import (
     authenticate_user,
     create_access_token,
-    get_password_hash,
 )
-from NIPTool.adapter import NiptAdapter
-from NIPTool.config import settings, get_nipt_adapter
-from NIPTool.crud.insert import insert_user
+from NIPTool.config import settings
 from NIPTool.models.database import User
-from NIPTool.models.server.load import NewUser
 
 router = APIRouter()
 
@@ -55,32 +51,4 @@ def login(token: Optional[str] = Depends(login_for_access_token)):
     else:
         response = RedirectResponse("../batches")
         response.set_cookie(key="token", value=token)
-    return response
-
-
-@router.post("/add_new_user")
-async def add_new_user(request: Request, adapter: NiptAdapter = Depends(get_nipt_adapter)):
-    """Redirects back to index, if invalid username or password """
-    form = await request.form()
-    new_user = NewUser(**form)
-
-    user = User(
-        **new_user.dict(),
-        added=datetime.datetime.now(),
-        role="inactive",
-        hashed_password=get_password_hash(new_user.password),
-    )
-
-    response = RedirectResponse("../new_user")
-
-    try:
-        insert_user(adapter=adapter, user=user)
-        response.set_cookie(
-            key="user_info",
-            value=f"An email will be sent to {new_user.email} when your user has been confirmed and activated.",
-        )
-    except Exception as error:
-        response.set_cookie(key="user_info", value=f"{error}")
-        pass
-
     return response

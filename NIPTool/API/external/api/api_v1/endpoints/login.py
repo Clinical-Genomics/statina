@@ -45,15 +45,15 @@ def logout():
 @router.post("/login")
 def login(token: Optional[str] = Depends(login_for_access_token)):
     """Redirects back to index, if invalid username or password """
-    print("hahah")
+
     if not token:
         response = RedirectResponse("../")
+        response.set_cookie(key="info_type", value="danger")
         response.set_cookie(
             key="user_info",
             value=f"Wrong username or password.",
         )
     else:
-        print("hohp")
         response = RedirectResponse("../batches")
         response.set_cookie(key="token", value=token)
     return response

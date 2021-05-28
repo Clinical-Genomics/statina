@@ -29,5 +29,9 @@ CMD gunicorn \
     --bind=$GUNICORN_BIND  \
     --threads=$GUNICORN_THREADS \
     --timeout=$GUNICORN_TIMEOUT \
+    --proxy-protocol \
+    --forwarded-allow-ips="10.0.2.100,127.0.0.1" \
+    --log-syslog \
+    --log-level="debug" \
     --worker-class=uvicorn.workers.UvicornWorker \
     NIPTool.main:$SERVICE_SCOPE\_app

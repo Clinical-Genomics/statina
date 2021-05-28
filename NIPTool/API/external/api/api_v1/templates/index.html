@@ -32,6 +32,12 @@
                                 <button type="submit" class="btn btn-primary">Submit</button>
                                 <a href="{{ url_for('new_user') }}"  class="btn btn-link">New User</a>
                             </form>
+                            {% if user_info %}
+                        <br>
+                        <div class="alert alert-{{ info_type}}" role="alert">
+                                {{ user_info }}
+                        </div>
+                        {% endif %}
 
 
                         </div>

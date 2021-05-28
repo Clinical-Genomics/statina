@@ -62,12 +62,15 @@ async def add_new_user(request: Request, adapter: NiptAdapter = Depends(get_nipt
         send_mail(
             user=new_user.username, email=new_user.email
         )  # if thisone fails, the error is not picked up!?!?!
+        response.set_cookie(key="info_type", value="success")
         response.set_cookie(
             key="user_info",
             value=f"Your user account has been created and an email has been sent to the NIPTool admin. "
             f"They will send an email to {new_user.email} when your user has been confirmed and activated.",
         )
+
     except Exception as error:
+        response.set_cookie(key="info_type", value="danger")
         response.set_cookie(key="user_info", value=f"{error}")
         pass
 
@@ -90,6 +93,7 @@ def new_user(request: Request):
         context={
             "request": request,
             "current_user": "",
+            "info_type": request.cookies.get("info_type"),
             "user_info": request.cookies.get("user_info"),
         },
     )

@@ -8,10 +8,11 @@ from pydantic import EmailStr
 from starlette.requests import Request
 from starlette.responses import RedirectResponse
 
+from NIPTool.API.external.api.api_v1.endpoints.index import router
 from NIPTool.API.external.api.api_v1.endpoints.login import router
 from NIPTool.API.external.api.deps import get_password_hash
 from NIPTool.adapter import NiptAdapter
-from NIPTool.config import get_nipt_adapter
+from NIPTool.config import get_nipt_adapter, templates
 from NIPTool.crud.insert import insert_user
 from NIPTool.exeptions import EmailNotSentError
 from NIPTool.models.database import User
@@ -57,10 +58,13 @@ async def add_new_user(request: Request, adapter: NiptAdapter = Depends(get_nipt
     response = RedirectResponse("../new_user")
 
     try:
+        print("hej")
         insert_user(adapter=adapter, user=user)
+        print("hoj")
         send_mail(
             user=new_user.username, email=new_user.email
         )  # if thisone fails, the error is not picked up!?!?!
+        print("haj")
         response.set_cookie(
             key="user_info",
             value=f"Your user account has been created and an email has been sent to the NIPTool admin. "
@@ -71,3 +75,24 @@ async def add_new_user(request: Request, adapter: NiptAdapter = Depends(get_nipt
         pass
 
     return response
+
+
+@router.get("/new_user")
+def new_user(request: Request):
+    """Log in view."""
+    return templates.TemplateResponse(
+        "new_user.html", context={"request": request, "current_user": ""}
+    )
+
+
+@router.post("/new_user")
+def new_user(request: Request):
+    """Log in view."""
+    return templates.TemplateResponse(
+        "new_user.html",
+        context={
+            "request": request,
+            "current_user": "",
+            "user_info": request.cookies.get("user_info"),
+        },
+    )

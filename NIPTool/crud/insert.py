@@ -48,10 +48,13 @@ def insert_samples(
 def insert_user(adapter: NiptAdapter, user: User) -> str:
     """Function to load a new user to the database."""
 
-    # Check that the username is unique, this should be controlled by creating a index with restrictions
-    existing_user: Optional[dict] = adapter.user_collection.find_one({"username": user.username})
-    if existing_user:
-        raise InsertError(f"User with username {user.username} already exist in database.")
+    existing_user: Optional[dict] = adapter.user_collection.find(
+        {"$or": [{"username": user.username}, {"email": user.email}]}
+    )
+    if list(existing_user):
+        raise InsertError(
+            f"User with username {user.username} or email {user.email} already exist in database."
+        )
     try:
         result: InsertOneResult = adapter.user_collection.insert_one(user.dict())
         LOG.info("Added user document %s.", user.email)

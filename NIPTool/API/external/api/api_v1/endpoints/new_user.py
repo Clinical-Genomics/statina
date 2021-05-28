@@ -55,16 +55,13 @@ async def add_new_user(request: Request, adapter: NiptAdapter = Depends(get_nipt
         hashed_password=get_password_hash(new_user.password),
     )
 
-    response = RedirectResponse("../new_user")
+    response = RedirectResponse("new_user")
 
     try:
-        print("hej")
         insert_user(adapter=adapter, user=user)
-        print("hoj")
         send_mail(
             user=new_user.username, email=new_user.email
         )  # if thisone fails, the error is not picked up!?!?!
-        print("haj")
         response.set_cookie(
             key="user_info",
             value=f"Your user account has been created and an email has been sent to the NIPTool admin. "

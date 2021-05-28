@@ -44,7 +44,7 @@ def logout():
 
 @router.post("/login")
 def login(token: Optional[str] = Depends(login_for_access_token)):
-    """Redirects back to index, if invalid username or password """
+    """Redirects back to index, if invalid username or password"""
 
     if not token:
         response = RedirectResponse("../")

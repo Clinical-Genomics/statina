@@ -1,10 +1,8 @@
 import logging
 
+from mongo_adapter import MongoAdapter
 from pymongo.collection import Collection
 from pymongo.database import Database
-
-from mongo_adapter import MongoAdapter
-
 
 LOG = logging.getLogger(__name__)
 

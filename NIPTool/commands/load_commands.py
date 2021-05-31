@@ -3,6 +3,8 @@ from pathlib import Path
 from typing import List
 
 import click
+from pymongo import MongoClient
+
 from NIPTool.adapter import NiptAdapter
 from NIPTool.config import settings
 from NIPTool.crud import find, insert
@@ -10,7 +12,6 @@ from NIPTool.exeptions import InsertError
 from NIPTool.models.database import Batch, DataBaseSample
 from NIPTool.models.server.load import BatchRequestBody, UserRequestBody
 from NIPTool.parse.batch import get_batch, get_samples
-from pymongo import MongoClient
 
 LOG = logging.getLogger(__name__)
 

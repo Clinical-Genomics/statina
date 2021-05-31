@@ -1,30 +1,30 @@
-from typing import List, Dict
+from typing import Dict, List
 
 from fastapi import APIRouter, Depends, Request
 
-from NIPTool.models.server.plots.coverage import CoveragePlotSampleData
-from NIPTool.models.server.sample import Sample
-from NIPTool.crud.find import find
 import NIPTool.crud.find.plots.fetal_fraction_plot_data as get_fetal_fraction
-from NIPTool.crud.find.plots.coverage_plot_data import (
-    get_scatter_data_for_coverage_plot,
-    get_box_data_for_coverage_plot,
-)
-from NIPTool.crud.find.plots.ncv_plot_data import (
-    get_tris_control_normal,
-    get_tris_control_abnormal,
-    get_tris_samples,
-    get_samples_for_report_ncv_plot,
-)
-from NIPTool.models.server.plots.fetal_fraction import (
-    FetalFractionSamples,
-    FetalFractionControlAbNormal,
-)
+from NIPTool.adapter import NiptAdapter
 from NIPTool.API.external.api.deps import get_current_user
 from NIPTool.API.external.constants import TRISOMI_TRESHOLDS
-from NIPTool.adapter import NiptAdapter
 from NIPTool.config import get_nipt_adapter, templates
-from NIPTool.models.database import Batch, User, DataBaseSample
+from NIPTool.crud.find import find
+from NIPTool.crud.find.plots.coverage_plot_data import (
+    get_box_data_for_coverage_plot,
+    get_scatter_data_for_coverage_plot,
+)
+from NIPTool.crud.find.plots.ncv_plot_data import (
+    get_samples_for_report_ncv_plot,
+    get_tris_control_abnormal,
+    get_tris_control_normal,
+    get_tris_samples,
+)
+from NIPTool.models.database import Batch, DataBaseSample, User
+from NIPTool.models.server.plots.coverage import CoveragePlotSampleData
+from NIPTool.models.server.plots.fetal_fraction import (
+    FetalFractionControlAbNormal,
+    FetalFractionSamples,
+)
+from NIPTool.models.server.sample import Sample
 
 router = APIRouter()
 

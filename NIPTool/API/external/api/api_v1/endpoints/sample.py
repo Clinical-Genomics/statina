@@ -2,18 +2,18 @@ from typing import Dict
 
 from fastapi import APIRouter, Depends, Request
 
+from NIPTool.adapter import NiptAdapter
+from NIPTool.API.external.api.deps import get_current_user
+from NIPTool.API.external.constants import CHROM_ABNORM, STATUS_CLASSES, STATUS_COLORS
+from NIPTool.config import get_nipt_adapter, templates
+from NIPTool.crud.find import find
 from NIPTool.crud.find.plots.ncv_plot_data import (
     get_abn_for_samp_tris_plot,
     get_normal_for_samp_tris_plot,
     get_sample_for_samp_tris_plot,
 )
-from NIPTool.API.external.api.deps import get_current_user
-from NIPTool.API.external.constants import CHROM_ABNORM, STATUS_CLASSES, STATUS_COLORS
-from NIPTool.adapter import NiptAdapter
-from NIPTool.config import get_nipt_adapter, templates
-from NIPTool.crud.find import find
-from NIPTool.models.database import Batch, User, DataBaseSample
-from NIPTool.models.server.plots.ncv import NCVSamples, NCV131821
+from NIPTool.models.database import Batch, DataBaseSample, User
+from NIPTool.models.server.plots.ncv import NCV131821, NCVSamples
 
 router = APIRouter()
 

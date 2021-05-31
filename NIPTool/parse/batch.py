@@ -1,11 +1,11 @@
 import csv
 import logging
 from pathlib import Path
+from typing import Dict, List, Optional
 
-from typing import Optional, List, Dict
 from pydantic import parse_obj_as
 
-from NIPTool.models.database import DataBaseSample, Batch
+from NIPTool.models.database import Batch, DataBaseSample
 
 LOG = logging.getLogger(__name__)
 

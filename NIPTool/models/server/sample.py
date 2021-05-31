@@ -3,9 +3,9 @@ from typing import Literal, Optional
 from pydantic import BaseModel, validator
 
 from NIPTool.API.external.constants import (
-    TRIS_CHROM_ABNORM,
-    SEX_CHROM_ABNORM,
     FF_TRESHOLD,
+    SEX_CHROM_ABNORM,
+    TRIS_CHROM_ABNORM,
     TRISOMI_TRESHOLDS,
 )
 from NIPTool.models.database import DataBaseSample

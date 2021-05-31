@@ -3,8 +3,8 @@ from pathlib import Path
 from fastapi import APIRouter, Depends, Request
 from fastapi.responses import FileResponse, RedirectResponse
 
-from NIPTool.API.external.api.deps import get_current_user
 from NIPTool.adapter.plugin import NiptAdapter
+from NIPTool.API.external.api.deps import get_current_user
 from NIPTool.config import get_nipt_adapter
 from NIPTool.crud.find import find
 from NIPTool.models.database import User

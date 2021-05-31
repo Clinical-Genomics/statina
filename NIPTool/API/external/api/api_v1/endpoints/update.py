@@ -4,15 +4,15 @@ from typing import Iterable
 
 from fastapi import APIRouter, Depends, Request
 from fastapi.responses import RedirectResponse
+from starlette.datastructures import FormData
 
+from NIPTool.adapter import NiptAdapter
 from NIPTool.API.external.api.deps import get_current_user
 from NIPTool.API.external.constants import CHROM_ABNORM
-from NIPTool.adapter import NiptAdapter
 from NIPTool.config import get_nipt_adapter
 from NIPTool.crud import update
 from NIPTool.crud.find import find
-from NIPTool.models.database import User, DataBaseSample
-from starlette.datastructures import FormData
+from NIPTool.models.database import DataBaseSample, User
 
 router = APIRouter()
 

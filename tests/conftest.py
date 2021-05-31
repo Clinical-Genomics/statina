@@ -3,6 +3,7 @@ from pathlib import Path
 import pytest
 from fastapi.testclient import TestClient
 from mongomock import MongoClient
+
 from NIPTool.adapter.plugin import NiptAdapter
 from NIPTool.config import get_nipt_adapter
 from NIPTool.main import internal_app as app

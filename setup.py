@@ -1,5 +1,6 @@
+from setuptools import find_packages, setup
+
 from NIPTool import __version__ as version
-from setuptools import setup, find_packages
 
 try:
     with open("requirements.txt", "r") as f:

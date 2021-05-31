@@ -1,8 +1,9 @@
 from typing import Iterable, List, Optional
 
+from pydantic import parse_obj_as
+
 from NIPTool.adapter import NiptAdapter
 from NIPTool.models.database import Batch, DataBaseSample, User
-from pydantic import parse_obj_as
 
 
 def user(

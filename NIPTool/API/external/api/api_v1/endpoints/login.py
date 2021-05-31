@@ -5,10 +5,7 @@ from fastapi import APIRouter, Depends, Request
 from fastapi.responses import RedirectResponse
 from fastapi.security import OAuth2PasswordRequestForm
 
-from NIPTool.API.external.api.deps import (
-    authenticate_user,
-    create_access_token,
-)
+from NIPTool.API.external.api.deps import authenticate_user, create_access_token
 from NIPTool.config import settings
 from NIPTool.models.database import User
 

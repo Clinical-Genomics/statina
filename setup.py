@@ -1,5 +1,6 @@
+from setuptools import find_packages, setup
+
 from NIPTool import __version__ as version
-from setuptools import setup, find_packages
 
 try:
     with open("requirements.txt", "r") as f:
@@ -24,7 +25,9 @@ setup(
     packages=find_packages(),
     include_package_data=True,
     zip_safe=False,
-    entry_points={"console_scripts": ["nipt=NIPTool.commands:cli"],},
+    entry_points={
+        "console_scripts": ["nipt=NIPTool.commands:cli"],
+    },
     classifiers=[
         "Programming Language :: Python :: 3",
         "License :: OSI Approved :: MIT License",

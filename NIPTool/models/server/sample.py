@@ -3,9 +3,9 @@ from typing import Literal, Optional
 from pydantic import BaseModel, validator
 
 from NIPTool.API.external.constants import (
-    TRIS_CHROM_ABNORM,
-    SEX_CHROM_ABNORM,
     FF_TRESHOLD,
+    SEX_CHROM_ABNORM,
+    TRIS_CHROM_ABNORM,
     TRISOMI_TRESHOLDS,
 )
 from NIPTool.models.database import DataBaseSample
@@ -64,7 +64,7 @@ class Sample(DataBaseSample):
     @validator("warnings", always=True)
     def set_warnings(cls, v, values: dict) -> SampleWarning:
 
-        """"""
+        """ """
 
         sample_warnings = {}
         fetal_fraction = values.get("FF_Formatted")
@@ -80,7 +80,7 @@ class Sample(DataBaseSample):
     @validator("text_warning", always=True)
     def set_text_warning(cls, v, values: dict) -> str:
 
-        """"""
+        """ """
 
         return ""
 

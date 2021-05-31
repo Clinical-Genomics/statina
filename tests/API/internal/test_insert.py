@@ -2,7 +2,6 @@ import pytest
 from fastapi import status
 from pydantic import ValidationError
 
-
 """
 def test_user_mocked(mocker, fast_app_client, valid_load_user):
     # GIVEN a insert_user function that never fails

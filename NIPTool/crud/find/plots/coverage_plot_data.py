@@ -1,11 +1,8 @@
-from typing import List, Dict
+from typing import Dict, List
 
-from NIPTool.models.server.sample import (
-    SampleWarning,
-    Sample,
-)
-from NIPTool.models.server.plots.coverage import CoveragePlotSampleData
 from NIPTool.models.database import DataBaseSample
+from NIPTool.models.server.plots.coverage import CoveragePlotSampleData
+from NIPTool.models.server.sample import Sample, SampleWarning
 
 
 def get_scatter_data_for_coverage_plot(

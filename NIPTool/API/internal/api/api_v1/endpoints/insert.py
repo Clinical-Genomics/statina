@@ -1,10 +1,11 @@
+from datetime import datetime
 from pathlib import Path
 from typing import List
 
 from fastapi import APIRouter, Depends, Response, status
-from datetime import datetime
-from NIPTool.API.external.api.deps import get_password_hash
+
 from NIPTool.adapter.plugin import NiptAdapter
+from NIPTool.API.external.api.deps import get_password_hash
 from NIPTool.config import get_nipt_adapter
 from NIPTool.crud.find import find
 from NIPTool.crud.insert import insert_batch, insert_samples, insert_user

@@ -1,10 +1,10 @@
 from copy import deepcopy
 from typing import Dict, Optional
 
-from NIPTool.models.server.plots.ncv import NCVSamples, NCV131821
 from NIPTool.adapter import NiptAdapter
 from NIPTool.crud.find import find
 from NIPTool.models.database import DataBaseSample
+from NIPTool.models.server.plots.ncv import NCV131821, NCVSamples
 
 
 def get_tris_control_abnormal(adapter: NiptAdapter, chr, x_axis) -> Dict[str, NCVSamples]:

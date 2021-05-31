@@ -82,12 +82,13 @@ Steps to test current branch on staging:
 
 `ssh localhost`
   
-If you made changes to internal app : `systemctl restart niptoolAppInternal.service` 
+If you made changes to internal app : `systemctl --user restart niptoolAppInternal.service` 
 
-If you made changes to external app : `systemctl restart niptoolApp.service` 
+If you made changes to external app : `systemctl --user restart niptoolApp.service` 
 
 Your branch should be deployed to staging at https://statina-stage.scilifelab.se 
 
+If for some reason you cannot access the application at given address, check status of the container: `systemctl --user status niptoolApp.service`
 
 ### Deploying to production
 

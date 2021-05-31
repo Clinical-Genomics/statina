@@ -64,7 +64,7 @@ class Sample(DataBaseSample):
     @validator("warnings", always=True)
     def set_warnings(cls, v, values: dict) -> SampleWarning:
 
-        """"""
+        """ """
 
         sample_warnings = {}
         fetal_fraction = values.get("FF_Formatted")
@@ -80,7 +80,7 @@ class Sample(DataBaseSample):
     @validator("text_warning", always=True)
     def set_text_warning(cls, v, values: dict) -> str:
 
-        """"""
+        """ """
 
         return ""
 

@@ -24,7 +24,9 @@ setup(
     packages=find_packages(),
     include_package_data=True,
     zip_safe=False,
-    entry_points={"console_scripts": ["nipt=NIPTool.commands:cli"],},
+    entry_points={
+        "console_scripts": ["nipt=NIPTool.commands:cli"],
+    },
     classifiers=[
         "Programming Language :: Python :: 3",
         "License :: OSI Approved :: MIT License",

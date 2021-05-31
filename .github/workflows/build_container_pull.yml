@@ -22,7 +22,6 @@ jobs:
           registry_username: ${{ secrets.DOCKER_USERNAME }}
           registry_password: ${{ secrets.DOCKER_PASSWORD }}
 
-
       - name: Get branch name
         uses: nelonoel/branch-name@v1.0.1
 

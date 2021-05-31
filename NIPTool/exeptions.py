@@ -20,7 +20,9 @@ class FileValidationError(NIPToolError):
     pass
 
 
-class MissMatchingUserNamesError(NIPToolError):
+class MissMatchingPasswordError(NIPToolError):
+    """Raise when password and confirmed password dont match"""
+
     pass
 
 

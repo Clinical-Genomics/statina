@@ -1,19 +1,20 @@
 from pydantic import BaseModel, EmailStr, validator
 
-from NIPTool.exeptions import MissMatchingUserNamesError
+from NIPTool.exeptions import MissMatchingPasswordError
 from NIPTool.config import EmailSettings
 
 
 class NewUser(BaseModel):
     email: EmailStr
     username: str
-    password_repeted: str
+    password_repeated: str
     password: str
 
     @validator("password", always=True)
     def validate_password(cls, v, values: dict) -> str:
-        if v != values["password_repeted"]:
-            raise MissMatchingUserNamesError
+        print(values)
+        if v != values["password_repeated"]:
+            raise MissMatchingPasswordError
         return v
 
 

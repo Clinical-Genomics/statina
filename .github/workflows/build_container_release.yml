@@ -18,7 +18,7 @@ jobs:
       - name: Retag latest to backup
         uses: tinact/docker.image-retag@master
         with:
-          image_name: clinicalgenomics/niptool-stage
+          image_name: clinicalgenomics/niptool
           image_old_tag: latest
           image_new_tag: backup
           registry: registry.hub.docker.com

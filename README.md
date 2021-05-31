@@ -65,6 +65,27 @@ make releases in release branches which corresponds to stable versions of NIPToo
 	- Make descriptive title
 	- Paste latest changelog to the text body
 	- Release!
+	
+### Deploying to staging
+
+Opening pull requests in NIPTool repository will enable a Github Action to build containers and publish to 
+[niptool-stage dockerhub](https://hub.docker.com/repository/docker/clinicalgenomics/niptool-stage) with each commit.
+
+Two tags will be published: one with the name of the branch and another tagged "latest"
+Steps to test current branch on staging:
+
+`ssh firstname.lastname@cg-vm1.scilifelab.se`
+
+`sudo -iu hiseq.clinical`
+
+`ssh localhost`
+  
+If you made changes to internal app : `systemctl restart niptoolAppInternal.service` 
+
+If you made changes to external app : `systemctl restart niptoolApp.service` 
+
+Your branch should be deployed to staging at https://statina-stage.scilifelab.se 
+
 
 ### Deploying to production
 

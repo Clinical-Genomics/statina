@@ -1,12 +1,13 @@
 import logging
 from typing import Dict, List, Optional
 
+from pymongo.results import InsertManyResult, InsertOneResult
+
 from NIPTool.adapter import NiptAdapter
 from NIPTool.exeptions import InsertError
 from NIPTool.models.database import Batch, DataBaseSample, User
 from NIPTool.models.server.load import BatchRequestBody
 from NIPTool.parse.batch import parse_segmental_calls
-from pymongo.results import InsertManyResult, InsertOneResult
 
 LOG = logging.getLogger(__name__)
 

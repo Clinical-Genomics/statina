@@ -4,15 +4,13 @@ from typing import Optional
 from fastapi import Depends, Request
 from fastapi.security import OAuth2PasswordRequestForm
 from jose import JWTError, jwt
-from NIPTool.config import get_nipt_adapter
-from NIPTool.crud.find import find
-from NIPTool.adapter.plugin import NiptAdapter
-from NIPTool.exeptions import CredentialsError
-
-from NIPTool.models.database import User
 from passlib.context import CryptContext
-from NIPTool.config import settings
 
+from NIPTool.adapter.plugin import NiptAdapter
+from NIPTool.config import get_nipt_adapter, settings
+from NIPTool.crud.find import find
+from NIPTool.exeptions import CredentialsError
+from NIPTool.models.database import User
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 

@@ -1,13 +1,13 @@
 from typing import Optional
 
-from NIPTool.models.server.plots.fetal_fraction import (
-    FetalFractionSamples,
-    FetalFractionControlAbNormal,
-    AbNormalityClasses,
-)
-from NIPTool.API.external.constants import CHROM_ABNORM, SEX_CHROM_ABNORM
 from NIPTool.adapter import NiptAdapter
+from NIPTool.API.external.constants import CHROM_ABNORM, SEX_CHROM_ABNORM
 from NIPTool.crud.find import find
+from NIPTool.models.server.plots.fetal_fraction import (
+    AbNormalityClasses,
+    FetalFractionControlAbNormal,
+    FetalFractionSamples,
+)
 
 
 def samples(

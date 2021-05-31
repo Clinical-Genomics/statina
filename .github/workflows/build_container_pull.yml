@@ -12,6 +12,16 @@ jobs:
       - name: Check out git repository
         uses: actions/checkout@v1
 
+      - name: Retag latest to backup
+        uses: ybrin/retag-docker-image@0.1.0
+        with:
+          registry: hub.docker.com
+          name: clinicalgenomics/niptool-stage
+          old_tag: latest
+          new_tag: backup
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+
       - name: Get branch name
         uses: nelonoel/branch-name@v1.0.1
 

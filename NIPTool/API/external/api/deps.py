@@ -52,6 +52,8 @@ def authenticate_user(username: str, password: str) -> Optional[User]:
 
     if not user:
         return None
+    if user.role == "inactive":
+        return None
     if not verify_password(password, user.hashed_password):
         return None
     return user

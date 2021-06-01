@@ -20,6 +20,16 @@ class FileValidationError(NIPToolError):
     pass
 
 
+class MissMatchingPasswordError(NIPToolError):
+    """Raise when password and confirmed password dont match"""
+
+    pass
+
+
+class EmailNotSentError(NIPToolError):
+    pass
+
+
 class NIPToolRestError(NIPToolError):
     def __init__(self, message: str, code: Optional[int] = None):
         self.message = message

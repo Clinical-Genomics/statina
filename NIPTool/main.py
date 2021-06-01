@@ -5,11 +5,13 @@ from NIPTool.API.external.api.api_v1.endpoints import (
     download,
     index,
     login,
+    new_user,
     sample,
     statistics,
     update,
 )
 from NIPTool.API.internal.api.api_v1.endpoints import insert
+
 
 external_app = FastAPI(
     servers=[{"url": "https://nipttol-stage.scilifelab.se", "description": "Staging environment"}],

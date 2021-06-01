@@ -32,7 +32,7 @@
                                         <td><a
                                                 href={{ url_for('batch', batch_id=batch.batch_id) }}>{{batch.batch_id if batch.batch_id else "No Batch Name"}}</a>
                                         </td>
-                                        <td class="Date"> {{batch.date }}</td>
+                                        <td class="Date"> {{batch.SequencingDate }}</td>
                                         <td class="Batch id">{{ batch.Flowcell}}</td>
                                     </tr>
                                     {% endfor %}

@@ -8,5 +8,5 @@ class User(BaseModel):
     username: str
     email: EmailStr
     added: datetime
-    role: Literal["R", "RW"]
+    role: Literal["R", "RW", "inactive"]
     hashed_password: str

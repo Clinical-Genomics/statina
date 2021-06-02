@@ -12,7 +12,6 @@ class NewUser(BaseModel):
 
     @validator("password", always=True)
     def validate_password(cls, v, values: dict) -> str:
-        print(values)
         if v != values["password_repeated"]:
             raise MissMatchingPasswordError
         return v

@@ -18,7 +18,7 @@ jobs:
       - name: Retag latest to backup
         uses: tinact/docker.image-retag@master
         with:
-          image_name: clinicalgenomics/niptool
+          image_name: clinicalgenomics/statina
           image_old_tag: latest
           image_new_tag: backup
           registry: registry.hub.docker.com
@@ -28,7 +28,7 @@ jobs:
       - name: Build and publish to Docker Hub
         uses: elgohr/Publish-Docker-Github-Action@master
         with:
-          name: clinicalgenomics/niptool
+          name: clinicalgenomics/statina
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
           tags: "${{ github.event.release.tag_name }}, latest"

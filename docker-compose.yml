@@ -3,16 +3,16 @@ version: '3'
 # (sudo) docker-compose up
 # (sudo) docker-compose down
 services:
-  nipttool-web:
-    container_name: niptool-web
-    image: niptool
+  statina-web:
+    container_name: statina-web
+    image: statina
     volumes:
       - ./demo/NIPT_RESULTS:/var/NIPT_RESULTS
     environment:
       MONGODB_HOST: 'mongo'
       NIPT_CONFIG: '/home/worker/app/demo/config.py'
     networks:
-      - niptool-net
+      - statina-net
     expose:
       - '5000'
     depends_on:
@@ -25,7 +25,7 @@ services:
     container_name: mongo
     image: mongo
     networks:
-      - niptool-net
+      - statina-net
     ports:
       - '27017:27017'
     expose:
@@ -38,12 +38,12 @@ services:
     links:
       - mongo:mongo
     networks:
-      - niptool-net
+      - statina-net
     command: mongorestore --host mongo:27017 /var/db_dump
 
 
 networks:
-  niptool-net:
+  statina-net:
     driver: bridge
     ipam:
       driver: default

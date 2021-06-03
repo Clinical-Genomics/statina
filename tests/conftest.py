@@ -4,10 +4,10 @@ import pytest
 from fastapi.testclient import TestClient
 from mongomock import MongoClient
 
-from NIPTool.adapter.plugin import NiptAdapter
-from NIPTool.config import get_nipt_adapter
-from NIPTool.main import internal_app as app
-from NIPTool.models.server.load import BatchRequestBody, UserRequestBody
+from statina.adapter.plugin import StatinaAdapter
+from statina.config import get_nipt_adapter
+from statina.main import internal_app as app
+from statina.models.server.load import BatchRequestBody, UserRequestBody
 
 from .small_helpers import SmallHelpers
 
@@ -15,11 +15,11 @@ DATABASE = "testdb"
 
 
 def override_nipt_adapter():
-    """Function for overriding the nipt adapter dependency"""
+    """Function for overriding the statina adapter dependency"""
 
     mongo_client = MongoClient()
     database = mongo_client[DATABASE]
-    return NiptAdapter(database.client, db_name=DATABASE)
+    return StatinaAdapter(database.client, db_name=DATABASE)
 
 
 @pytest.fixture()

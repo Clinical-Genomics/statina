@@ -1,4 +1,4 @@
-name: NIPTool CI
+name: statina CI
 
 on: ["pull_request"]
 
@@ -30,7 +30,7 @@ jobs:
 
     - name: Test with pytest & Coveralls
       run: |
-        pytest --cov=NIPTool/
+        pytest --cov=statina/
         coveralls
       env:
         GITHUB: 1

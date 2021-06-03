@@ -19,7 +19,7 @@ services:
       - mongo
     ports:
       - '5000:5000'
-    command: nipt run --host 0.0.0.0
+    command: statina run --host 0.0.0.0
 
   mongo:
     container_name: mongo

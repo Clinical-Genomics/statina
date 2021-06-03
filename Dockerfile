@@ -1,7 +1,7 @@
 FROM python:3.8-slim
 
 LABEL base_image="python:3.8-slim"
-LABEL about.home="https://github.com/Clinical-Genomics/NIPTool"
+LABEL about.home="https://github.com/Clinical-Genomics/statina"
 LABEL about.tags="NIPT,statistics,Non Invasive Prenatal Test,python"
 
 
@@ -9,8 +9,8 @@ ENV GUNICORN_WORKERS=1
 ENV GUNICORN_THREADS=1
 ENV GUNICORN_BIND="0.0.0.0:8000"
 ENV GUNICORN_TIMEOUT=400
-ENV DB_URI="mongodb://localhost:27017/nipt-demo"
-ENV DB_NAME="nipt-demo"
+ENV DB_URI="mongodb://localhost:27017/statina-demo"
+ENV DB_NAME="statina-demo"
 ENV SERVICE_SCOPE="external"
 
 EXPOSE 8000
@@ -35,4 +35,4 @@ CMD gunicorn \
     --access-logfile - \
     --log-level="debug" \
     --worker-class=uvicorn.workers.UvicornWorker \
-    NIPTool.main:$SERVICE_SCOPE\_app
+    statina.main:$SERVICE_SCOPE\_app

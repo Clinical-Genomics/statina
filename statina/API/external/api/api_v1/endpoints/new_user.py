@@ -44,7 +44,7 @@ def send_mail(user: str, email: EmailStr):
 
 @router.post("/add_new_user")
 async def add_new_user(request: Request, adapter: StatinaAdapter = Depends(get_nipt_adapter)):
-    """Redirects back to index, if invalid username or password """
+    """Redirects back to index, if invalid username or password"""
     form = await request.form()
     new_user = NewUser(**form)
 

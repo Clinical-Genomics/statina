@@ -3,3 +3,4 @@ pytest-cov
 coveralls
 pylint
 mongomock
+bump2version

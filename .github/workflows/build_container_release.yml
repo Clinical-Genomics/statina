@@ -15,16 +15,6 @@ jobs:
       - name: Check out git repository
         uses: actions/checkout@v2
 
-      - name: Retag latest to backup
-        uses: tinact/docker.image-retag@master
-        with:
-          image_name: clinicalgenomics/statina
-          image_old_tag: latest
-          image_new_tag: backup
-          registry: registry.hub.docker.com
-          registry_username: ${{ secrets.DOCKER_USERNAME }}
-          registry_password: ${{ secrets.DOCKER_PASSWORD }}
-
       - name: Build and publish to Docker Hub
         uses: elgohr/Publish-Docker-Github-Action@master
         with:

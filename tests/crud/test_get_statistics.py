@@ -1,5 +1,5 @@
-from NIPTool.adapter import NiptAdapter
-from NIPTool.crud.find.plots.statistics_plot_data import (
+from statina.adapter import StatinaAdapter
+from statina.crud.find.plots.statistics_plot_data import (
     get_last_batches,
     get_statistics_for_box_plot,
     get_statistics_for_scatter_plot,
@@ -8,7 +8,7 @@ from NIPTool.crud.find.plots.statistics_plot_data import (
 
 def test_get_last_batches(database):
     # GIVEN a database with four batch documents:
-    nipt_adapter = NiptAdapter(database.client, db_name="test")
+    nipt_adapter = StatinaAdapter(database.client, db_name="test")
 
     batch1 = {"SequencingDate": "2022-03-10"}
     batch2 = {"SequencingDate": "2022-02-10"}
@@ -27,7 +27,7 @@ def test_get_last_batches(database):
 
 def test_get_last_batches_to_fiew_batches_in_database(database):
     # GIVEN a database with four batch documents:
-    nipt_adapter = NiptAdapter(database.client, db_name="test")
+    nipt_adapter = StatinaAdapter(database.client, db_name="test")
 
     batch1 = {"SequencingDate": "2022-03-10"}
     batch2 = {"SequencingDate": "2022-02-10"}
@@ -46,7 +46,7 @@ def test_get_last_batches_to_fiew_batches_in_database(database):
 
 def test_get_statistics_for_box_plot(database, small_helpers):
     # GIVEN a database with thre batches and nine samples like below
-    nipt_adapter = NiptAdapter(database.client, db_name="test")
+    nipt_adapter = StatinaAdapter(database.client, db_name="test")
     batches = ["201860", "201861", "201862"]
     for batch_id in batches:
         batch = small_helpers.batch(batch_id=batch_id)

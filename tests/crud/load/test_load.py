@@ -1,11 +1,11 @@
-from NIPTool.adapter.plugin import NiptAdapter
-from NIPTool.crud.insert import insert_batch, insert_user
-from NIPTool.parse.batch import get_batch, get_samples
+from statina.adapter.plugin import StatinaAdapter
+from statina.crud.insert import insert_batch, insert_user
+from statina.parse.batch import get_batch, get_samples
 
 
 def test_load_user(database, valid_load_user):
-    # GIVEN a user with valid requiered fields and a nipt database adapter
-    nipt_adapter = NiptAdapter(database.client, db_name="test")
+    # GIVEN a user with valid requiered fields and a statina database adapter
+    nipt_adapter = StatinaAdapter(database.client, db_name="test")
 
     # WHEN running insert_user
     insert_user(nipt_adapter, valid_load_user)
@@ -18,7 +18,7 @@ def test_batch_valid_files(database, valid_csv, valid_load_batch):
     # GIVEN the following request data:
     #   a valid csv file with three samples
     #   segmental_calls and multiqc_report files with random content, but that do exist.
-    nipt_adapter = NiptAdapter(database.client, db_name="test")
+    nipt_adapter = StatinaAdapter(database.client, db_name="test")
     batch = get_batch(valid_csv)
 
     # WHEN running insert_batch

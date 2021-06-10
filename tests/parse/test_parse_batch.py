@@ -4,8 +4,8 @@ from typing import List
 import pytest
 from pydantic import ValidationError
 
-from NIPTool.models.database import Batch, DataBaseSample
-from NIPTool.parse.batch import get_batch, get_samples, parse_csv, parse_segmental_calls
+from statina.models.database import Batch, DataBaseSample
+from statina.parse.batch import get_batch, get_samples, parse_csv, parse_segmental_calls
 
 
 def get_nr_csv_entries(csv_path: Path) -> int:

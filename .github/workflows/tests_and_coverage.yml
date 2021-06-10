@@ -1,4 +1,4 @@
-name: NIPTool CI
+name: statina CI
 
 on: ["pull_request"]
 
@@ -13,10 +13,10 @@ jobs:
     - uses: actions/checkout@v2
 
     # Set up python
-    - name: Set up Python 3.7
+    - name: Set up Python 3.8
       uses: actions/setup-python@v2
       with:
-        python-version: 3.7
+        python-version: 3.8
 
     - name: Install Dependencies
       run: |
@@ -30,7 +30,7 @@ jobs:
 
     - name: Test with pytest & Coveralls
       run: |
-        pytest --cov=NIPTool/
+        pytest --cov=statina/
         coveralls
       env:
         GITHUB: 1

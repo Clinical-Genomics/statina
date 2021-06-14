@@ -20,25 +20,25 @@
                                     <tr>
                                         <td><strong>Batch:</strong></td>
                                         <td><a href={{ url_for('batch', batch_id=batch.batch_id) }}>{{ batch.batch_id }}</a></td>
-                                        <td><strong># QCFlags:</strong></td>
+                                        <td><strong>QCFlags:</strong></td>
                                         <td>{{ sample.QCFlag}}</td>
                                     </tr>
                                     <tr>
                                         <td><strong>Sequencing Date:</strong></td>
                                         <td>{{batch.date }} </td>
-                                        <td><strong>Sex (NCV-classified):</strong></td>
+                                        <td><strong>Sex (Auto Classified):</strong></td>
                                         <td>{{NCV_sex}}</td>
                                     </tr>
                                     <tr>
                                         <td><strong>Sample Type:</strong></td>
                                         <td>{{sample.SampleType}}</td>
-                                        <td><strong>Abn (NCV-classified):</strong></td>
-                                        <td>{{NCV_warn}}</td>
+                                        <td><strong>Abnormality (Auto Classified):</strong></td>
+                                        <td>{{ sample.text_warning }}</td>
                                     </tr>
                                     <tr>
                                         <td><strong>NonExcludedSites:</strong></td>
                                         <td>{{ sample.NonExcludedSites}}</td>
-                                        <td><strong>Included in Validation Data Set:</strong></td>
+                                        <td><strong>Included in Clinical Data Set:</strong></td>
                                         <td>{{sample.include}}</td>
                                     </tr>
                                 </table>

@@ -17,13 +17,13 @@ status_options = Literal[
 class DataBaseSample(BaseModel):
     sample_id: str = Field(..., alias="SampleID")
     batch_id: str = Field(..., alias="SampleProject")
-    SampleType: Optional[str]
+    SampleType: Optional[str] = ""
     Description: Optional[str]
     Flowcell: Optional[str]
     Index1: Optional[str]
     Index2: Optional[str]
     Library_nM: Optional[float]
-    QCFlag: Optional[str]  # Check this!
+    QCFlag: Optional[str] = ""
     Zscore_13: Optional[float]
     Zscore_18: Optional[float]
     Zscore_21: Optional[float]
@@ -79,7 +79,7 @@ class DataBaseSample(BaseModel):
     Chr22: Optional[int]
     ChrX: Optional[int]
     ChrY: Optional[int]
-    FF_Formatted: Optional[float]
+    FF_Formatted: Optional[float] = Field(..., alias="Fetal Fraction Preface")
     FFY: Optional[float]
     FFX: Optional[float]
     DuplicationRate: Optional[float]

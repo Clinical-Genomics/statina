@@ -20,11 +20,24 @@ STATUS_COLORS = {
 }
 
 TRISOMI_TRESHOLDS = {
-    "soft_max_ff": {"NCV": 2.5, "color": "orange", "text": "Warning threshold = 2.5"},
-    "soft_max": {"NCV": 3, "color": "orange", "text": "Warning threshold = 3"},
-    "soft_min": {"NCV": -4, "color": "orange", "text": "Warning threshold = -4"},
-    "hard_max": {"NCV": 4, "color": "red", "text": "Threshold = 4"},
-    "hard_min": {"NCV": -5, "color": "red", "text": "Threshold = -5"},
+    "soft_max": {"Zscore": 2.5, "color": "orange", "text": "Warning threshold = 2.5"},
+    "soft_min": {"Zscore": -4, "color": "orange", "text": "Warning threshold = -4"},
+    "hard_max": {"Zscore": 4, "color": "red", "text": "Threshold = 4"},
+    "hard_min": {"Zscore": -5, "color": "red", "text": "Threshold = -5"},
 }
 
-FF_TRESHOLD = 3
+FF_TRESHOLDS = {
+    "fetal_fraction_preface": 4,
+    "fetal_fraction_y_max": 6,
+    "fetal_fraction_y_min": 4,
+}
+
+SEX_THRESHOLDS = {
+    "y_min": -1,
+    "y_max": 20,
+    "xx_lower": 2,
+    "xx_upper": 4,
+    "xy_lowest": 0.5,
+    "k_upper": 1.51,
+    "k_lower": 1.49,
+}

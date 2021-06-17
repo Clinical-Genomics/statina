@@ -41,22 +41,23 @@
         data.push(backstat);
         var i = 0
 
-        {% for line  in sex_thresholds %}
-            var thresholds = {
-                x: {{sex_thresholds[line]['x']}},
-                y: {{sex_thresholds[line]['y']}},
-                mode: 'lines',
-                showlegend: false,
-                text: "{{sex_thresholds[line]['text']}}",
-                line: {
-                    dash: 'dot',
-                    color: 'red',
-                    width: 2
-                },
-                name: "{{line}}"
-            };
-            data.push(thresholds);
-        {% endfor %}
+        //{% for line  in sex_thresholds %}
+        //    var thresholds = {
+        //        x: {{sex_thresholds[line]['x']}},
+        //        y: {{sex_thresholds[line]['y']}},
+        //        mode: 'lines',
+        //        showlegend: false,
+        //        text: "{{sex_thresholds[line]['text']}}",
+        //        line: {
+        //            dash: 'dot',
+        //            color: 'red',
+        //            width: 1
+        //        },
+        //        name: "{{line}}"
+        //    };
+        //    data.push(thresholds);
+        //{% endfor %}
+
         {% for name in cases['names'] %}
             var NCVXYsamps = {
                 y: [{{cases['FFY'][loop.index]}}],

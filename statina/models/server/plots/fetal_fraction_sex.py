@@ -1,3 +1,4 @@
+from dataclasses import dataclass
 from typing import List, Optional
 
 import numpy as np
@@ -19,16 +20,17 @@ class ThresholdLine(BaseModel):
 
 
 class SexChromosomeThresholds:
+    y_min: float = SEX_THRESHOLDS["y_min"]
+    y_max: float = SEX_THRESHOLDS["y_max"]
+    xx_lower: float = SEX_THRESHOLDS["xx_lower"]
+    xx_upper: float = SEX_THRESHOLDS["xx_upper"]
+    xy_lowest: float = SEX_THRESHOLDS["xy_lowest"]
+    k_upper: float = SEX_THRESHOLDS["k_upper"]
+    k_lower: float = SEX_THRESHOLDS["k_lower"]
+
     def __init__(self, x_min, x_max):
         self.x_min: float = x_min
         self.x_max: float = x_max
-        self.y_min: float = SEX_THRESHOLDS["y_min"]
-        self.y_max: float = SEX_THRESHOLDS["y_max"]
-        self.xx_lower: float = SEX_THRESHOLDS["xx_lower"]
-        self.xx_upper: float = SEX_THRESHOLDS["xx_upper"]
-        self.xy_lowest: float = SEX_THRESHOLDS["xy_lowest"]
-        self.k_upper: float = SEX_THRESHOLDS["k_upper"]
-        self.k_lower: float = SEX_THRESHOLDS["k_lower"]
 
     def xy_lower_get_y(self, x: float) -> float:
         k = self.k_lower

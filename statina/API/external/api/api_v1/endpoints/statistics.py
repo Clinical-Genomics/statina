@@ -21,7 +21,7 @@ def statistics(
 ):
     """Statistics view."""
 
-    nr_batches = 3
+    nr_batches = 20
     scatter_plots = ["Stdev_13", "Stdev_18", "Stdev_21"]
     box_plots = [
         "Chr13_Ratio",

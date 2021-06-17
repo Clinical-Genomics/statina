@@ -12,7 +12,7 @@ from statina.crud.find.plots.coverage_plot_data import (
     get_box_data_for_coverage_plot,
     get_scatter_data_for_coverage_plot,
 )
-from statina.crud.find.plots.ncv_plot_data import (
+from statina.crud.find.plots.zscore_plot_data import (
     get_samples_for_samp_tris_plot,
     get_tris_control_abnormal,
     get_tris_control_normal,

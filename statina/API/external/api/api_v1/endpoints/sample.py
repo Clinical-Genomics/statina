@@ -7,7 +7,7 @@ from statina.API.external.api.deps import get_current_user
 from statina.API.external.constants import CHROM_ABNORM, STATUS_CLASSES, STATUS_COLORS
 from statina.config import get_nipt_adapter, templates
 from statina.crud.find import find
-from statina.crud.find.plots.ncv_plot_data import (
+from statina.crud.find.plots.zscore_plot_data import (
     get_abn_for_samp_tris_plot,
     get_normal_for_samp_tris_plot,
     get_sample_for_samp_tris_plot,

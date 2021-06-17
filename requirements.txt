@@ -21,3 +21,4 @@ gunicorn
 python-jose
 bcrypt
 numpy
+aiofiles

@@ -260,7 +260,6 @@ def report(
 
     db_samples: List[DataBaseSample] = find.batch_samples(batch_id=batch_id, adapter=adapter)
     samples: List[Sample] = [Sample(**db_sample.dict()) for db_sample in db_samples]
-
     scatter_data: Dict[str, CoveragePlotSampleData] = get_scatter_data_for_coverage_plot(samples)
     box_data: Dict[int, List[float]] = get_box_data_for_coverage_plot(samples)
     control: FetalFractionSamples = get_fetal_fraction.samples(
@@ -280,6 +279,7 @@ def report(
     return templates.TemplateResponse(
         "batch/report.html",
         context=dict(
+            # common
             request=request,
             current_user=user,
             batch=find.batch(batch_id=batch_id, adapter=adapter),
@@ -291,9 +291,10 @@ def report(
             ),
             normal_data=get_normal_for_samp_tris_plot(adapter).dict(by_alias=True),
             abnormal_data=get_abnormal_for_samp_tris_plot(adapter),
-            # FF
+            # Fetal Fraction preface
             control=control,
             cases=get_fetal_fraction.samples(adapter=adapter, batch_id=batch_id),
+            # Fetal Fraction  XY
             abnormal=abnormal_dict,
             max_x=max(control.FFX) + 1,
             min_x=min(control.FFX) - 1,

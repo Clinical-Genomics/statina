@@ -11,12 +11,27 @@ from statina.API.external.api.deps import get_current_user
 from statina.API.external.constants import CHROM_ABNORM
 from statina.config import get_nipt_adapter
 from statina.crud import update
+from statina.crud.delete import delete_batches
 from statina.crud.find import find
 from statina.models.database import DataBaseSample, User
 
 router = APIRouter()
 
 LOG = logging.getLogger(__name__)
+
+
+@router.post("/delete_batch")
+async def delete_batch(
+    request: Request,
+    adapter: StatinaAdapter = Depends(get_nipt_adapter),
+    user: User = Depends(get_current_user),
+):
+    form = await request.form()
+    if user.role != "RW":  ## should be admin. Need fix stuf before
+        return RedirectResponse(request.headers.get("referer"))
+    batches: Iterable[str] = form.getlist("delete")
+    delete_batches(adapter=adapter, batches=batches)
+    return RedirectResponse(request.headers.get("referer"))
 
 
 @router.post("/set_sample_status")

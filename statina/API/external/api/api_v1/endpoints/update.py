@@ -20,15 +20,30 @@ router = APIRouter()
 LOG = logging.getLogger(__name__)
 
 
+@router.post("/update_user")
+async def update_user(
+    request: Request,
+    adapter: StatinaAdapter = Depends(get_nipt_adapter),
+    user: User = Depends(get_current_user),
+):
+
+    if user.role != "admin":  ## should be admin. Need fix stuf before
+        return RedirectResponse(request.headers.get("referer"))
+    form = await request.form()
+    users: Iterable[str] = form.getlist("update")
+    update.update_users(adapter=adapter, users=users)
+    return RedirectResponse(request.headers.get("referer"))
+
+
 @router.post("/delete_batch")
 async def delete_batch(
     request: Request,
     adapter: StatinaAdapter = Depends(get_nipt_adapter),
     user: User = Depends(get_current_user),
 ):
-    form = await request.form()
     if user.role != "admin":  ## should be admin. Need fix stuf before
         return RedirectResponse(request.headers.get("referer"))
+    form = await request.form()
     batches: Iterable[str] = form.getlist("delete")
     delete_batches(adapter=adapter, batches=batches)
     return RedirectResponse(request.headers.get("referer"))

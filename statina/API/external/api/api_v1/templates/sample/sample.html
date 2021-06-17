@@ -31,7 +31,7 @@
                                             {% for abn in chrom_abnorm %}
                                             <tr>
                                                 <td width=10% ><strong>{{ abn }}</strong></td>
-                                                {% if current_user.role=='RW' %}
+                                                {% if current_user.role in ['RW','admin']  %}
                                                 <td width=10% class={{ status_classes[sample['status_'+abn]] }} >
                                                     <select  name="{{abn}}" >
                                                     <option {% if sample['status_'+abn] == "Normal" %} selected {% endif %} value="Normal">Normal</option>
@@ -62,7 +62,7 @@
                                         <td>
                                         </td>
                                         <p align="right"> 
-                                            {% if current_user.role=='RW' %}
+                                            {% if current_user.role in ['RW','admin']  %}
                                             <button type="submit" class="btn btn-warning" name="trisomi status" value="ff"  > Save</button>     
                                             {% endif %}     
                                         </p>

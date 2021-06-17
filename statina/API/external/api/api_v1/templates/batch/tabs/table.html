@@ -16,7 +16,7 @@
                         <table>
                             <tbody>
                                 <tr>
-                                    {% if current_user.role=='RW' %}
+                                    {% if current_user.role in ['RW','admin']  %}
                                     <p align="right">
                                         <button type="submit" class="btn btn-light" name="button_id" value="include all samples"> Include all and Save</button>
                                         <input type="submit" class="btn btn-light" name="button_id" value="Save">
@@ -69,7 +69,7 @@
                                             <td width="3%" class = "default">{{sample.QCFlag}}</td>
                                             <td><p> <small>{{ sample.status }}</small></p></td>
                                             <td><a class="dropdown-item" href="{{ url_for('sample_download', file_id='segmental_calls', sample_id=sample.sample_id) }}">segmental calls</a></td>
-                                            {% if current_user.role=='RW' %}
+                                            {% if current_user.role in ['RW','admin']  %}
                                             <td width="1%" {% if sample.include %}class="success"{% endif %}> <input type="checkbox" name="include_{{ sample.sample_id }}" {% if sample.include %}checked
                                             {% endif %}></td>
                                             <td width="18%">

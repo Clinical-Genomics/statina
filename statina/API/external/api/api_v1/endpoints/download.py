@@ -1,6 +1,6 @@
 from pathlib import Path
 
-from fastapi import APIRouter, Depends, Request, Response
+from fastapi import APIRouter, Depends, Request
 from fastapi.responses import FileResponse, RedirectResponse
 
 from statina.adapter.plugin import StatinaAdapter
@@ -9,14 +9,8 @@ from statina.config import get_nipt_adapter
 from statina.crud.find import find
 from statina.models.database import User, DataBaseSample
 from statina.parse.batch import validate_file_path
-
-
-from pathlib import Path
 from zipfile import ZIP_DEFLATED, ZipFile
-
 from os import PathLike
-import io
-
 from typing import Union, Optional
 
 router = APIRouter()

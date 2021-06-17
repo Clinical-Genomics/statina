@@ -35,7 +35,6 @@ def validate_file_path(file_path: Optional[str]) -> bool:
     if not file_path:
         return False
     file = Path(file_path)
-    print(file.exists())
     return bool(file.exists())
 
 

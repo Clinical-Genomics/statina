@@ -8,7 +8,6 @@ from pydantic import EmailStr
 from starlette.requests import Request
 from starlette.responses import RedirectResponse
 
-from statina.API.external.api.api_v1.endpoints.index import router
 from statina.API.external.api.api_v1.endpoints.login import router
 from statina.API.external.api.deps import get_password_hash
 from statina.adapter import StatinaAdapter

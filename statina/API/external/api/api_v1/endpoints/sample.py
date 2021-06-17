@@ -14,6 +14,7 @@ from statina.crud.find.plots.ncv_plot_data import (
 )
 from statina.models.database import Batch, DataBaseSample, User
 from statina.models.server.plots.ncv import NCV131821, NCVSamples
+from statina.models.server.sample import Sample
 
 router = APIRouter()
 
@@ -29,14 +30,13 @@ def sample(
 
     sample: DataBaseSample = find.sample(sample_id=sample_id, adapter=adapter)
     batch: Batch = find.batch(batch_id=sample.batch_id, adapter=adapter)
-
     return templates.TemplateResponse(
         "sample/sample.html",
         context=dict(
             request=request,
             current_user=user,
             chrom_abnorm=CHROM_ABNORM,
-            sample=sample,
+            sample=Sample(**sample.dict()),
             status_classes=STATUS_CLASSES,
             batch=batch,
             page_id="sample",
@@ -55,14 +55,13 @@ def sample(
 
     sample: DataBaseSample = find.sample(sample_id=sample_id, adapter=adapter)
     batch: Batch = find.batch(batch_id=sample.batch_id, adapter=adapter)
-
     return templates.TemplateResponse(
         "sample/sample.html",
         context=dict(
             request=request,
             current_user=user,
             chrom_abnorm=CHROM_ABNORM,
-            sample=sample,
+            sample=Sample(**sample.dict()),
             status_classes=STATUS_CLASSES,
             batch=batch,
             page_id="sample",
@@ -91,7 +90,7 @@ def sample_tris(
             normal_data=normal_data.dict(exclude_none=True, by_alias=True),
             abnormal_data=abnormal_data,
             sample_data=sample_data,
-            sample=sample.dict(),
+            sample=Sample(**sample.dict()),
             batch=batch,
             status_colors=STATUS_COLORS,
             page_id="sample_tris",
@@ -120,7 +119,7 @@ def sample_tris(
             normal_data=normal_data,
             abnormal_data=abnormal_data,
             sample_data=sample_data,
-            sample=sample.dict(),
+            sample=Sample(**sample.dict()),
             batch=batch,
             status_colors=STATUS_COLORS,
             page_id="sample_tris",

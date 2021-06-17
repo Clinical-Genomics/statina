@@ -24,6 +24,7 @@ from statina.models.server.plots.fetal_fraction import (
     FetalFractionControlAbNormal,
     FetalFractionSamples,
 )
+from statina.models.server.plots.fetal_fraction_sex import SexChromosomeThresholds
 from statina.models.server.sample import Sample
 
 router = APIRouter()
@@ -165,16 +166,28 @@ def fetal_fraction_XY(
         },
     )
 
+    x_max = max(control.FFX) + 1
+    x_min = min(control.FFX) - 1
+
+    sex_thresholds = SexChromosomeThresholds(x_min=x_min, x_max=x_max)
     return templates.TemplateResponse(
         "batch/tabs/FF_XY.html",
         context=dict(
+            sex_thresholds={
+                "XY_horisontal": sex_thresholds.XY_horizontal(),
+                "XX_lower": sex_thresholds.XX_lower(),
+                "XX_upper": sex_thresholds.XX_upper(),
+                "XY_lower": sex_thresholds.XY_lower(),
+                "XY_upper": sex_thresholds.XY_upper(),
+                "XXY": sex_thresholds.XXY(),
+            },
             request=request,
             current_user=user,
             control=control,
             abnormal=abnormal_dict,
             cases=get_fetal_fraction.samples(adapter=adapter, batch_id=batch_id),
-            max_x=max(control.FFX) + 1,
-            min_x=min(control.FFX) - 1,
+            max_x=x_max,
+            min_x=x_min,
             batch=batch.dict(),
             page_id="batches_FF_XY",
         ),

@@ -14,4 +14,4 @@ class UserRequestBody(BaseModel):
     email: EmailStr
     username: str
     password: str
-    role: Literal["R", "RW"]
+    role: Literal["R", "RW", "admin"]

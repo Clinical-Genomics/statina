@@ -27,7 +27,7 @@ async def delete_batch(
     user: User = Depends(get_current_user),
 ):
     form = await request.form()
-    if user.role != "RW":  ## should be admin. Need fix stuf before
+    if user.role != "admin":  ## should be admin. Need fix stuf before
         return RedirectResponse(request.headers.get("referer"))
     batches: Iterable[str] = form.getlist("delete")
     delete_batches(adapter=adapter, batches=batches)
@@ -44,7 +44,7 @@ async def set_sample_status(
 
     form = await request.form()
 
-    if user.role != "RW":
+    if user.role not in ["RW", "admin"]:
         return RedirectResponse(request.headers.get("referer"))
 
     sample_id: str = form["sample_id"]
@@ -80,7 +80,7 @@ async def sample_comment(
 
     form = await request.form()
 
-    if user.role != "RW":
+    if user.role not in ["RW", "admin"]:
         return RedirectResponse(request.headers.get("referer"))
 
     sample_id: str = form["sample_id"]
@@ -103,7 +103,7 @@ async def include_samples(
 
     form = await request.form()
 
-    if user.role != "RW":
+    if user.role not in ["RW", "admin"]:
         return RedirectResponse(request.headers.get("referer"))
 
     button_id = form.get("button_id")

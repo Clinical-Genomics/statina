@@ -26,12 +26,12 @@ async def update_user(
     adapter: StatinaAdapter = Depends(get_nipt_adapter),
     user: User = Depends(get_current_user),
 ):
-
-    if user.role != "admin":  ## should be admin. Need fix stuf before
+    if user.role != "admin":
         return RedirectResponse(request.headers.get("referer"))
     form = await request.form()
-    users: Iterable[str] = form.getlist("update")
-    update.update_users(adapter=adapter, users=users)
+    update_user: User = find.user(email=form["user_email"], adapter=adapter)
+    update_user.role = form["role"]
+    update.update_user(adapter=adapter, user=update_user)
     return RedirectResponse(request.headers.get("referer"))
 
 
@@ -41,7 +41,7 @@ async def delete_batch(
     adapter: StatinaAdapter = Depends(get_nipt_adapter),
     user: User = Depends(get_current_user),
 ):
-    if user.role != "admin":  ## should be admin. Need fix stuf before
+    if user.role != "admin":
         return RedirectResponse(request.headers.get("referer"))
     form = await request.form()
     batches: Iterable[str] = form.getlist("delete")

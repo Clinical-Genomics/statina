@@ -15,7 +15,7 @@ from statina.adapter import StatinaAdapter
 from statina.config import get_nipt_adapter, templates
 from statina.crud.find import find
 from statina.crud.insert import insert_user
-from statina.exeptions import EmailNotSentError
+from statina.exeptions import EmailNotSentError, CredentialsError
 from statina.models.database import User
 from statina.models.server.new_user import NewUserRequestEmail, NewUser
 
@@ -108,10 +108,31 @@ def users(
 ):
     """Admin view with table of all users."""
     if user.role != "admin":
-        return RedirectResponse(request.headers.get("referer"))
+        raise CredentialsError(message="Only admin users can access the users page")
 
     user_list: List[User] = find.users(adapter=adapter)
-    print(user_list)
+    return templates.TemplateResponse(
+        "users.html",
+        context={
+            "request": request,
+            "users": user_list,
+            "page_id": "users",
+            "current_user": user,
+        },
+    )
+
+
+@router.post("/users")
+def users(
+    request: Request,
+    adapter: StatinaAdapter = Depends(get_nipt_adapter),
+    user: User = Depends(get_current_user),
+):
+    """Admin view with table of all users."""
+    if user.role != "admin":
+        CredentialsError(message="Only admin users can access the users page")
+
+    user_list: List[User] = find.users(adapter=adapter)
     return templates.TemplateResponse(
         "users.html",
         context={

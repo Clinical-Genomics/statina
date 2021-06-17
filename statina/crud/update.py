@@ -1,6 +1,4 @@
 import logging
-from typing import Iterable
-
 from statina.adapter import StatinaAdapter
 from statina.models.database import DataBaseSample, User
 
@@ -21,13 +19,5 @@ def update_user(adapter: StatinaAdapter, user: User) -> None:
 
     user_dict: dict = user.dict(exclude_none=True)
     email = user.email
-    LOG.info(f"Updating sample {email}")
+    LOG.info(f"Updating user {email}")
     adapter.user_collection.update_one({"email": email}, {"$set": user_dict})
-
-
-def update_users(adapter: StatinaAdapter, users: Iterable[str]) -> None:
-    """Update a user objects in the database"""
-
-    for user_email in users:
-        user = adapter.user_collection.find_one({"email": user_email})
-        update_user(user=user, adapter=adapter)

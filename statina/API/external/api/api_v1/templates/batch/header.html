@@ -42,13 +42,13 @@
                 href="{{ url_for('batch', batch_id = batch.batch_id) }}">Batch Summary Table</a>
         </li>
         <li {% if page_id =='batches_NCV13' %} class="active" {% endif %}><a
-                href="{{ url_for('NCV', batch_id = batch.batch_id, ncv = '13') }}">Zscore 13</a>
+                href="{{ url_for('Zscore', batch_id = batch.batch_id, ncv = '13') }}">Zscore 13</a>
         </li>
         <li {% if page_id =='batches_NCV18' %} class="active" {% endif %}><a
-                href="{{ url_for('NCV', batch_id = batch.batch_id, ncv = '18') }}">Zscore 18</a>
+                href="{{ url_for('Zscore', batch_id = batch.batch_id, ncv = '18') }}">Zscore 18</a>
         </li>
         <li {% if page_id =='batches_NCV21' %} class="active" {% endif %}><a
-                href="{{ url_for('NCV', batch_id = batch.batch_id, ncv = '21') }}">Zscore 21</a>
+                href="{{ url_for('Zscore', batch_id = batch.batch_id, ncv = '21') }}">Zscore 21</a>
         </li>
         <li {% if page_id =='batches_FF' %} class="active" {% endif %}><a
                 href="{{ url_for('fetal_fraction', batch_id = batch.batch_id) }}">Fetal Fraction Preface</a>

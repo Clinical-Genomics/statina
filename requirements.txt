@@ -20,4 +20,3 @@ httptools
 gunicorn
 python-jose
 bcrypt
-aiofiles

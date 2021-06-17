@@ -77,7 +77,6 @@ class Sample(DataBaseSample):
             sample_warnings[key]: str = cls.get_tris_warning(
                 z_score=z_score, fetal_fraction=fetal_fraction_pf
             )
-        print(sample_warnings)
         return SampleWarning(**sample_warnings)
 
     @validator("text_warning", always=True)
@@ -88,7 +87,6 @@ class Sample(DataBaseSample):
         text_warnings = [
             abn for abn, warning in values["warnings"].dict().items() if warning == "danger"
         ]
-        print(text_warnings)
         return ", ".join(text_warnings)
 
     @classmethod

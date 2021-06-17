@@ -20,7 +20,6 @@ def get_current_user(
     adapter: StatinaAdapter = Depends(get_nipt_adapter),
 ) -> User:
     """Decoding user from token stored in cookies."""
-
     try:
         payload = jwt.decode(
             request.cookies.get("token"),

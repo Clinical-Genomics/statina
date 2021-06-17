@@ -22,12 +22,11 @@ def batch_download(
     user: User = Depends(get_current_user),
 ):
     """View for batch downloads"""
-
     batch: dict = find.batch(adapter=adapter, batch_id=batch_id).dict()
     file_path = batch.get(file_id)
 
     if not validate_file_path(file_path):
-        return RedirectResponse(request.url)
+        return RedirectResponse(request.headers.get("referer"))
 
     path = Path(file_path)
 

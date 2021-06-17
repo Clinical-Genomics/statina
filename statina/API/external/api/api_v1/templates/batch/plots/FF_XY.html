@@ -1,72 +1,95 @@
 {% block scripts %}
-<script>
-    var XY_plot = document.getElementById('FFXY')
-    var data = []
-    var layout = {
-    annotations : [],
-    legend:{hovermode:'closest' },
-    hovermode:'closest',
-    xaxis :{range: [{{max_x}},{{min_x}}],
-            showline: true,
-            zeroline: false,
-            linecolor: '#636363',
-            linewidth: 5,
-            showgrid: false,
-            gridcolor: '#bdbdbd',
-            title: 'FFX'
+    <script>
+        var XY_plot = document.getElementById('FFXY')
+        var data = []
+        var layout = {
+            annotations: [],
+            legend: {hovermode: 'closest'},
+            hovermode: 'closest',
+            xaxis: {
+                range: [{{max_x}}, {{min_x}}],
+                //range: [{{20}}, {{-6}}],
+                showline: true,
+                zeroline: false,
+                linecolor: '#636363',
+                linewidth: 5,
+                showgrid: false,
+                gridcolor: '#bdbdbd',
+                title: 'Fetal Fraction X'
             },
-            
-    yaxis :{
-            zeroline: false,
-            showline: true,
-            showgrid: false,
-            linecolor: '#636363',
-            linewidth: 5,
-            title : 'FFY'
-            },};
 
-    var backstat = {
-        y: {{control['FFY']}},
-        x: {{control['FFX']}},
-        text: {{control['names']|tojson}},
-        name: 'Negative (N={{control['count']}})',
-        hoverinfo:'none',
-        mode: 'markers',
-        type: 'scatter',
-        marker: {color: '#ccccb3'}}
+            yaxis: {
+                zeroline: false,
+                showline: true,
+                showgrid: false,
+                linecolor: '#636363',
+                linewidth: 5,
+                title: 'Fetal Fraction Y'
+            },
+        };
+
+        var backstat = {
+            y: {{control['FFY']}},
+            x: {{control['FFX']}},
+            text: {{control['names']|tojson}},
+            name: 'Negative (N={{control['count']}})',
+            hoverinfo: 'none',
+            mode: 'markers',
+            type: 'scatter',
+            marker: {color: '#ccccb3'}
+        }
         data.push(backstat);
         var i = 0
 
+        //{% for line  in sex_thresholds %}
+        //    var thresholds = {
+        //        x: {{sex_thresholds[line]['x']}},
+        //        y: {{sex_thresholds[line]['y']}},
+        //        mode: 'lines',
+        //        showlegend: false,
+        //        text: "{{sex_thresholds[line]['text']}}",
+        //        line: {
+        //            dash: 'dot',
+        //            color: 'red',
+        //            width: 1
+        //        },
+        //        name: "{{line}}"
+        //    };
+        //    data.push(thresholds);
+        //{% endfor %}
 
-    {% for name in cases['names'] %}
-        var NCVXYsamps = {
-            y: [{{cases['FFY'][loop.index]}}],
-            x: [{{cases['FFX'][loop.index]}}],
-            name: {{name|tojson}},
-            mode: 'markers',
-            text: {{name|tojson}},
-            type: 'scatter'}
-        data.push(NCVXYsamps);
-    {% endfor %}
-
-    {% for abn  in abnormal.keys() %} 
-        {% for status  in abnormal[abn] %}
-        var verif = {                                                                  
-                name: '{{abn}} {{status}} (N={{abnormal[abn][status]["count"]}})',                                                               
-                y: {{abnormal[abn][status]['FFY']}},                                        
-                x: {{abnormal[abn][status]['FFX']}},
-                text: {{abnormal[abn][status]['names']|tojson}},                                       
-            mode: 'markers',
-            marker: {   line: {width:2},
-                        size: 7,
-                        symbol :'circle-open',                                                   
-                        type: 'scatter'              
-                    } }
-        data.push(verif);
-        var i = i +1
+        {% for name in cases['names'] %}
+            var NCVXYsamps = {
+                y: [{{cases['FFY'][loop.index]}}],
+                x: [{{cases['FFX'][loop.index]}}],
+                name: {{name|tojson}},
+                mode: 'markers',
+                text: {{name|tojson}},
+                type: 'scatter'
+            }
+            data.push(NCVXYsamps);
         {% endfor %}
-    {% endfor %}
 
-    Plotly.newPlot('FFXY', data, layout);
-</script>
+        {% for abn  in abnormal.keys() %}
+            {% for status  in abnormal[abn] %}
+                var verif = {
+                    name: '{{abn}} {{status}} (N={{abnormal[abn][status]["count"]}})',
+                    y: {{abnormal[abn][status]['FFY']}},
+                    x: {{abnormal[abn][status]['FFX']}},
+                    text: {{abnormal[abn][status]['names']|tojson}},
+                    mode: 'markers',
+                    marker: {
+                        line: {width: 2},
+                        size: 7,
+                        symbol: 'circle-open',
+                        type: 'scatter'
+                    }
+                }
+                data.push(verif);
+                var i = i + 1
+            {% endfor %}
+        {% endfor %}
+
+        Plotly.newPlot('FFXY', data, layout);
+    </script>
 {% endblock %}

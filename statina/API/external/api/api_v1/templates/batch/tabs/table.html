@@ -33,17 +33,19 @@
                                     <thead>
                                         <tr>
                                             <th>Sample Name</th>
-                                            <th>NCV13</th>
-                                            <th>NCV18</th>
-                                            <th>NCV21</th>
-                                            <th>NCVX</th>
-                                            <th>FF(%)</th>
-                                            <th>FFX(%)</th>
-                                            <th>FFY(%)</th>
+                                            <th>Zscore 13</th>
+                                            <th>Zscore 18</th>
+                                            <th>Zscore 21</th>
+                                            <th>Zscore X</th>
+                                            <th>FF-PF (%)</th>
+                                            <th>FF-X (%)</th>
+                                            <th>FF-Y (%)</th>
+                                            <th>Sex</th>
                                             <th>CNVSegment</th>
-                                            <th>Download</th>
-                                            <th><a href="#" data-toggle="tooltip" data-placement="bottom" title="Warning for chomosome abnormality. Automatically generated. Based on pre defined NCV trsholds">Warning</a></th>
+                                            <th><a href="#" data-toggle="tooltip" data-placement="bottom" title="Warning for chomosome abnormality. Automatically generated. Based on pre defined Zscore and Fetal Fraction trsholds">Warning</a></th>
+                                            <th>QC Flagg</th>
                                             <th><a href="#" data-toggle="tooltip" data-placement="bottom" title="Chomosome abnormalies. Manually classified by user through the sample page">Status</a></th>
+                                            <th>Download</th>
                                             <th><a href="#" data-toggle="tooltip" data-placement="bottom" title="Samples checked in the 'Include' column are added to the validation sample set for comparison. Check the checkboxes for samples to include and save. If all samples are ok, just press 'set all OK'.">Include</a></th>
                                             <th>Comment</th>
                                             <th>Last Change</th>
@@ -53,21 +55,23 @@
                                         {% for sample in sample_info %}
                                         <input type=text name="samples" value="{{ sample.sample_id }}" hidden>
                                         <tr>
-                                            <td width="20%"> <a href={{ url_for('sample', sample_id=sample.sample_id) }}>{{ sample.sample_id }}</a></td>
-                                            <td width="4%" class = "{{ sample.warnings.Zscore_13}}">{{ sample.Zscore_13 }}</td>
-                                            <td width="4%" class = "{{ sample.warnings.Zscore_18}}">{{ sample.Zscore_18 }}</td>
-                                            <td width="4%" class = "{{ sample.warnings.Zscore_21}}">{{ sample.Zscore_21 }}</td>
-                                            <td width="4%" class = "{{ sample.warnings.Zscore_X}}">{{ sample.Zscore_X }}</td>
-                                            <td width="4%" class = "{{sample.warnings.FF_Formatted}}">{{sample.FF_Formatted}}</td>
-                                            <td width="4%" class = "default">{{sample.FFX}}</td>
-                                            <td width="4%" class = "default">{{sample.FFY}}</td>
-                                            <td width="4%" class = "default">{{sample.CNVSegment}}</td>
-                                            <td><a class="dropdown-item" href="{{ url_for('sample_download', file_id='segmental_calls', sample_id=sample.sample_id) }}">segmental calls</a></td>
-                                            <td><p> <small>{{ sample.text_warning }}</small></p></td>
+                                            <td width="10%"> <a href={{ url_for('sample', sample_id=sample.sample_id) }}>{{ sample.sample_id }}</a></td>
+                                            <td width="3%" class = "{{ sample.warnings.Zscore_13}}">{{ sample.Zscore_13 }}</td>
+                                            <td width="3%" class = "{{ sample.warnings.Zscore_18}}">{{ sample.Zscore_18 }}</td>
+                                            <td width="3%" class = "{{ sample.warnings.Zscore_21}}">{{ sample.Zscore_21 }}</td>
+                                            <td width="3%" class = "{{ sample.warnings.Zscore_X}}">{{ sample.Zscore_X }}</td>
+                                            <td width="3%" class = "{{sample.warnings.FF_Formatted}}">{{sample.FF_Formatted}}</td>
+                                            <td width="3%" class = "default">{{sample.FFX}}</td>
+                                            <td width="3%" class =  "{{sample.warnings.FFY}}">{{sample.FFY}}</td>
+                                            <td width="3%" class = "default"></td>
+                                            <td width="3%" class = "default">{{sample.CNVSegment}}</td>
+                                            <td width="3%"><p> <small>{{ sample.text_warning }}</small></p></td>
+                                            <td width="3%" class = "default">{{sample.QCFlag}}</td>
                                             <td><p> <small>{{ sample.status }}</small></p></td>
+                                            <td><a class="dropdown-item" href="{{ url_for('sample_download', file_id='segmental_calls', sample_id=sample.sample_id) }}">segmental calls</a></td>
                                             {% if current_user.role=='RW' %}
-
-                                            <td width="1%" {% if sample.include %}class="success"{% endif %}> <input type="checkbox" name="include_{{ sample.sample_id }}" {% if sample.include %}checked{% endif %}></td>
+                                            <td width="1%" {% if sample.include %}class="success"{% endif %}> <input type="checkbox" name="include_{{ sample.sample_id }}" {% if sample.include %}checked
+                                            {% endif %}></td>
                                             <td width="18%">
                                                 <div class="form-group">
                                                     <textarea class="form-control" rows="1" name = "comment_{{ sample.sample_id }}" >{{sample.comment}}</textarea>

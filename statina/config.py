@@ -22,10 +22,6 @@ class Settings(BaseSettings):
     host: str = "localhost"
     access_token_expire_minutes: int = 30
     port: int = 8000
-    sll_port: int = 465
-    smtp_server: str = "smtp.gmail.com"
-    sender_email: EmailStr = "testkontopython@gmail.com"
-    sender_password: str = "TestkontoPython1!"
 
     class Config:
         env_file = str(ENV_FILE)
@@ -36,8 +32,8 @@ class EmailSettings(BaseSettings):
 
     sll_port: int = 465
     smtp_server: str = "smtp.gmail.com"
-    sender_email: EmailStr = "testkontopython@gmail.com"
-    sender_password: str = "TestkontoPython1!"
+    sender_email: EmailStr
+    sender_password: str
 
     class Config:
         env_file = str(ENV_FILE)

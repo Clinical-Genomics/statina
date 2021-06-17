@@ -8,6 +8,8 @@ from statina.API.external.constants import SEX_THRESHOLDS
 
 
 class ThresholdLine(BaseModel):
+    """Model for treshold lines for plots."""
+
     x: List[float]
     y: List[float]
     text: str
@@ -20,6 +22,8 @@ class ThresholdLine(BaseModel):
 
 
 class SexChromosomeThresholds:
+    """Threshold lines for the Fetal Fraction XY plot"""
+
     y_min: float = SEX_THRESHOLDS["y_min"]
     y_max: float = SEX_THRESHOLDS["y_max"]
     xx_lower: float = SEX_THRESHOLDS["xx_lower"]
@@ -48,12 +52,12 @@ class SexChromosomeThresholds:
         return (y - m) / k
 
     def XXY(self) -> ThresholdLine:
-        """ """
+        """Returning a threshold line to separate XYY from XXY"""
         x = self.xx_upper
         return ThresholdLine(x=[x, x], y=[self.y_max, self.xy_upper_get_y(x=x)], text=f"x={x}")
 
     def XY_upper(self) -> ThresholdLine:
-        """ """
+        """Returning a threshold line to separate XY from XXY and XYY"""
         return ThresholdLine(
             x=[self.x_max, self.xx_upper],
             y=[
@@ -64,7 +68,7 @@ class SexChromosomeThresholds:
         )
 
     def XY_lower(self) -> ThresholdLine:
-        """ """
+        """Returning a threshold line to separate XY from other"""
         return ThresholdLine(
             x=[self.x_max, self.xx_lower],
             y=[
@@ -75,18 +79,18 @@ class SexChromosomeThresholds:
         )
 
     def XY_horizontal(self) -> ThresholdLine:
-        """ """
+        """Returning a threshold line to separate XY from XX"""
         y = self.xy_lowest
         return ThresholdLine(x=[self.x_min, self.x_max], y=[y, y], text=f"y={y}")
 
     def XX_upper(self) -> ThresholdLine:
-        """ """
+        """Returning a threshold line to separate XX from XXX"""
         x = self.xx_upper
 
         return ThresholdLine(x=[x, x], y=[self.y_min, self.xy_lowest], text=f"x={x}")
 
     def XX_lower(self) -> ThresholdLine:
-        """ """
+        """Returning a threshold line to separate XX from X0"""
         x = self.xx_lower
 
         return ThresholdLine(x=[x, x], y=[self.y_min, self.xy_lowest], text=f"x={x}")

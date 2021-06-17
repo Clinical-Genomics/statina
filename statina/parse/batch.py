@@ -35,7 +35,7 @@ def validate_file_path(file_path: Optional[str]) -> bool:
     if not file_path:
         return False
     file = Path(file_path)
-    return bool(file.exists())
+    return file.exists()
 
 
 def convert_empty_str_to_none(data: dict) -> dict:

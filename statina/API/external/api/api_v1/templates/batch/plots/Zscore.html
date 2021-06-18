@@ -1,6 +1,6 @@
 {% block scripts %}
     <script>
-        {% for chrom, cases  in ncv_chrom_data.items() %}
+        {% for chrom in chromosomes %}
             $(function chrom_plot() {
                 var data = []
                 var layout = {
@@ -9,8 +9,8 @@
                     annotations: [],
                     xaxis: {
                         showline: true,
-                        ticktext: {{cases['names']|tojson}},
-                        tickvals: {{cases['x_axis']}},
+                        ticktext: {{ncv_chrom_data[chrom]['names']|tojson}},
+                        tickvals: {{ncv_chrom_data[chrom]['x_axis']}},
                         tickangle: 20,
                         linecolor: '#636363',
                         linewidth: 5,
@@ -25,28 +25,28 @@
                         showgrid: false,
                         linecolor: '#636363',
                         linewidth: 5,
-                        title: 'NCV{{chrom}}'
+                        title: 'Zscore{{chrom}}'
                     }
                 };
 
                 var cases = {
-                    name: "Current batch (N =" + "{{cases['count']}}" + ")",
-                    y: {{cases['ncv_values']}},
-                    x: {{cases['x_axis']}},
-                    text: {{cases['names']|tojson}},
+                    name: "Current batch (N =" + "{{ncv_chrom_data[chrom]['count']}}" + ")",
+                    y: {{ncv_chrom_data[chrom]['ncv_values']}},
+                    x: {{ncv_chrom_data[chrom]['x_axis']}},
+                    text: {{ncv_chrom_data[chrom]['names']|tojson}},
                     mode: 'markers',
                     type: 'scatter',
                 };
                 data.push(cases)
 
                 var box = {
-                    y: {{ normal_data.ncv_values }},
+                    y: {{ normal_data[chrom].ncv_values }},
                     pointpos: 30,
                     type: 'box',
                     marker: {
                         color: '#ccccb3'
                     },
-                    name: 'Negative (N={{normal_data.count}})',
+                    name: 'Negative (N={{normal_data[chrom].count}})',
                     hoverinfo: 'none'
                 }
                 data.push(box)
@@ -54,7 +54,7 @@
 
                 {% for line  in tris_thresholds %}
                     var line = {
-                        x: [{{cases['x_axis'][0]}}, {{cases['x_axis'][-1]}}],
+                        x: [{{ncv_chrom_data[chrom]['x_axis'][0]}}, {{ncv_chrom_data[chrom]['x_axis'][-1]}}],
                         y: [{{tris_thresholds[line]['Zscore']}}, {{tris_thresholds[line]['Zscore']}}],
                         mode: 'lines',
                         text: "{{tris_thresholds[line]['text']}}",
@@ -69,7 +69,7 @@
                     data.push(line);
                 {% endfor %}
 
-                {% for status, data  in abnormal_data.items() %}
+                {% for status, data  in abnormal_data[chrom].items() %}
                     var verif = {
                         name: "{{status}} T{{chrom}} (N={{data.count}})",
                         y: {{data.ncv_values}},
@@ -82,7 +82,7 @@
                 {% endfor %}
 
 
-                Plotly.newPlot('NCV{{chrom}}_plot', data, layout);
+                Plotly.newPlot('Zscore{{chrom}}_plot', data, layout);
             });
         {% endfor %}
     </script>
@@ -100,8 +100,5 @@
     </script>
 
 
-    <script>
-        var d = new Date();
-        document.getElementById("demo").innerHTML = d.toDateString();
-    </script>
+
 {% endblock %}

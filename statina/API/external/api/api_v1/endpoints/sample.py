@@ -7,13 +7,13 @@ from statina.API.external.api.deps import get_current_user
 from statina.API.external.constants import CHROM_ABNORM, STATUS_CLASSES, STATUS_COLORS
 from statina.config import get_nipt_adapter, templates
 from statina.crud.find import find
-from statina.crud.find.plots.ncv_plot_data import (
+from statina.crud.find.plots.zscore_plot_data import (
     get_abn_for_samp_tris_plot,
     get_normal_for_samp_tris_plot,
     get_sample_for_samp_tris_plot,
 )
 from statina.models.database import Batch, DataBaseSample, User
-from statina.models.server.plots.ncv import NCV131821, NCVSamples
+from statina.models.server.plots.ncv import Zscore131821, ZscoreSamples
 from statina.models.server.sample import Sample
 
 router = APIRouter()
@@ -79,9 +79,9 @@ def sample_tris(
     """Sample view with trisomi plot."""
     sample: DataBaseSample = find.sample(sample_id=sample_id, adapter=adapter)
     batch: Batch = find.batch(batch_id=sample.batch_id, adapter=adapter)
-    abnormal_data: Dict[str, NCVSamples] = get_abn_for_samp_tris_plot(adapter=adapter)
-    normal_data: NCV131821 = get_normal_for_samp_tris_plot(adapter=adapter)
-    sample_data: NCVSamples = get_sample_for_samp_tris_plot(sample)
+    abnormal_data: Dict[str, ZscoreSamples] = get_abn_for_samp_tris_plot(adapter=adapter)
+    normal_data: Zscore131821 = get_normal_for_samp_tris_plot(adapter=adapter)
+    sample_data: ZscoreSamples = get_sample_for_samp_tris_plot(sample)
     return templates.TemplateResponse(
         "sample/sample_tris.html",
         context=dict(
@@ -108,9 +108,9 @@ def sample_tris(
     """Sample view with trisomi plot."""
     sample: DataBaseSample = find.sample(sample_id=sample_id, adapter=adapter)
     batch: Batch = find.batch(batch_id=sample.batch_id, adapter=adapter)
-    abnormal_data: Dict[str, NCVSamples] = get_abn_for_samp_tris_plot(adapter=adapter)
-    normal_data: NCV131821 = get_normal_for_samp_tris_plot(adapter=adapter)
-    sample_data: NCVSamples = get_sample_for_samp_tris_plot(sample)
+    abnormal_data: Dict[str, ZscoreSamples] = get_abn_for_samp_tris_plot(adapter=adapter)
+    normal_data: Zscore131821 = get_normal_for_samp_tris_plot(adapter=adapter)
+    sample_data: ZscoreSamples = get_sample_for_samp_tris_plot(sample)
     return templates.TemplateResponse(
         "sample/sample_tris.html",
         context=dict(

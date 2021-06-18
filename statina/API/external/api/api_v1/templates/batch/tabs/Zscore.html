@@ -2,16 +2,18 @@
 {% block body %}
 <div class="container-fluid">
     {% include 'batch/header.html' %}
+    {% for chr in chromosomes %}
     <div class="tab-pane active" id='NCV_{{chr}}'>
         <div class="panel panel-default">
             <div class="panel-body">
-                <div id="NCV{{chr}}_plot" style="min-width:400px; height:800px; "></div><br><br>
+                <div id="Zscore{{chr}}_plot" style="min-width:400px; height:800px; "></div><br><br>
             </div>
         </div>
     </div>
+{% endfor %}
 </div>
 {% endblock %}
 
 {% block scripts %}
-{% include 'batch/plots/NCV.html' %}
+{% include 'batch/plots/Zscore.html' %}
 {% endblock %}

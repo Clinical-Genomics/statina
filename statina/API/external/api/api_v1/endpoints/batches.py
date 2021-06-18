@@ -12,11 +12,13 @@ from statina.crud.find.plots.coverage_plot_data import (
     get_box_data_for_coverage_plot,
     get_scatter_data_for_coverage_plot,
 )
-from statina.crud.find.plots.ncv_plot_data import (
-    get_samples_for_report_ncv_plot,
+from statina.crud.find.plots.zscore_plot_data import (
+    get_samples_for_samp_tris_plot,
     get_tris_control_abnormal,
     get_tris_control_normal,
     get_tris_samples,
+    get_normal_for_samp_tris_plot,
+    get_abnormal_for_samp_tris_plot,
 )
 from statina.models.database import Batch, DataBaseSample, User
 from statina.models.server.plots.coverage import CoveragePlotSampleData
@@ -114,27 +116,27 @@ def batch(
 
 
 @router.get("/{batch_id}/{ncv}")
-def NCV(
+def Zscore(
     request: Request,
     batch_id: str,
     ncv: str,
     adapter: StatinaAdapter = Depends(get_nipt_adapter),
     user: User = Depends(get_current_user),
 ):
-    """Batch view with with NCV plot"""
+    """Batch view with with Zscore plot"""
 
     batch: Batch = find.batch(batch_id=batch_id, adapter=adapter)
 
     return templates.TemplateResponse(
-        "batch/tabs/NCV.html",
+        "batch/tabs/Zscore.html",
         context=dict(
             request=request,
             tris_thresholds=TRISOMI_TRESHOLDS,
             batch=batch.dict(),
-            chr=ncv,
+            chromosomes=[ncv],
             ncv_chrom_data={ncv: get_tris_samples(adapter=adapter, chr=ncv, batch_id=batch_id)},
-            normal_data=get_tris_control_normal(adapter, ncv),
-            abnormal_data=get_tris_control_abnormal(adapter, ncv, 0),
+            normal_data={ncv: get_tris_control_normal(adapter, ncv)},
+            abnormal_data={ncv: get_tris_control_abnormal(adapter, ncv, 0)},
             page_id=f"batches_NCV{ncv}",
             current_user=user,
         ),
@@ -258,7 +260,6 @@ def report(
 
     db_samples: List[DataBaseSample] = find.batch_samples(batch_id=batch_id, adapter=adapter)
     samples: List[Sample] = [Sample(**db_sample.dict()) for db_sample in db_samples]
-
     scatter_data: Dict[str, CoveragePlotSampleData] = get_scatter_data_for_coverage_plot(samples)
     box_data: Dict[int, List[float]] = get_box_data_for_coverage_plot(samples)
     control: FetalFractionSamples = get_fetal_fraction.samples(
@@ -278,18 +279,22 @@ def report(
     return templates.TemplateResponse(
         "batch/report.html",
         context=dict(
+            # common
             request=request,
             current_user=user,
             batch=find.batch(batch_id=batch_id, adapter=adapter),
-            # NCV
-            ncv_chrom_data=get_samples_for_report_ncv_plot(adapter, batch_id).dict(
-                exclude_none=True, by_alias=True
+            # Zscore
+            tris_thresholds=TRISOMI_TRESHOLDS,
+            chromosomes=["13", "18", "21"],
+            ncv_chrom_data=get_samples_for_samp_tris_plot(adapter, batch_id=batch_id).dict(
+                by_alias=True
             ),
-            normal_data=get_tris_control_normal(adapter, "21"),  ####?????????????????????
-            abnormal_data=get_tris_control_abnormal(adapter, "21", 0),
-            # FF
+            normal_data=get_normal_for_samp_tris_plot(adapter).dict(by_alias=True),
+            abnormal_data=get_abnormal_for_samp_tris_plot(adapter),
+            # Fetal Fraction preface
             control=control,
             cases=get_fetal_fraction.samples(adapter=adapter, batch_id=batch_id),
+            # Fetal Fraction  XY
             abnormal=abnormal_dict,
             max_x=max(control.FFX) + 1,
             min_x=min(control.FFX) - 1,

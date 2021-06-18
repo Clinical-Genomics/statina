@@ -37,7 +37,7 @@ SEX_THRESHOLDS = {
     "y_max": 20,
     "xx_lower": 2,
     "xx_upper": 4,
-    "xy_lowest": 0.5,
+    "xy_lowest": 0.6,
     "k_upper": 1.51,
     "k_lower": 1.49,
 }

@@ -73,9 +73,7 @@ class Sample(DataBaseSample):
         sample_warnings["FF_Formatted"]: str = cls.get_ff_preface_warning(
             fetal_fraction_pf=fetal_fraction_pf, fetal_fraction_y=fetal_fraction_y
         )
-        sample_warnings["FFY"]: str = cls.get_ff_y_warning(
-            fetal_fraction_y=fetal_fraction_y, fetal_fraction_pf=fetal_fraction_pf
-        )
+        sample_warnings["FFY"]: str = cls.get_ff_y_warning(fetal_fraction_y=fetal_fraction_y)
         for key in ["Zscore_13", "Zscore_18", "Zscore_21"]:
             z_score = values.get(key)
             sample_warnings[key]: str = cls.get_tris_warning(
@@ -121,18 +119,14 @@ class Sample(DataBaseSample):
             return "default"
 
     @classmethod
-    def get_ff_y_warning(cls, fetal_fraction_y: float, fetal_fraction_pf: float) -> str:
+    def get_ff_y_warning(cls, fetal_fraction_y: float) -> str:
         """Get fetal fraction warning based on preset threshold"""
 
         y_min = FF_TRESHOLDS["fetal_fraction_y_min"]
         y_max = FF_TRESHOLDS["fetal_fraction_y_max"]
-        pf_min = FF_TRESHOLDS["fetal_fraction_preface"]
 
         if not isinstance(fetal_fraction_y, (float, int)):
             return "default"
-
-        if fetal_fraction_y < y_min and fetal_fraction_pf < pf_min:
-            return "danger"
 
         if y_min <= fetal_fraction_y < y_max:
             return "danger"
@@ -143,8 +137,9 @@ class Sample(DataBaseSample):
     def get_ff_preface_warning(cls, fetal_fraction_pf: float, fetal_fraction_y: float) -> str:
         """Get fetal fraction preface warning based on preset threshold"""
 
-        if not isinstance(fetal_fraction_y, (float, int)) or isinstance(
-            fetal_fraction_pf, (float, int)
+        if not (
+            isinstance(fetal_fraction_y, (float, int))
+            and isinstance(fetal_fraction_pf, (float, int))
         ):
             return "default"
         y_min = FF_TRESHOLDS["fetal_fraction_y_min"]

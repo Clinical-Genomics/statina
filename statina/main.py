@@ -7,7 +7,7 @@ from statina.API.external.api.api_v1.endpoints import (
     download,
     index,
     login,
-    new_user,
+    user,
     sample,
     statistics,
     update,

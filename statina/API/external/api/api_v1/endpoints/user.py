@@ -2,6 +2,7 @@ import datetime
 import smtplib
 import ssl
 from email.message import EmailMessage
+from typing import List
 
 from fastapi import Depends
 from pydantic import EmailStr
@@ -9,11 +10,12 @@ from starlette.requests import Request
 from starlette.responses import RedirectResponse
 
 from statina.API.external.api.api_v1.endpoints.login import router
-from statina.API.external.api.deps import get_password_hash
+from statina.API.external.api.deps import get_password_hash, get_current_user
 from statina.adapter import StatinaAdapter
 from statina.config import get_nipt_adapter, templates
+from statina.crud.find import find
 from statina.crud.insert import insert_user
-from statina.exeptions import EmailNotSentError
+from statina.exeptions import EmailNotSentError, CredentialsError
 from statina.models.database import User
 from statina.models.server.new_user import NewUserRequestEmail, NewUser
 
@@ -94,5 +96,49 @@ def new_user(request: Request):
             "current_user": "",
             "info_type": request.cookies.get("info_type"),
             "user_info": request.cookies.get("user_info"),
+        },
+    )
+
+
+@router.get("/users")
+def users(
+    request: Request,
+    adapter: StatinaAdapter = Depends(get_nipt_adapter),
+    user: User = Depends(get_current_user),
+):
+    """Admin view with table of all users."""
+    if user.role != "admin":
+        raise CredentialsError(message="Only admin users can access the users page")
+
+    user_list: List[User] = find.users(adapter=adapter)
+    return templates.TemplateResponse(
+        "users.html",
+        context={
+            "request": request,
+            "users": user_list,
+            "page_id": "users",
+            "current_user": user,
+        },
+    )
+
+
+@router.post("/users")
+def users(
+    request: Request,
+    adapter: StatinaAdapter = Depends(get_nipt_adapter),
+    user: User = Depends(get_current_user),
+):
+    """Admin view with table of all users."""
+    if user.role != "admin":
+        CredentialsError(message="Only admin users can access the users page")
+
+    user_list: List[User] = find.users(adapter=adapter)
+    return templates.TemplateResponse(
+        "users.html",
+        context={
+            "request": request,
+            "users": user_list,
+            "page_id": "users",
+            "current_user": user,
         },
     )

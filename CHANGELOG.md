@@ -5,6 +5,14 @@ This change log will document the notable changes to this project in this file a
 ## [x.x.x]
 
 
+## [1.0.0]
+
+### Fixed
+- adjust warning thresholds for FF
+
+### Added
+- adds automatic sex classification
+
 
 ## [0.2.0]
 

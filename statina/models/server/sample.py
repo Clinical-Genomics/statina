@@ -23,6 +23,7 @@ class Sample(DataBaseSample):
     warnings: Optional[SampleWarning]
     text_warning: Optional[str]
     status: Optional[str]
+    sex: Optional[Literal["XX", "XY"]]
 
     @validator("Zscore_13")
     def round_zscore_13(cls, v):
@@ -64,14 +65,15 @@ class Sample(DataBaseSample):
 
     @validator("warnings", always=True)
     def set_warnings(cls, v, values: dict) -> SampleWarning:
-
-        """ """
+        """Get warnings for a sample and return a SampleWarning"""
 
         sample_warnings = {}
         fetal_fraction_pf = values.get("FF_Formatted")
-        sample_warnings["FF_Formatted"]: str = cls.get_ff_warning(fetal_fraction=fetal_fraction_pf)
         fetal_fraction_y = values.get("FFY")
-        sample_warnings["FFY"]: str = cls.get_ff_y(fetal_fraction_y=fetal_fraction_y)
+        sample_warnings["FF_Formatted"]: str = cls.get_ff_preface_warning(
+            fetal_fraction_pf=fetal_fraction_pf, fetal_fraction_y=fetal_fraction_y
+        )
+        sample_warnings["FFY"]: str = cls.get_ff_y_warning(fetal_fraction_y=fetal_fraction_y)
         for key in ["Zscore_13", "Zscore_18", "Zscore_21"]:
             z_score = values.get(key)
             sample_warnings[key]: str = cls.get_tris_warning(
@@ -81,13 +83,19 @@ class Sample(DataBaseSample):
 
     @validator("text_warning", always=True)
     def set_text_warning(cls, v, values: dict) -> str:
-
-        """ """
+        """Joining the warnings for a sample to a text string"""
 
         text_warnings = [
             abn for abn, warning in values["warnings"].dict().items() if warning == "danger"
         ]
         return ", ".join(text_warnings)
+
+    @validator("sex", always=True)
+    def set_sex(cls, v, values: dict) -> str:
+        """Set sex based on fetal fraction Y thresholds"""
+
+        fetal_fraction_y = values.get("FFY")
+        return "XY" if fetal_fraction_y >= FF_TRESHOLDS["fetal_fraction_y_min"] else "XX"
 
     @classmethod
     def get_tris_warning(cls, z_score: float, fetal_fraction: float) -> str:
@@ -111,25 +119,31 @@ class Sample(DataBaseSample):
             return "default"
 
     @classmethod
-    def get_ff_warning(cls, fetal_fraction: float) -> str:
+    def get_ff_y_warning(cls, fetal_fraction_y: float) -> str:
         """Get fetal fraction warning based on preset threshold"""
 
-        if (
-            isinstance(fetal_fraction, float)
-            and fetal_fraction <= FF_TRESHOLDS["fetal_fraction_preface"]
-        ):
+        y_min = FF_TRESHOLDS["fetal_fraction_y_min"]
+        y_max = FF_TRESHOLDS["fetal_fraction_y_max"]
+
+        if not isinstance(fetal_fraction_y, (float, int)):
+            return "default"
+
+        if y_min <= fetal_fraction_y < y_max:
             return "danger"
 
         return "default"
 
     @classmethod
-    def get_ff_y(cls, fetal_fraction_y: float) -> str:
-        """Get fetal fraction warning based on preset threshold"""
+    def get_ff_preface_warning(cls, fetal_fraction_pf: float, fetal_fraction_y: float) -> str:
+        """Get fetal fraction preface warning based on preset threshold"""
 
-        if (
-            isinstance(fetal_fraction_y, float)
-            and FF_TRESHOLDS["fetal_fraction_y_min"] <= FF_TRESHOLDS["fetal_fraction_y_max"]
+        if not (
+            isinstance(fetal_fraction_y, (float, int))
+            and isinstance(fetal_fraction_pf, (float, int))
         ):
+            return "default"
+        y_min = FF_TRESHOLDS["fetal_fraction_y_min"]
+        pf_min = FF_TRESHOLDS["fetal_fraction_preface"]
+        if fetal_fraction_pf < pf_min and fetal_fraction_y < y_min:
             return "danger"
-
         return "default"

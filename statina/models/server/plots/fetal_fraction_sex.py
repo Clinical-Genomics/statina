@@ -78,7 +78,7 @@ class SexChromosomeThresholds:
             text=f"hej",
         )
 
-    def XY_horizontal(self) -> ThresholdLine:
+    def XY_fetal_fraction_y(self) -> ThresholdLine:
         """Returning a threshold line to separate XY from XX"""
         y = self.xy_lowest
         return ThresholdLine(x=[self.x_min, self.x_max], y=[y, y], text=f"y={y}")

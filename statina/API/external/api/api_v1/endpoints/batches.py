@@ -176,7 +176,7 @@ def fetal_fraction_XY(
         "batch/tabs/FF_XY.html",
         context=dict(
             sex_thresholds={
-                "XY_horisontal": sex_thresholds.XY_horizontal(),
+                "XY_fetal_fraction_y": sex_thresholds.XY_fetal_fraction_y(),
                 # "XX_lower": sex_thresholds.XX_lower(),
                 # "XX_upper": sex_thresholds.XX_upper(),
                 # "XY_lower": sex_thresholds.XY_lower(),

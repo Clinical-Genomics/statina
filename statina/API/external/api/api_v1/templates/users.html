@@ -1,0 +1,73 @@
+{% extends 'layout/layout.html' %}
+{% block body %}
+    <div class="container-fluid">
+        <div class="jumbotron vertical-center">
+            <div class="row">
+                <div class="col-lg-12">
+                    <h1 class="page-header"><strong>Users</strong></h1>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="panel panel-default">
+                    <div id="user_list">
+                        <div class="panel-body">
+                            <div class="table-responsive">
+                                <table id="user_table" class="table table-striped table-bordered" cellspacing="0"
+                                       width="100%">
+                                    {% if current_user.role=='admin' %}
+                                        <thead>
+                                        <tr>
+                                            <th>Email</th>
+                                            <th>Name</th>
+                                            <th>Role</th>
+                                            <th></th>
+                                        </tr>
+                                        </thead>
+                                        <tbody class=list>
+                                        {% for user in users %}
+                                            <form action="{{ url_for('update_user') }}" method="post">
+                                                <input type=text name="user_email" value="{{ user.email }}" hidden>
+                                                <tr>
+                                                    <td class="Date"> {{ user.email }}</td>
+                                                    <td class="user id">{{ user.username }}</td>
+                                                    <td class="user id">
+                                                        <select class="form-control" id="role" name="role">
+                                                            <option {% if user.role=='R' %}selected{% endif %}>R
+                                                            </option>
+                                                            <option {% if user.role=='RW' %}selected{% endif %}>RW
+                                                            </option>
+                                                            <option {% if user.role=='admin' %}selected{% endif %}>
+                                                                admin
+                                                            </option>
+                                                            <option {% if user.role=='inactive' %}selected{% endif %}>
+                                                                inactive
+                                                            </option>
+                                                        </select>
+                                                    </td>
+                                                    <td>
+                                                        <p>
+                                                            <input type="submit" class="btn btn-warning"
+                                                                   name="button_id"
+                                                                   value="Save">
+                                                        </p>
+                                                    </td>
+
+                                                </tr>
+                                            </form>
+                                        {% endfor %}
+                                        </tbody>
+                                    {% endif %}
+                                </table>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+{% endblock %}

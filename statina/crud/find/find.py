@@ -6,6 +6,13 @@ from statina.adapter import StatinaAdapter
 from statina.models.database import Batch, DataBaseSample, User
 
 
+def users(adapter: StatinaAdapter) -> List[User]:
+    """Return all users from the batch collection"""
+
+    users: Iterable[dict] = adapter.user_collection.find()
+    return parse_obj_as(List[User], list(users))
+
+
 def user(
     adapter: StatinaAdapter, email: Optional[str] = None, user_name: Optional[str] = None
 ) -> Optional[User]:

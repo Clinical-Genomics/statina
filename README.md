@@ -60,11 +60,10 @@ make releases in release branches which corresponds to stable versions of Statin
 	- Paste the latest changelog to the text body
 	- get it approved and merge to master. **Dont delete the release branch!**
 5) Make a [new release](https://github.com/Clinical-Genomics/statina/releases/new).
-	- Name tag version as `vX.X.X`
-	- Set target to the release branch
-	- Make descriptive title
-	- Paste latest changelog to the text body
-	- Release!
+	- `git checkout master`
+	- `git tag "vX.X.X"`
+	- `git push --tag`
+	- got to the new release on [releases](https://github.com/Clinical-Genomics/statina/releases) and click 'Create Release'
 	
 ### Deploying to staging
 
@@ -82,9 +81,7 @@ Steps to test current branch on staging:
 
 `ssh localhost`
   
-If you made changes to internal app : `systemctl --user restart statinaAppInternal.service` 
-
-If you made changes to external app : `systemctl --user restart statinaApp.service` 
+If you made changes to internal app : `systemctl --user restart statina.target` 
 
 Your branch should be deployed to staging at https://statina-stage.scilifelab.se 
 

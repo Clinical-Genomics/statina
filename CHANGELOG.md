@@ -5,6 +5,13 @@ This change log will document the notable changes to this project in this file a
 ## [x.x.x]
 
 
+
+## [0.2.0]
+
+### Added
+- This PR adds a admin user view
+
+
 ## [0.1.0]
 
 ### Fixed

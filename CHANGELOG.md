@@ -5,7 +5,7 @@ This change log will document the notable changes to this project in this file a
 ## [x.x.x]
 
 
-## [0.3.0]
+## [1.0.0]
 
 ### Fixed
 - adjust warning thresholds for FF

@@ -35,7 +35,7 @@ def samples(
     }
 
     if control_samples:
-        match["$match"]["batch_id"] = {"$ne": batch_id}
+        # match["$match"]["batch_id"] = {"$ne": batch_id}
         for abn in SEX_CHROM_ABNORM:
             match["$match"][f"status_{abn}"] = {"$eq": "Normal"}
     else:

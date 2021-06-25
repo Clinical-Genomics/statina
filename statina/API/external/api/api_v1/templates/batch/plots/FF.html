@@ -38,8 +38,8 @@
 
     {% for name in cases['names'] %}
         var NCVXYsamps = {
-            y: [{{cases['FF'][loop.index]}}],
-            x: [{{cases['FFY'][loop.index]}}],
+            y: [{{cases['FF'][loop.index0]}}],
+            x: [{{cases['FFY'][loop.index0]}}],
             name: {{name|tojson}},
             mode: 'markers',
             text: {{name|tojson}},
@@ -87,8 +87,8 @@
 
     {% for name in cases['names'] %}
         var NCVXYsamps = {
-            y: [{{cases['FF'][loop.index]}}],
-            x: [{{cases['FFX'][loop.index]}}],
+            y: [{{cases['FF'][loop.index0]}}],
+            x: [{{cases['FFX'][loop.index0]}}],
             name: {{name|tojson}},
             mode: 'markers',
             text: {{name|tojson}},

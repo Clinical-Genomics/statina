@@ -10,5 +10,5 @@ jobs:
       - uses: actions/setup-python@v2
       - uses: psf/black@stable
         with:
-          args: ". --check --line-length 100"
+          black_args: ". --check --line-length 100"
           

@@ -19,14 +19,14 @@ from typing import Union, Optional
 router = APIRouter()
 
 
-def zip_dir(zip_name: str, source_dir: Union[str, PathLike], suffix: Optional[str] = None):
+def zip_dir(zip_name: str, source_dir: Union[str, PathLike], suffix: Optional[str] = None)-> io.BytesIO:
     """Function for zipping"""
     src_path = Path(source_dir).expanduser().resolve(strict=True)
     file_obj = io.BytesIO()
     with ZipFile(file=file_obj, mode="a", compression=ZIP_DEFLATED, compresslevel=9) as zf:
         for file in src_path.iterdir():
-            zf.writestr(zinfo_or_arcname=file.name, data=open(file, "r").read())
-            print(file)
+            zf.write(filename=file.as_posix(), arcname=file.name)
+        print(zf.testzip())
     return file_obj
 
 

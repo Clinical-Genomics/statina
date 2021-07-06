@@ -41,7 +41,6 @@ def batch_download(
     """View for batch downloads"""
     batch: dict = find.batch(adapter=adapter, batch_id=batch_id).dict()
     file_path = batch.get(file_id)
-    file_path = "/Users/maya.brandi/opt/lovedkitten/2021-02-09"
     print(file_path)
     if not validate_file_path(file_path):
         return RedirectResponse(request.headers.get("referer"))

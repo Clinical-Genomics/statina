@@ -23,10 +23,11 @@ def zip_dir(zip_name: str, source_dir: Union[str, PathLike], suffix: Optional[st
     """Function for zipping"""
     src_path = Path(source_dir).expanduser().resolve(strict=True)
     file_obj = io.BytesIO()
+    file_obj.seek(0)
     with ZipFile(file=file_obj, mode="a", compression=ZIP_DEFLATED, compresslevel=9) as zf:
         for file in src_path.iterdir():
             zf.write(filename=file.as_posix(), arcname=file.name)
-        print(zf.testzip())
+    file_obj.seek(0)
     return file_obj
 
 

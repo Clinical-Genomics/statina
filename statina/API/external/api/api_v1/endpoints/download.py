@@ -30,11 +30,12 @@ def zip_dir(zip_name: str, source_dir: Union[str, PathLike], suffix: Optional[st
     return file_obj
 
 
-@router.get("/batch_download/{batch_id}/{file_id}")
+@router.get("/batch_download/{batch_id}/{file_id}/{file_name}")
 def batch_download(
     request: Request,
     batch_id: str,
     file_id: str,
+    file_name: str,
     adapter: StatinaAdapter = Depends(get_nipt_adapter),
     user: User = Depends(get_current_user),
 ):

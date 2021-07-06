@@ -24,10 +24,9 @@ def zip_dir(zip_name: str, source_dir: Union[str, PathLike], suffix: Optional[st
     src_path = Path(source_dir).expanduser().resolve(strict=True)
     file_obj = io.BytesIO()
     with ZipFile(file=file_obj, mode="w", compression=ZIP_DEFLATED, compresslevel=9) as zf:
-        for file in src_path.rglob("*"):
-            zf.writestr(zinfo_or_arcname=file, data=open(file, "r"))
+        for file in src_path.iterdir():
+            zf.writestr(zinfo_or_arcname=file.name, data=open(file, "rb"))
             print(file)
-        zf.write(file, file.relative_to(src_path.parent))
     return file_obj
 
 

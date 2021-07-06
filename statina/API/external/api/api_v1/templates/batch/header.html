@@ -30,7 +30,7 @@
                             Result file</a>
                         <li class="divider"></li>
                         <a class="dropdown-item"
-                           href="{{ url_for('batch_download', file_id='segmental_calls', file_name="segmental_calls.zip", batch_id=batch.batch_id) }}">Segmental
+                           href="{{ url_for('batch_download', file_id='segmental_calls', file_name=batch.id+"_segmental_calls.zip", batch_id=batch.batch_id) }}">Segmental
                             calls</a>
                     </ul>
                 </li>

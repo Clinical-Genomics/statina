@@ -45,18 +45,13 @@ def batch_download(
     """View for batch downloads"""
     batch: dict = find.batch(adapter=adapter, batch_id=batch_id).dict()
     file_path = batch.get(file_id)
-    print(file_path)
     if not validate_file_path(file_path):
         return RedirectResponse(request.headers.get("referer"))
 
     path = Path(file_path)
     if path.is_dir():
-        print("hej")
         zip_file_name = f"{batch_id}_segmental_calls.zip"
-        print(zip_file_name)
-
         file_obj = zip_dir(zip_name=zip_file_name, source_dir=file_path, suffix="bed")
-        print(file_obj)
         return StreamingResponse(file_obj, media_type="application/text")
 
     return FileResponse(

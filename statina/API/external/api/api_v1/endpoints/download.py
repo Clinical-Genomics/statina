@@ -25,7 +25,7 @@ def zip_dir(zip_name: str, source_dir: Union[str, PathLike], suffix: Optional[st
     file_obj = io.BytesIO()
     with ZipFile(file=file_obj, mode="w", compression=ZIP_DEFLATED, compresslevel=9) as zf:
         for file in src_path.iterdir():
-            zf.writestr(zinfo_or_arcname=file.name, data=open(file, "rb"))
+            zf.writestr(zinfo_or_arcname=file.name, data=io.BytesIO(open(file, "rb")))
             print(file)
     return file_obj
 

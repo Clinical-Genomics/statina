@@ -19,7 +19,9 @@ from typing import Union, Optional
 router = APIRouter()
 
 
-def zip_dir(zip_name: str, source_dir: Union[str, PathLike], suffix: Optional[str] = None)-> io.BytesIO:
+def zip_dir(
+    zip_name: str, source_dir: Union[str, PathLike], suffix: Optional[str] = None
+) -> io.BytesIO:
     """Function for zipping"""
     src_path = Path(source_dir).expanduser().resolve(strict=True)
     file_obj = io.BytesIO()

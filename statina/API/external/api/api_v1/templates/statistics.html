@@ -63,9 +63,9 @@
             title : "{{plot_name}}"
             }};
 
-    {% for batch in box_stat %}
+    {% for batch in batch_ids %}
     var box = {
-        y: {{ batch[plot_name] }},
+        y: {{ box_stat[batch][plot_name] }},
         x: Array({{ nr_batches }}).fill({{ loop.index }}),
         type: 'box',
         showlegend: false,
@@ -115,7 +115,7 @@
     {% for batch_id in scatter_stat %}
         var batch = {
             y: [{{ scatter_stat[batch_id][plot_name] }}],
-            x: [{{ loop.index  }}],
+            x: [{{ loop.index }}],
             type: 'scatter',
             mode: 'markers',
             showlegend: false,

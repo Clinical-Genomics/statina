@@ -28,7 +28,7 @@ TRISOMI_TRESHOLDS = {
 
 FF_TRESHOLDS = {
     "fetal_fraction_preface": 7,
-    "fetal_fraction_y_max": 4,
+    "fetal_fraction_y_max": 3,
     "fetal_fraction_y_min": 0.6,
 }
 

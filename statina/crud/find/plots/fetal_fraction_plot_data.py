@@ -20,7 +20,6 @@ def samples(
             "FF_Formatted": {"$ne": "None", "$exists": True},
             "FFY": {"$ne": "None", "$exists": True},
             "FFX": {"$ne": "None", "$exists": True},
-            "include": {"$eq": True},
         }
     }
     group = {
@@ -36,6 +35,7 @@ def samples(
 
     if control_samples:
         match["$match"]["batch_id"] = {"$ne": batch_id}
+        match["$match"]["include"] = {"$eq": True}
         for abn in SEX_CHROM_ABNORM:
             match["$match"][f"status_{abn}"] = {"$eq": "Normal"}
     else:

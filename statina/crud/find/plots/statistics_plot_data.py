@@ -14,7 +14,7 @@ def get_last_batches(adapter, nr_of_batches: int) -> list:
 
 
 def get_statistics_for_scatter_plot(batches: list, fields: list) -> dict:
-    """Formating data for scatter plot"""
+    """Formatting data for scatter plot"""
 
     scatter_plot_data = {}
     for batch in batches:
@@ -28,7 +28,7 @@ def get_statistics_for_scatter_plot(batches: list, fields: list) -> dict:
 
 
 def get_statistics_for_box_plot(adapter: StatinaAdapter, batches: list, fields: list):
-    """Getting and formating data for box plot"""
+    """Getting and formatting data for box plot"""
 
     match = {"$match": {"batch_id": {"$in": batches}}}
     lookup = {
@@ -48,5 +48,4 @@ def get_statistics_for_box_plot(adapter: StatinaAdapter, batches: list, fields: 
     pipe = [match, lookup, unwind, group]
     # maybe add a fina sort to the pipe
     box_plot_data = list(find.sample_aggregate(pipe=pipe, adapter=adapter))
-
-    return box_plot_data
+    return {batch["_id"]["batch"]: batch for batch in box_plot_data}

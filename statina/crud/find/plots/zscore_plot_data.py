@@ -120,7 +120,7 @@ def get_tris_samples(adapter: StatinaAdapter, chr, batch_id: str) -> ZscoreSampl
     """Cases for trisomi plots."""
 
     pipe = [
-        {"$match": {"batch_id": {"$eq": batch_id}, "include": {"$eq": True}}},
+        {"$match": {"batch_id": {"$eq": batch_id}}},
         {
             "$group": {
                 "_id": {"batch": "$batch_id"},

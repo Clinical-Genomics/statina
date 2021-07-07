@@ -6,6 +6,7 @@ This change log will document the notable changes to this project in this file a
 
 ### Added
 - two plots to QC-Data view
+- html-report download
 
 
 

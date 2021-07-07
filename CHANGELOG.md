@@ -2,8 +2,18 @@
 
 This change log will document the notable changes to this project in this file and it is following [Semantic Versioning](https://semver.org/)
 
-## [x.x.x]
+## [X.X.X]
 
+## [1.0.1]
+
+### Added
+- Changes FF-x tresholds and shows the tresholds in the XY plot
+- Change FF-y treshold #81 
+- Makes the bath table scrollable with fixed header #83 
+
+### Fixed
+- Fixes a bug in the QC-plots - ticktext showing batch ids was based on a soted list of batch_ids, while the box-plots was not sorted acordingly #87
+- Fixed a "bug" in the fetal fraction xy plot and z-score plots, where only 'included' samples were shown instead of all samples in the batch.  #79 
 
 ## [1.0.0]
 

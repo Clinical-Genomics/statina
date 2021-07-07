@@ -50,7 +50,6 @@ def batch_download(
 
     path = Path(file_path)
     if path.is_dir():
-        zip_file_name = f"{batch_id}_segmental_calls.zip"
         file_obj = zip_dir(zip_name=zip_file_name, source_dir=file_path, suffix="bed")
         return StreamingResponse(file_obj, media_type="application/text")
 

@@ -19,23 +19,26 @@ from typing import Union, Optional
 router = APIRouter()
 
 
-def zip_dir(zip_name: str, source_dir: Union[str, PathLike], suffix: Optional[str] = None):
+def zip_dir(
+    zip_name: str, source_dir: Union[str, PathLike], suffix: Optional[str] = None
+) -> io.BytesIO:
     """Function for zipping"""
     src_path = Path(source_dir).expanduser().resolve(strict=True)
     file_obj = io.BytesIO()
-    with ZipFile(file=file_obj, mode="w", compression=ZIP_DEFLATED, compresslevel=9) as zf:
-        for file in src_path.rglob("*"):
-            zf.writestr(zinfo_or_arcname=file, data=open(file, "r"))
-            print(file)
-        zf.write(file, file.relative_to(src_path.parent))
+    file_obj.seek(0)
+    with ZipFile(file=file_obj, mode="a", compression=ZIP_DEFLATED, compresslevel=9) as zf:
+        for file in src_path.iterdir():
+            zf.write(filename=file.as_posix(), arcname=file.name)
+    file_obj.seek(0)
     return file_obj
 
 
-@router.get("/batch_download/{batch_id}/{file_id}")
+@router.get("/batch_download/{batch_id}/{file_id}/{file_name}")
 def batch_download(
     request: Request,
     batch_id: str,
     file_id: str,
+    file_name: str,
     adapter: StatinaAdapter = Depends(get_nipt_adapter),
     user: User = Depends(get_current_user),
 ):
@@ -43,18 +46,13 @@ def batch_download(
     batch: dict = find.batch(adapter=adapter, batch_id=batch_id).dict()
     file_path = batch.get(file_id)
     file_path = "/Users/maya.brandi/opt/lovedkitten/2021-02-09"
-    print(file_path)
     if not validate_file_path(file_path):
         return RedirectResponse(request.headers.get("referer"))
 
     path = Path(file_path)
     if path.is_dir():
-        print("hej")
         zip_file_name = f"{batch_id}_segmental_calls.zip"
-        print(zip_file_name)
-
         file_obj = zip_dir(zip_name=zip_file_name, source_dir=file_path, suffix="bed")
-        print(file_obj)
         return StreamingResponse(file_obj, media_type="application/text")
 
     return FileResponse(

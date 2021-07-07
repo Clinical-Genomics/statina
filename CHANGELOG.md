@@ -2,11 +2,14 @@
 
 This change log will document the notable changes to this project in this file and it is following [Semantic Versioning](https://semver.org/)
 
-## [X.X.X]
 
+## [x.x.x]
+
+## [1.1.0]
 
 ### Fixed
 - Correcting release documentation
+- ziped batch archive download
 
 ### Added
 - two plots to QC-Data view

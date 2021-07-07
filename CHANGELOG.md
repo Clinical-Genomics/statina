@@ -4,6 +4,10 @@ This change log will document the notable changes to this project in this file a
 
 ## [X.X.X]
 
+### Fixed
+- Correcting release documentation
+
+
 ## [1.0.2]
 
 ### Added

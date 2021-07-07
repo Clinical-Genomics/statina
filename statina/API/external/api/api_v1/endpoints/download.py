@@ -1,24 +1,16 @@
-import io
-import zipfile
-from os import PathLike
 from pathlib import Path
-from typing import Optional, Union
-from zipfile import ZIP_DEFLATED, ZipFile
 
-from fastapi import APIRouter, Depends, Request
+from fastapi import APIRouter, Depends
 from fastapi.responses import FileResponse, RedirectResponse
 from starlette.requests import Request
 from starlette.responses import StreamingResponse
 
-from statina.API.external.api.api_v1.endpoints.batches import router
 from statina.API.external.constants import TRISOMI_TRESHOLDS
-from statina.adapter import StatinaAdapter
 
 from statina.adapter.plugin import StatinaAdapter
 from statina.API.external.api.deps import get_current_user
 from statina.config import get_nipt_adapter, templates
 from statina.crud.find import find
-<<<<<<< HEAD
 from statina.crud.find.plots import fetal_fraction_plot_data as get_fetal_fraction
 from statina.crud.find.plots.coverage_plot_data import (
     get_scatter_data_for_coverage_plot,
@@ -29,23 +21,18 @@ from statina.crud.find.plots.zscore_plot_data import (
     get_normal_for_samp_tris_plot,
     get_abnormal_for_samp_tris_plot,
 )
-from statina.models.database import User, DataBaseSample
 from statina.models.server.plots.coverage import CoveragePlotSampleData
 from statina.models.server.plots.fetal_fraction import (
     FetalFractionSamples,
     FetalFractionControlAbNormal,
 )
 from statina.models.server.sample import Sample
-from statina.parse.batch import validate_file_path
 from zipfile import ZIP_DEFLATED, ZipFile
 import io
-import zipfile
 from os import PathLike
-from typing import Union, Optional, List, Dict
-=======
+from typing import Union, List, Dict
 from statina.models.database import DataBaseSample, User
 from statina.parse.batch import validate_file_path
->>>>>>> 0bbe9d16269574ae61cb3b5d439b7adf21033ce7
 
 router = APIRouter()
 

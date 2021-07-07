@@ -1,6 +1,8 @@
+import io
 from typing import Dict, List
 
 from fastapi import APIRouter, Depends, Request
+from starlette.responses import RedirectResponse, StreamingResponse
 
 import statina.crud.find.plots.fetal_fraction_plot_data as get_fetal_fraction
 from statina.adapter import StatinaAdapter
@@ -248,10 +250,11 @@ def coverage(
     )
 
 
-@router.get("/batches/{batch_id}/report/{coverage}")
+@router.get("/batches/{batch_id}/report/{coverage}/{file_name}")
 def report(
     request: Request,
     batch_id: str,
+    file_name: str,
     coverage: str,
     adapter: StatinaAdapter = Depends(get_nipt_adapter),
     user: User = Depends(get_current_user),
@@ -276,35 +279,40 @@ def report(
         },
     )
 
-    return templates.TemplateResponse(
-        "batch/report.html",
-        context=dict(
-            # common
-            request=request,
-            current_user=user,
-            batch=find.batch(batch_id=batch_id, adapter=adapter),
-            # Zscore
-            tris_thresholds=TRISOMI_TRESHOLDS,
-            chromosomes=["13", "18", "21"],
-            ncv_chrom_data=get_samples_for_samp_tris_plot(adapter, batch_id=batch_id).dict(
-                by_alias=True
-            ),
-            normal_data=get_normal_for_samp_tris_plot(adapter).dict(by_alias=True),
-            abnormal_data=get_abnormal_for_samp_tris_plot(adapter),
-            # Fetal Fraction preface
-            control=control,
-            cases=get_fetal_fraction.samples(adapter=adapter, batch_id=batch_id),
-            # Fetal Fraction  XY
-            abnormal=abnormal_dict,
-            max_x=max(control.FFX) + 1,
-            min_x=min(control.FFX) - 1,
-            # table
-            sample_info=samples,
-            # coverage
-            coverage=coverage,
-            x_axis=list(range(1, 23)),
-            scatter_data=scatter_data,
-            box_data=box_data,
-            page_id="batches",
+    template = templates.get_template("batch/report.html")
+    output_from_parsed_template = template.render(
+        # common
+        request=request,
+        current_user=user,
+        batch=find.batch(batch_id=batch_id, adapter=adapter),
+        # Zscore
+        tris_thresholds=TRISOMI_TRESHOLDS,
+        chromosomes=["13", "18", "21"],
+        ncv_chrom_data=get_samples_for_samp_tris_plot(adapter, batch_id=batch_id).dict(
+            by_alias=True
         ),
+        normal_data=get_normal_for_samp_tris_plot(adapter).dict(by_alias=True),
+        abnormal_data=get_abnormal_for_samp_tris_plot(adapter),
+        # Fetal Fraction preface
+        control=control,
+        cases=get_fetal_fraction.samples(adapter=adapter, batch_id=batch_id),
+        # Fetal Fraction  XY
+        abnormal=abnormal_dict,
+        max_x=max(control.FFX) + 1,
+        min_x=min(control.FFX) - 1,
+        # table
+        sample_info=samples,
+        # coverage
+        coverage=coverage,
+        x_axis=list(range(1, 23)),
+        scatter_data=scatter_data,
+        box_data=box_data,
+        page_id="batches",
     )
+
+    in_mem_file = io.StringIO()
+    in_mem_file.seek(0)
+
+    in_mem_file.write(output_from_parsed_template)
+    in_mem_file.seek(0)
+    return StreamingResponse(in_mem_file, media_type="application/text")

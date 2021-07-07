@@ -15,10 +15,10 @@
                         Batch Downloads
                     </button>
                     <ul class="dropdown-menu">
-                        <a class="dropdown-item" href="{{ url_for('report', batch_id=batch.batch_id , coverage=0) }}">
+                        <a class="dropdown-item" href="{{ url_for('report', batch_id=batch.batch_id , file_name=batch.batch_id+"_report.html", coverage=0) }}">
                             Report</a>
                         <li class="divider"></li>
-                        <a class="dropdown-item" href="{{ url_for('report', batch_id=batch.batch_id , coverage=1) }}">
+                        <a class="dropdown-item" href="{{ url_for('report', batch_id=batch.batch_id , file_name=batch.batch_id+"_report.html", coverage=1) }}">
                             Coverage Report</a>
                         <li class="divider"></li>
                         <a class="dropdown-item"

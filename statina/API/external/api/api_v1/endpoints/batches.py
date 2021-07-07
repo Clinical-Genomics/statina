@@ -13,12 +13,9 @@ from statina.crud.find.plots.coverage_plot_data import (
     get_scatter_data_for_coverage_plot,
 )
 from statina.crud.find.plots.zscore_plot_data import (
-    get_samples_for_samp_tris_plot,
     get_tris_control_abnormal,
     get_tris_control_normal,
     get_tris_samples,
-    get_normal_for_samp_tris_plot,
-    get_abnormal_for_samp_tris_plot,
 )
 from statina.models.database import Batch, DataBaseSample, User
 from statina.models.server.plots.coverage import CoveragePlotSampleData
@@ -244,67 +241,5 @@ def coverage(
             scatter_data=scatter_data,
             box_data=box_data,
             page_id="batches_cov",
-        ),
-    )
-
-
-@router.get("/batches/{batch_id}/report/{coverage}")
-def report(
-    request: Request,
-    batch_id: str,
-    coverage: str,
-    adapter: StatinaAdapter = Depends(get_nipt_adapter),
-    user: User = Depends(get_current_user),
-):
-    """Report view, collecting all tables and plots from one batch."""
-
-    db_samples: List[DataBaseSample] = find.batch_samples(batch_id=batch_id, adapter=adapter)
-    samples: List[Sample] = [Sample(**db_sample.dict()) for db_sample in db_samples]
-    scatter_data: Dict[str, CoveragePlotSampleData] = get_scatter_data_for_coverage_plot(samples)
-    box_data: Dict[int, List[float]] = get_box_data_for_coverage_plot(samples)
-    control: FetalFractionSamples = get_fetal_fraction.samples(
-        adapter=adapter, batch_id=batch_id, control_samples=True
-    )
-    abnormal: FetalFractionControlAbNormal = get_fetal_fraction.control_abnormal(adapter)
-    abnormal_dict = abnormal.dict(
-        exclude_none=True,
-        exclude={
-            "X0": {"status_data_"},
-            "XXX": {"status_data_"},
-            "XXY": {"status_data_"},
-            "XYY": {"status_data_"},
-        },
-    )
-
-    return templates.TemplateResponse(
-        "batch/report.html",
-        context=dict(
-            # common
-            request=request,
-            current_user=user,
-            batch=find.batch(batch_id=batch_id, adapter=adapter),
-            # Zscore
-            tris_thresholds=TRISOMI_TRESHOLDS,
-            chromosomes=["13", "18", "21"],
-            ncv_chrom_data=get_samples_for_samp_tris_plot(adapter, batch_id=batch_id).dict(
-                by_alias=True
-            ),
-            normal_data=get_normal_for_samp_tris_plot(adapter).dict(by_alias=True),
-            abnormal_data=get_abnormal_for_samp_tris_plot(adapter),
-            # Fetal Fraction preface
-            control=control,
-            cases=get_fetal_fraction.samples(adapter=adapter, batch_id=batch_id),
-            # Fetal Fraction  XY
-            abnormal=abnormal_dict,
-            max_x=max(control.FFX) + 1,
-            min_x=min(control.FFX) - 1,
-            # table
-            sample_info=samples,
-            # coverage
-            coverage=coverage,
-            x_axis=list(range(1, 23)),
-            scatter_data=scatter_data,
-            box_data=box_data,
-            page_id="batches",
         ),
     )

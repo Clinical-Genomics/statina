@@ -31,6 +31,8 @@ def statistics(
         "DuplicationRate",
         "MappedReads",
         "GC_Dropout",
+        "AT_Dropout",
+        "Bin2BinVariance",
     ]
 
     batches = get_last_batches(adapter=adapter, nr_of_batches=nr_batches)

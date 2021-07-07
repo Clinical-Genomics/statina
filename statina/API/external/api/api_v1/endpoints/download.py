@@ -1,4 +1,9 @@
+import io
+import zipfile
+from os import PathLike
 from pathlib import Path
+from typing import Optional, Union
+from zipfile import ZIP_DEFLATED, ZipFile
 
 from fastapi import APIRouter, Depends, Request
 from fastapi.responses import FileResponse, RedirectResponse
@@ -8,20 +13,13 @@ from statina.adapter.plugin import StatinaAdapter
 from statina.API.external.api.deps import get_current_user
 from statina.config import get_nipt_adapter
 from statina.crud.find import find
-from statina.models.database import User, DataBaseSample
+from statina.models.database import DataBaseSample, User
 from statina.parse.batch import validate_file_path
-from zipfile import ZIP_DEFLATED, ZipFile
-import io
-import zipfile
-from os import PathLike
-from typing import Union, Optional
 
 router = APIRouter()
 
 
-def zip_dir(
-    zip_name: str, source_dir: Union[str, PathLike], suffix: Optional[str] = None
-) -> io.BytesIO:
+def zip_dir(source_dir: Union[str, PathLike]) -> io.BytesIO:
     """Function for zipping"""
     src_path = Path(source_dir).expanduser().resolve(strict=True)
     file_obj = io.BytesIO()
@@ -50,7 +48,7 @@ def batch_download(
 
     path = Path(file_path)
     if path.is_dir():
-        file_obj = zip_dir(zip_name=zip_file_name, source_dir=file_path, suffix="bed")
+        file_obj = zip_dir(source_dir=file_path)
         return StreamingResponse(file_obj, media_type="application/text")
 
     return FileResponse(

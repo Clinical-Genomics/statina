@@ -4,10 +4,13 @@ This change log will document the notable changes to this project in this file a
 
 ## [X.X.X]
 
+
+### Fixed
+- Correcting release documentation
+
 ### Added
 - two plots to QC-Data view
 - html-report download
-
 
 
 ## [1.0.2]

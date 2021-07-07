@@ -7,6 +7,7 @@ from statina.API.external.constants import (
     TRIS_CHROM_ABNORM,
     TRISOMI_TRESHOLDS,
     FF_TRESHOLDS,
+    FF_TRESHOLDS,
 )
 from statina.models.database import DataBaseSample
 
@@ -17,6 +18,10 @@ class SampleWarning(BaseModel):
     Zscore_18: Literal["danger", "default", "warning"]
     Zscore_21: Literal["danger", "default", "warning"]
     FFY: Literal["danger", "default", "warning"]
+    X0: Literal["danger", "default", "warning"]
+    XXX: Literal["danger", "default", "warning"]
+    # XXY: Literal["danger", "default", "warning"]
+    # XYY: Literal["danger", "default", "warning"]
 
 
 class Sample(DataBaseSample):
@@ -70,10 +75,18 @@ class Sample(DataBaseSample):
         sample_warnings = {}
         fetal_fraction_pf = values.get("FF_Formatted")
         fetal_fraction_y = values.get("FFY")
+        fetal_fraction_x = values.get("FFX")
         sample_warnings["FF_Formatted"]: str = cls.get_ff_preface_warning(
             fetal_fraction_pf=fetal_fraction_pf, fetal_fraction_y=fetal_fraction_y
         )
         sample_warnings["FFY"]: str = cls.get_ff_y_warning(fetal_fraction_y=fetal_fraction_y)
+        sample_warnings["X0"]: str = cls.get_x0_warning(
+            fetal_fraction_y=fetal_fraction_y, fetal_fraction_x=fetal_fraction_x
+        )
+        sample_warnings["XXX"]: str = cls.get_xxx_warning(
+            fetal_fraction_y=fetal_fraction_y, fetal_fraction_x=fetal_fraction_x
+        )
+
         for key in ["Zscore_13", "Zscore_18", "Zscore_21"]:
             z_score = values.get(key)
             sample_warnings[key]: str = cls.get_tris_warning(
@@ -129,6 +142,42 @@ class Sample(DataBaseSample):
             return "default"
 
         if y_min <= fetal_fraction_y < y_max:
+            return "danger"
+
+        return "default"
+
+    @classmethod
+    def get_x0_warning(cls, fetal_fraction_y: float, fetal_fraction_x: float) -> str:
+        """Get fetal fraction warning based on preset threshold"""
+
+        x_treshold = FF_TRESHOLDS["fetal_fraction_X0"]
+        y_treshold = FF_TRESHOLDS["fetal_fraction_y_min"]
+
+        if not (
+            isinstance(fetal_fraction_y, (float, int))
+            and isinstance(fetal_fraction_x, (float, int))
+        ):
+            return "default"
+
+        if fetal_fraction_y < y_treshold and fetal_fraction_x > x_treshold:
+            return "danger"
+
+        return "default"
+
+    @classmethod
+    def get_xxx_warning(cls, fetal_fraction_y: float, fetal_fraction_x: float) -> str:
+        """Get fetal fraction warning based on preset threshold"""
+
+        x_treshold = FF_TRESHOLDS["fetal_fraction_XXX"]
+        y_treshold = FF_TRESHOLDS["fetal_fraction_y_min"]
+
+        if not (
+            isinstance(fetal_fraction_y, (float, int))
+            and isinstance(fetal_fraction_x, (float, int))
+        ):
+            return "default"
+
+        if fetal_fraction_y < y_treshold and fetal_fraction_x < x_treshold:
             return "danger"
 
         return "default"

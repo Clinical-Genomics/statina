@@ -4,6 +4,11 @@ This change log will document the notable changes to this project in this file a
 
 ## [X.X.X]
 
+### Added
+- two plots to QC-Data view
+
+
+
 ## [1.0.2]
 
 ### Added

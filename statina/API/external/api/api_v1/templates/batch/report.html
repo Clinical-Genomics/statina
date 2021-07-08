@@ -51,27 +51,7 @@
                         </table>
                     </footer>
                     <footer>
-                        {% if coverage=="1" %}
-                            <div id="cov_plot" style="min-width:400px; height:800px; "></div>
-                        {% endif %}
-                    </footer>
-                    <footer>
-                        <div id="Zscore13_plot" style="min-width:400px; height:800px; "></div>
-                    </footer>
-                    <footer>
-                        <div id="Zscore18_plot" style="min-width:400px; height:800px; "></div>
-                    </footer>
-                    <footer>
-                        <div id="Zscore21_plot" style="min-width:400px; height:800px; "></div>
-                    </footer>
-                    <footer>
                         <div id="FFXY" style="min-width:400px; height:800px; "></div>
-                    </footer>
-                    <footer>
-                        <div id="FFY" style="min-width:400px; height:800px; "></div>
-                    </footer>
-                    <footer>
-                        <div id="FFX" style="min-width:400px; height:800px; "></div>
                     </footer>
                 </div>
             </div>
@@ -79,9 +59,5 @@
     </div>
 {% endblock %}
 {% block scripts %}
-    {% include 'batch/plots/Zscore.html' %}
     {% include 'batch/plots/FF_XY.html' %}
-    {% include 'batch/plots/FF.html' %}
-    {% include 'batch/plots/coverage.html' %}
-
 {% endblock %}

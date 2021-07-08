@@ -26,12 +26,13 @@ from statina.models.server.plots.fetal_fraction import (
     FetalFractionSamples,
     FetalFractionControlAbNormal,
 )
+from statina.models.server.plots.fetal_fraction_sex import SexChromosomeThresholds
 from statina.models.server.sample import Sample
 from zipfile import ZIP_DEFLATED, ZipFile
 import io
 from os import PathLike
 from typing import Union, List, Dict
-from statina.models.database import DataBaseSample, User
+from statina.models.database import DataBaseSample, User, Batch
 from statina.parse.batch import validate_file_path
 
 router = APIRouter()
@@ -96,23 +97,22 @@ def sample_download(
     )
 
 
-@router.get("/batches/{batch_id}/report/{coverage}/{file_name}")
+@router.get("/batches/{batch_id}/report/{file_name}")
 def report(
     request: Request,
     batch_id: str,
     file_name: str,
-    coverage: str,
     adapter: StatinaAdapter = Depends(get_nipt_adapter),
     user: User = Depends(get_current_user),
 ):
     """Report view, collecting all tables and plots from one batch."""
 
-    db_samples: List[DataBaseSample] = find.batch_samples(batch_id=batch_id, adapter=adapter)
-    samples: List[Sample] = [Sample(**db_sample.dict()) for db_sample in db_samples]
-    scatter_data: Dict[str, CoveragePlotSampleData] = get_scatter_data_for_coverage_plot(samples)
-    box_data: Dict[int, List[float]] = get_box_data_for_coverage_plot(samples)
+    samples: List[DataBaseSample] = find.batch_samples(batch_id=batch_id, adapter=adapter)
+    batch: Batch = find.batch(batch_id=batch_id, adapter=adapter)
+
+    cases = get_fetal_fraction.samples(adapter=adapter, batch_id=batch_id)
     control: FetalFractionSamples = get_fetal_fraction.samples(
-        adapter=adapter, batch_id=batch_id, control_samples=True
+        batch_id=batch_id, adapter=adapter, control_samples=True
     )
     abnormal: FetalFractionControlAbNormal = get_fetal_fraction.control_abnormal(adapter)
     abnormal_dict = abnormal.dict(
@@ -125,35 +125,33 @@ def report(
         },
     )
 
+    x_max = max(control.FFX + cases.FFX) + 1
+    x_min = min(control.FFX + cases.FFX) - 1
+
+    sex_thresholds = SexChromosomeThresholds(x_min=x_min, x_max=x_max)
+
     template = templates.get_template("batch/report.html")
     output_from_parsed_template = template.render(
         # common
         request=request,
         current_user=user,
         batch=find.batch(batch_id=batch_id, adapter=adapter),
-        # Zscore
-        tris_thresholds=TRISOMI_TRESHOLDS,
-        chromosomes=["13", "18", "21"],
-        ncv_chrom_data=get_samples_for_samp_tris_plot(adapter, batch_id=batch_id).dict(
-            by_alias=True
-        ),
-        normal_data=get_normal_for_samp_tris_plot(adapter).dict(by_alias=True),
-        abnormal_data=get_abnormal_for_samp_tris_plot(adapter),
-        # Fetal Fraction preface
-        control=control,
-        cases=get_fetal_fraction.samples(adapter=adapter, batch_id=batch_id),
         # Fetal Fraction  XY
+        sex_thresholds={
+            "XY_fetal_fraction_y": sex_thresholds.XY_fetal_fraction_y(),
+            "XX_lower": sex_thresholds.XX_lower(),
+            "XX_upper": sex_thresholds.XX_upper(),
+            "XY_upper": sex_thresholds.XY_upper(),
+            "XY_lower": sex_thresholds.XY_lower(),
+            "XXY": sex_thresholds.XXY(),
+        },
+        control=control,
         abnormal=abnormal_dict,
-        max_x=max(control.FFX) + 1,
-        min_x=min(control.FFX) - 1,
+        cases=cases,
+        max_x=x_max,
+        min_x=x_min,
         # table
-        sample_info=samples,
-        # coverage
-        coverage=coverage,
-        x_axis=list(range(1, 23)),
-        scatter_data=scatter_data,
-        box_data=box_data,
-        page_id="batches",
+        sample_info=[Sample(**sample.dict()) for sample in samples],
     )
 
     in_mem_file = io.StringIO()

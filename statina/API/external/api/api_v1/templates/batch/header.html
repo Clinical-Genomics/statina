@@ -15,23 +15,22 @@
                         Batch Downloads
                     </button>
                     <ul class="dropdown-menu">
-                        <a class="dropdown-item" href="{{ url_for('report', batch_id=batch.batch_id , coverage=0) }}">
+                        <a class="dropdown-item" href="{{ url_for('report', batch_id=batch.batch_id , file_name=batch.batch_id+"_report.html", coverage=0) }}">
                             Report</a>
                         <li class="divider"></li>
-                        <a class="dropdown-item" href="{{ url_for('report', batch_id=batch.batch_id , coverage=1) }}">
+                        <a class="dropdown-item" href="{{ url_for('report', batch_id=batch.batch_id , file_name=batch.batch_id+"_coverage_report.html", coverage=1) }}">
                             Coverage Report</a>
                         <li class="divider"></li>
                         <a class="dropdown-item"
-                           href="{{ url_for('batch_download', file_id='multiqc_report', batch_id=batch.batch_id) }}">Multi
+                           href="{{ url_for('batch_download', file_id='multiqc_report', file_name='multiqc_report', batch_id=batch.batch_id) }}">Multi
                             QC</a>
                         <li class="divider"></li>
                         <a class="dropdown-item"
-                           href="{{ url_for('batch_download', file_id='result_file', batch_id=batch.batch_id) }}">Fluffy
+                           href="{{ url_for('batch_download', file_id='result_file', file_name='result_file',batch_id=batch.batch_id) }}">Fluffy
                             Result file</a>
                         <li class="divider"></li>
                         <a class="dropdown-item"
-                           href="{{ url_for('batch_download', file_id='segmental_calls', batch_id=batch.batch_id) }}">Segmental
-                            calls</a>
+                           href="{{ url_for('batch_download', file_id='segmental_calls', file_name=batch.batch_id+'.zip', batch_id=batch.batch_id) }}">Full Batch Archive</a>
                     </ul>
                 </li>
             </ul>

@@ -51,14 +51,12 @@ make releases in release branches which corresponds to stable versions of Statin
 
 ### Steps to make a new release:
 
-1) Create a release branch from master named `version_X.X.X`
 2) Update change log with the new version.
 3) Update statina/__init__.py with the new version.
 4) Make a PR to master,
-	- Name PR `release version X.X.X`
 	- Justify if its a patch/minor/major version bump
 	- Paste the latest changelog to the text body
-	- get it approved and merge to master. **Dont delete the release branch!**
+	- get it approved and merge to master.
 5) Make a [new release](https://github.com/Clinical-Genomics/statina/releases/new).
 	- `git checkout master`
 	- `git tag "vX.X.X"`

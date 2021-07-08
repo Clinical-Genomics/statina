@@ -33,6 +33,7 @@ def statistics(
         "GC_Dropout",
         "AT_Dropout",
         "Bin2BinVariance",
+        "Library_nM",
     ]
 
     batches = get_last_batches(adapter=adapter, nr_of_batches=nr_batches)

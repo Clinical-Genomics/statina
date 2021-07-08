@@ -151,6 +151,7 @@ def fetal_fraction_XY(
 
     batch: Batch = find.batch(batch_id=batch_id, adapter=adapter)
 
+    cases = get_fetal_fraction.samples(adapter=adapter, batch_id=batch_id)
     control: FetalFractionSamples = get_fetal_fraction.samples(
         batch_id=batch_id, adapter=adapter, control_samples=True
     )
@@ -165,8 +166,8 @@ def fetal_fraction_XY(
         },
     )
 
-    x_max = max(control.FFX) + 1
-    x_min = min(control.FFX) - 1
+    x_max = max(control.FFX + cases.FFX) + 1
+    x_min = min(control.FFX + cases.FFX) - 1
 
     sex_thresholds = SexChromosomeThresholds(x_min=x_min, x_max=x_max)
     return templates.TemplateResponse(
@@ -176,15 +177,15 @@ def fetal_fraction_XY(
                 "XY_fetal_fraction_y": sex_thresholds.XY_fetal_fraction_y(),
                 "XX_lower": sex_thresholds.XX_lower(),
                 "XX_upper": sex_thresholds.XX_upper(),
-                # "XY_lower": sex_thresholds.XY_lower(),
-                # "XY_upper": sex_thresholds.XY_upper(),
-                # "XXY": sex_thresholds.XXY(),
+                "XY_upper": sex_thresholds.XY_upper(),
+                "XY_lower": sex_thresholds.XY_lower(),
+                "XXY": sex_thresholds.XXY(),
             },
             request=request,
             current_user=user,
             control=control,
             abnormal=abnormal_dict,
-            cases=get_fetal_fraction.samples(adapter=adapter, batch_id=batch_id),
+            cases=cases,
             max_x=x_max,
             min_x=x_min,
             batch=batch.dict(),

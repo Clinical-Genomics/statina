@@ -21,6 +21,14 @@ class ThresholdLine(BaseModel):
         return [np.mean(values["x"]), np.mean(values["y"])]
 
 
+def x_get_y(x: float, k: float, m: float) -> float:
+    return k * x + m
+
+
+def y_get_x(y: float, k: float, m: float) -> float:
+    return (y - m) / k
+
+
 class SexChromosomeThresholds:
     """Threshold lines for the Fetal Fraction XY plot"""
 
@@ -31,49 +39,43 @@ class SexChromosomeThresholds:
     xy_lowest: float = FF_TRESHOLDS["fetal_fraction_y_min"]
     k_upper: float = FF_TRESHOLDS["k_upper"]
     k_lower: float = FF_TRESHOLDS["k_lower"]
+    m_lower: float = FF_TRESHOLDS["m_lower"]
+    m_upper: float = FF_TRESHOLDS["m_upper"]
 
     def __init__(self, x_min, x_max):
         self.x_min: float = x_min
         self.x_max: float = x_max
 
-    def xy_lower_get_y(self, x: float) -> float:
-        k = self.k_lower
-        m = self.xy_lowest - k * self.xx_upper
-        return k * x + m
-
-    def xy_upper_get_y(self, x: float) -> float:
-        k = self.k_upper
-        m = self.xy_lowest - k * self.xx_lower
-        return k * x + m
-
-    def xy_upper_get_x(self, y: float) -> float:
-        k = self.k_upper
-        m = self.xy_lowest - k * self.xx_lower
-        return (y - m) / k
-
     def XXY(self) -> ThresholdLine:
         """Returning a threshold line to separate XYY from XXY"""
         x = self.xx_upper
-        return ThresholdLine(x=[x, x], y=[self.y_axis_max, self.xy_upper_get_y(x=x)], text=f"x={x}")
+        return ThresholdLine(
+            x=[x, x],
+            y=[
+                x_get_y(x=x, k=self.k_upper, m=self.m_upper),
+                x_get_y(x=self.x_max, k=self.k_upper, m=self.m_upper),
+            ],
+            text=f"x={x}",
+        )
 
-    def XY_upper(self) -> ThresholdLine:
+    def XY_lower(self) -> ThresholdLine:
         """Returning a threshold line to separate XY from XXY and XYY"""
         return ThresholdLine(
-            x=[self.x_max, self.xx_upper],
+            x=[y_get_x(y=self.xy_lowest, k=self.k_lower, m=self.m_lower), self.x_max],
             y=[
-                self.xy_lower_get_y(x=self.x_max),
-                self.xy_lower_get_y(x=self.xx_upper),
+                self.xy_lowest,
+                x_get_y(x=self.x_max, k=self.k_lower, m=self.m_lower),
             ],
             text=f"hej",
         )
 
-    def XY_lower(self) -> ThresholdLine:
+    def XY_upper(self) -> ThresholdLine:
         """Returning a threshold line to separate XY from other"""
         return ThresholdLine(
-            x=[self.x_max, self.xx_lower],
+            x=[y_get_x(y=self.xy_lowest, k=self.k_upper, m=self.m_upper), self.x_max],
             y=[
-                self.xy_upper_get_y(x=self.x_max),
-                self.xy_upper_get_y(x=self.xx_lower),
+                self.xy_lowest,
+                x_get_y(x=self.x_max, k=self.k_upper, m=self.m_upper),
             ],
             text=f"hej",
         )

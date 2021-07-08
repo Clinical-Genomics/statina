@@ -61,7 +61,7 @@ class SexChromosomeThresholds(BaseModel):
 
         return ThresholdLine(x=[x, x], y=[values["y_max"], cls.xy_upper_get_y(x=x)], text=f"x={x}")
 
-    @validator("XY_upper", always=True)
+    @validator("XY_lower", always=True)
     def set_XY_upper(cls, v, values: dict) -> ThresholdLine:
         """ """
         return ThresholdLine(
@@ -73,7 +73,7 @@ class SexChromosomeThresholds(BaseModel):
             text=f"hej",
         )
 
-    @validator("XY_lower", always=True)
+    @validator("XY_upper", always=True)
     def set_XY_lower(cls, v, values: dict) -> ThresholdLine:
         """ """
         return ThresholdLine(

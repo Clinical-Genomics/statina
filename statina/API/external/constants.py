@@ -34,6 +34,8 @@ FF_TRESHOLDS = {
     "fetal_fraction_X0": 3.4,
     "y_axis_min": -1,
     "y_axis_max": 20,
-    "k_upper": 1.51,
-    "k_lower": 1.49,
+    "k_upper": 0.9809,
+    "k_lower": 0.9799,
+    "m_lower": -4.3987,
+    "m_upper": 6.5958,
 }

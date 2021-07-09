@@ -59,7 +59,7 @@ class SexChromosomeThresholds:
         )
 
     def XY_lower(self) -> ThresholdLine:
-        """Returning a threshold line to separate XY from XXY and XYY"""
+        """Returning a threshold line to separate XY from other"""
         return ThresholdLine(
             x=[y_get_x(y=self.xy_lowest, k=self.k_lower, m=self.m_lower), self.x_max],
             y=[
@@ -70,7 +70,7 @@ class SexChromosomeThresholds:
         )
 
     def XY_upper(self) -> ThresholdLine:
-        """Returning a threshold line to separate XY from other"""
+        """Returning a threshold line to separate XY from XXY and XYY"""
         return ThresholdLine(
             x=[y_get_x(y=self.xy_lowest, k=self.k_upper, m=self.m_upper), self.x_max],
             y=[

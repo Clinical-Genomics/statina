@@ -28,6 +28,13 @@ def user(
     return User(**raw_user)
 
 
+def samples(adapter: StatinaAdapter) -> List[DataBaseSample]:
+    """Return all batches from the batch collection"""
+
+    raw_samples: Iterable[dict] = adapter.sample_collection.find()
+    return parse_obj_as(List[DataBaseSample], list(raw_samples))
+
+
 def sample(adapter: StatinaAdapter, sample_id: str) -> Optional[DataBaseSample]:
     """Find one sample from the sample collection"""
 

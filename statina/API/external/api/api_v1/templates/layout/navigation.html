@@ -18,6 +18,8 @@
                         <li class="divider"></li>
                         <a class="active" href={{ url_for('logout') }}><i class="fa fa-sign-out"></i> Sign Out</a>
                         <li class="divider"></li>
+                        <a class="active" href={{ url_for('samples') }}><i class="fa fa-sign-out"></i> All samples</a>
+                        <li class="divider"></li>
                         {% if current_user.role=='admin' %}
                             <a class="active" href="{{ url_for('users') }}"><i class="fa fa-home"></i> Users</a>
                         {% endif %}

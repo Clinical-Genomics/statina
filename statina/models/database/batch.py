@@ -20,6 +20,7 @@ class Batch(BaseModel):
     Stdev_21: Optional[float]
     Stdev_X: Optional[float]
     Stdev_Y: Optional[float]
+    comment: Optional[str] = ""
 
     class Config:
         validate_assignment = True

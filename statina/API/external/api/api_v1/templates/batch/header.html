@@ -9,30 +9,62 @@
         </div>
         <div class="row">
             <div class="col-lg-9"><big><em> Sequenced: {{ batch.SequencingDate }}</em></big></div>
-            <ul class="nav navbar-top-links navbar-right">
-                <li class="dropdown">
-                    <button class="btn btn-secondary dropdown-toggle" data-toggle="dropdown">
-                        Batch Downloads
-                    </button>
-                    <ul class="dropdown-menu">
-                        <a class="dropdown-item" href="{{ url_for('report', batch_id=batch.batch_id , file_name=batch.batch_id+"_report.html") }}">
-                            Report</a>
-                        <li class="divider"></li>
-                        <a class="dropdown-item"
-                           href="{{ url_for('batch_download', file_id='multiqc_report', file_name='multiqc_report', batch_id=batch.batch_id) }}">Multi
-                            QC</a>
-                        <li class="divider"></li>
-                        <a class="dropdown-item"
-                           href="{{ url_for('batch_download', file_id='result_file', file_name='result_file',batch_id=batch.batch_id) }}">Fluffy
-                            Result file</a>
-                        <li class="divider"></li>
-                        <a class="dropdown-item"
-                           href="{{ url_for('batch_download', file_id='segmental_calls', file_name=batch.batch_id+'.zip', batch_id=batch.batch_id) }}">Full Batch Archive</a>
-                    </ul>
-                </li>
-            </ul>
+        </div>
+        <br>
+        <div class="row">
+            <div class="col-lg-12">
+                {% if current_user.role in ['RW','admin'] %}
+                    <form action="{{ url_for('batch_comment') }}" method="post">
+
+                    <div class="form-group">
+                        <textarea class="form-control" rows="2" name="comment">{{ batch.comment }}</textarea>
+                    </div>
+                    <td>
+                        <input type=text name="form_id" value="set_batch_comment" hidden>
+                        <input type=text name="batch_id" value="{{ batch.batch_id }}" hidden>
+                    </td>
+                    <td>
+                        <p align="right">
+                            <input type="submit" class="btn" value="Save comment">
+                        </p>
+                    </td>
+                    </form>
+                {% else %}
+                    <div class="panel panel-default">
+                        <div class="panel-heading">Comment</div>
+                        <div class="panel-body">{{ batch.comment }}</div>
+                    </div>
+                {% endif %}
+            </div>
+            <div class="row">
+                <ul class="nav navbar-top-links navbar-right">
+                    <li class="dropdown">
+                        <button class="btn btn-secondary dropdown-toggle" data-toggle="dropdown">
+                            Batch Downloads <i class="fa fa-caret-down"></i>
+                        </button>
+                        <ul class="dropdown-menu">
+                            <a class="dropdown-item"
+                               href="{{ url_for('report', batch_id=batch.batch_id , file_name=batch.batch_id+"_report.html") }}">
+                                Report</a>
+                            <li class="divider"></li>
+                            <a class="dropdown-item"
+                               href="{{ url_for('batch_download', file_id='multiqc_report', file_name='multiqc_report', batch_id=batch.batch_id) }}">Multi
+                                QC</a>
+                            <li class="divider"></li>
+                            <a class="dropdown-item"
+                               href="{{ url_for('batch_download', file_id='result_file', file_name='result_file',batch_id=batch.batch_id) }}">Fluffy
+                                Result file</a>
+                            <li class="divider"></li>
+                            <a class="dropdown-item"
+                               href="{{ url_for('batch_download', file_id='segmental_calls', file_name=batch.batch_id+'.zip', batch_id=batch.batch_id) }}">Full
+                                Batch Archive</a>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
         </div>
     </div> <!--jumbotron-->
+
     <ul class="nav nav-tabs" id="myTab">
         <li {% if page_id =='batches' %} class="active" {% endif %}><a
                 href="{{ url_for('batch', batch_id = batch.batch_id) }}">Batch Summary Table</a>

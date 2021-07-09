@@ -1,4 +1,4 @@
-from typing import Dict
+from typing import Dict, List
 
 from fastapi import APIRouter, Depends, Request
 
@@ -17,6 +17,25 @@ from statina.models.server.plots.ncv import Zscore131821, ZscoreSamples
 from statina.models.server.sample import Sample
 
 router = APIRouter()
+
+
+@router.get("/samples/")
+def samples(
+    request: Request,
+    adapter: StatinaAdapter = Depends(get_nipt_adapter),
+    user: User = Depends(get_current_user),
+):
+    """Get sample with id"""
+    samples: List[DataBaseSample] = find.samples(adapter=adapter)
+    return templates.TemplateResponse(
+        "sample/samples.html",
+        context=dict(
+            request=request,
+            current_user=user,
+            sample_info=[Sample(**sample.dict()) for sample in samples],
+            page_id="samples",
+        ),
+    )
 
 
 @router.get("/samples/{sample_id}/")

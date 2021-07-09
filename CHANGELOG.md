@@ -4,6 +4,8 @@ This change log will document the notable changes to this project in this file a
 
 
 ## [x.x.x]
+### Added
+- samples view
 
 ## [1.1.0]
 

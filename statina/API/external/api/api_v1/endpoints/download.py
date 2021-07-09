@@ -5,23 +5,12 @@ from fastapi.responses import FileResponse, RedirectResponse
 from starlette.requests import Request
 from starlette.responses import StreamingResponse
 
-from statina.API.external.constants import TRISOMI_TRESHOLDS
-
+from statina.API.external.constants import COLORS
 from statina.adapter.plugin import StatinaAdapter
 from statina.API.external.api.deps import get_current_user
 from statina.config import get_nipt_adapter, templates
 from statina.crud.find import find
 from statina.crud.find.plots import fetal_fraction_plot_data as get_fetal_fraction
-from statina.crud.find.plots.coverage_plot_data import (
-    get_scatter_data_for_coverage_plot,
-    get_box_data_for_coverage_plot,
-)
-from statina.crud.find.plots.zscore_plot_data import (
-    get_samples_for_samp_tris_plot,
-    get_normal_for_samp_tris_plot,
-    get_abnormal_for_samp_tris_plot,
-)
-from statina.models.server.plots.coverage import CoveragePlotSampleData
 from statina.models.server.plots.fetal_fraction import (
     FetalFractionSamples,
     FetalFractionControlAbNormal,
@@ -31,7 +20,7 @@ from statina.models.server.sample import Sample
 from zipfile import ZIP_DEFLATED, ZipFile
 import io
 from os import PathLike
-from typing import Union, List, Dict
+from typing import Union, List
 from statina.models.database import DataBaseSample, User, Batch
 from statina.parse.batch import validate_file_path
 
@@ -148,6 +137,7 @@ def report(
         control=control,
         abnormal=abnormal_dict,
         cases=cases,
+        colors=COLORS,
         max_x=x_max,
         min_x=x_min,
         # table

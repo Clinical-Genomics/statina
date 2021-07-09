@@ -1,103 +1,115 @@
 {% block scripts %}
-<script>
-    var XY_plot = document.getElementById('FFY')
-    var data = []
-    var layout = {
-    title:'Fetal fraction Y and Preface correlation.',
-    annotations : [],
-    legend:{hovermode:'closest' },
-    hovermode:'closest',
-    xaxis :{
-            showline: true,
-            zeroline: false,
-            linecolor: '#636363',
-            linewidth: 5,
-            showgrid: false,
-            gridcolor: '#bdbdbd',
-            title: 'Fetal Fraction Y'
+    <script>
+        var XY_plot = document.getElementById('FFY')
+        var data = []
+        var layout = {
+            title: 'Fetal fraction Y and Preface correlation.',
+            annotations: [],
+            legend: {hovermode: 'closest', orientation: 'h'},
+            hovermode: 'closest',
+            xaxis: {
+                showline: true,
+                zeroline: false,
+                linecolor: '#636363',
+                linewidth: 5,
+                showgrid: false,
+                gridcolor: '#bdbdbd',
+                title: 'Fetal Fraction Y'
             },
-            
-    yaxis :{
-            zeroline: false,
-            showline: true,
-            showgrid: false,
-            linecolor: '#636363',
-            linewidth: 5,
-            title : 'Fetal Fraction Preface (%)'
-            },};
-    var backstat = {
-    y: {{control['FF']}},
-    x: {{control['FFY']}},
-    name: 'Negative (N={{control['count']}})',
-    hoverinfo:'none',
-    mode: 'markers',
-    type: 'scatter',
-    marker: {color: '#ccccb3'}}
-    data.push(backstat);
 
-
-    {% for name in cases['names'] %}
-        var NCVXYsamps = {
-            y: [{{cases['FF'][loop.index0]}}],
-            x: [{{cases['FFY'][loop.index0]}}],
-            name: {{name|tojson}},
-            mode: 'markers',
-            text: {{name|tojson}},
-            type: 'scatter'}
-        data.push(NCVXYsamps);
-    {% endfor %}
-
-    Plotly.newPlot('FFY', data, layout);
-</script>
-<script>
-    var XY_plot = document.getElementById('FFX')
-    var data = []
-    var layout = {
-    title:'Fetal fraction X and Preface correlation.',
-    annotations : [],
-    legend:{hovermode:'closest' },
-    hovermode:'closest',
-    xaxis :{
-            showline: true,
-            zeroline: false,
-            linecolor: '#636363',
-            linewidth: 5,
-            showgrid: false,
-            gridcolor: '#bdbdbd',
-            title: 'Fetal Fraction X'
+            yaxis: {
+                zeroline: false,
+                showline: true,
+                showgrid: false,
+                linecolor: '#636363',
+                linewidth: 5,
+                title: 'Fetal Fraction Preface (%)'
             },
-            
-    yaxis :{
-            zeroline: false,
-            showline: true,
-            showgrid: false,
-            linecolor: '#636363',
-            linewidth: 5,
-            title : 'Fetal Fraction Preface (%)'
-            },};
-    var backstat = {
-    y: {{control['FF']}},
-    x: {{control['FFX']}},
-    name: 'Negative (N={{control['count']}})',
-    hoverinfo:'none',
-    mode: 'markers',
-    type: 'scatter',
-    marker: {color: '#ccccb3'}}
-    data.push(backstat);
-
-    {% for name in cases['names'] %}
-        var NCVXYsamps = {
-            y: [{{cases['FF'][loop.index0]}}],
-            x: [{{cases['FFX'][loop.index0]}}],
-            name: {{name|tojson}},
+        };
+        var backstat = {
+            y: {{control['FF']}},
+            x: {{control['FFY']}},
+            name: 'Negative (N={{control['count']}})',
+            hoverinfo: 'none',
             mode: 'markers',
-            text: {{name|tojson}},
-            type: 'scatter'}
-        data.push(NCVXYsamps);
-    {% endfor %}
+            type: 'scatter',
+            marker: {color: '#ccccb3'}
+        }
+        data.push(backstat);
 
 
-    Plotly.newPlot('FFX', data, layout);
-</script>
+        {% for name in cases['names'] %}
+            var NCVXYsamps = {
+                y: [{{cases['FF'][loop.index0]}}],
+                x: [{{cases['FFY'][loop.index0]}}],
+                name: {{name|tojson}},
+                mode: 'markers',
+                marker: {
+                    size: 10
+                },
+                text: {{name|tojson}},
+                type: 'scatter'
+            }
+            data.push(NCVXYsamps);
+        {% endfor %}
+
+        Plotly.newPlot('FFY', data, layout);
+    </script>
+    <script>
+        var XY_plot = document.getElementById('FFX')
+        var data = []
+        var layout = {
+            title: 'Fetal fraction X and Preface correlation.',
+            annotations: [],
+            legend: {hovermode: 'closest', orientation: 'h'},
+            hovermode: 'closest',
+            xaxis: {
+                showline: true,
+                zeroline: false,
+                linecolor: '#636363',
+                linewidth: 5,
+                showgrid: false,
+                gridcolor: '#bdbdbd',
+                title: 'Fetal Fraction X'
+            },
+
+            yaxis: {
+                zeroline: false,
+                showline: true,
+                showgrid: false,
+                linecolor: '#636363',
+                linewidth: 5,
+                title: 'Fetal Fraction Preface (%)'
+            },
+        };
+        var backstat = {
+            y: {{control['FF']}},
+            x: {{control['FFX']}},
+            name: 'Negative (N={{control['count']}})',
+            hoverinfo: 'none',
+            mode: 'markers',
+            type: 'scatter',
+            marker: {color: '#ccccb3'}
+        }
+        data.push(backstat);
+
+        {% for name in cases['names'] %}
+            var NCVXYsamps = {
+                y: [{{cases['FF'][loop.index0]}}],
+                x: [{{cases['FFX'][loop.index0]}}],
+                name: {{name|tojson}},
+                mode: 'markers',
+                marker: {
+                    size: 10
+                },
+                text: {{name|tojson}},
+                type: 'scatter'
+            }
+            data.push(NCVXYsamps);
+        {% endfor %}
+
+
+        Plotly.newPlot('FFX', data, layout);
+    </script>
 
 {% endblock %}

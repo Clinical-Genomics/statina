@@ -10,21 +10,18 @@
                         {{ batch.batch_id }}</small><small>
                         <p align="right" id="demo"></p>
                     </small></h2>
-                    <footer>
                         <table id="batch_table" class="table table-bordered">
                             <thead>
                             <tr>
-                                <th>Sample Name</th>
-                                <th>Zscore 13</th>
-                                <th>Zscore 18</th>
-                                <th>Zscore 21</th>
-                                <th>Zscore X</th>
+                                <th>Sample</th>
+                                <th>Zscore13</th>
+                                <th>Zscore18</th>
+                                <th>Zscore21</th>
                                 <th>FF-PF(%)</th>
                                 <th>FF-X(%)</th>
                                 <th>FF-Y(%)</th>
-                                <th>CNVSegment</th>
+                                <th>Sex</th>
                                 <th>Warning</th>
-                                <th>Status</th>
                                 <th>Comment</th>
                             </tr>
                             </thead>
@@ -36,22 +33,21 @@
                                     <td width="4%" class="{{ sample.warnings.Zscore_13 }}">{{ sample.Zscore_13 }}</td>
                                     <td width="4%" class="{{ sample.warnings.Zscore_18 }}">{{ sample.Zscore_18 }}</td>
                                     <td width="4%" class="{{ sample.warnings.Zscore_21 }}">{{ sample.Zscore_21 }}</td>
-                                    <td width="4%" class="{{ sample.warnings.Zscore_X }}">{{ sample.Zscore_X }}</td>
                                     <td width="4%"
                                         class="{{ sample.warnings.FF_Formatted }}">{{ sample.FF_Formatted }}</td>
                                     <td width="4%" class="default">{{ sample.FFX }}</td>
                                     <td width="4%" class="{{ sample.warnings.FFY }}">{{ sample.FFY }}</td>
-                                    <td width="4%" class="default">{{ sample.CNVSegment }}</td>
+                                    <td width="3%" class = "default">{{sample.sex}}</td>
                                     <td width="3%"><p><small>{{ sample.text_warning }}</small></p></td>
-                                    <td><p><small>{{ sample.status }}</small></p></td>
                                     <td width="18%">{{ sample.comment }}</td>
                                 </tr>
                             {% endfor %}
                             </tbody>
                         </table>
-                    </footer>
                     <footer>
+                        <figure class="highcharts-figure">
                         <div id="FFXY" style="min-width:400px; height:800px; "></div>
+                        </figure>
                     </footer>
                 </div>
             </div>

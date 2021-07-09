@@ -4,7 +4,7 @@
         var data = []
         var layout = {
             annotations: [],
-            legend: {hovermode: 'closest'},
+            legend: {hovermode: 'closest',  orientation: 'h'},
             hovermode: 'closest',
             xaxis: {
                 range: [{{max_x}}, {{min_x}}],
@@ -64,6 +64,10 @@
                 x: [{{cases['FFX'][loop.index0]}}],
                 name: {{name|tojson}},
                 mode: 'markers',
+                marker: {
+                    color: "{{colors[loop.index0]}}",
+                    size: 10
+                },
                 text: {{name|tojson}},
                 type: 'scatter'
             }

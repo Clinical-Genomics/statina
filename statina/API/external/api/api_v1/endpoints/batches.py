@@ -5,7 +5,7 @@ from fastapi import APIRouter, Depends, Request
 import statina.crud.find.plots.fetal_fraction_plot_data as get_fetal_fraction
 from statina.adapter import StatinaAdapter
 from statina.API.external.api.deps import get_current_user
-from statina.API.external.constants import TRISOMI_TRESHOLDS
+from statina.API.external.constants import TRISOMI_TRESHOLDS, COLORS
 from statina.config import get_nipt_adapter, templates
 from statina.crud.find import find
 from statina.crud.find.plots.coverage_plot_data import (
@@ -183,6 +183,7 @@ def fetal_fraction_XY(
             },
             request=request,
             current_user=user,
+            colors=COLORS,
             control=control,
             abnormal=abnormal_dict,
             cases=cases,
@@ -208,6 +209,7 @@ def fetal_fraction(
         context=dict(
             request=request,
             current_user=user,
+            colors=COLORS,
             control=get_fetal_fraction.samples(
                 adapter=adapter, batch_id=batch_id, control_samples=True
             ),

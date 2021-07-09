@@ -5,7 +5,7 @@ from fastapi import APIRouter, Depends, Request
 import statina.crud.find.plots.fetal_fraction_plot_data as get_fetal_fraction
 from statina.adapter import StatinaAdapter
 from statina.API.external.api.deps import get_current_user
-from statina.API.external.constants import TRISOMI_TRESHOLDS
+from statina.API.external.constants import TRISOMI_TRESHOLDS, COLORS
 from statina.config import get_nipt_adapter, templates
 from statina.crud.find import find
 from statina.crud.find.plots.coverage_plot_data import (
@@ -151,6 +151,7 @@ def fetal_fraction_XY(
 
     batch: Batch = find.batch(batch_id=batch_id, adapter=adapter)
 
+    cases = get_fetal_fraction.samples(adapter=adapter, batch_id=batch_id)
     control: FetalFractionSamples = get_fetal_fraction.samples(
         batch_id=batch_id, adapter=adapter, control_samples=True
     )
@@ -165,8 +166,8 @@ def fetal_fraction_XY(
         },
     )
 
-    x_max = max(control.FFX) + 1
-    x_min = min(control.FFX) - 1
+    x_max = max(control.FFX + cases.FFX) + 1
+    x_min = min(control.FFX + cases.FFX) - 1
 
     sex_thresholds = SexChromosomeThresholds(x_min=x_min, x_max=x_max)
     return templates.TemplateResponse(
@@ -176,15 +177,16 @@ def fetal_fraction_XY(
                 "XY_fetal_fraction_y": sex_thresholds.XY_fetal_fraction_y(),
                 "XX_lower": sex_thresholds.XX_lower(),
                 "XX_upper": sex_thresholds.XX_upper(),
-                # "XY_lower": sex_thresholds.XY_lower(),
-                # "XY_upper": sex_thresholds.XY_upper(),
-                # "XXY": sex_thresholds.XXY(),
+                "XY_upper": sex_thresholds.XY_upper(),
+                "XY_lower": sex_thresholds.XY_lower(),
+                "XXY": sex_thresholds.XXY(),
             },
             request=request,
             current_user=user,
+            colors=COLORS,
             control=control,
             abnormal=abnormal_dict,
-            cases=get_fetal_fraction.samples(adapter=adapter, batch_id=batch_id),
+            cases=cases,
             max_x=x_max,
             min_x=x_min,
             batch=batch.dict(),
@@ -207,6 +209,7 @@ def fetal_fraction(
         context=dict(
             request=request,
             current_user=user,
+            colors=COLORS,
             control=get_fetal_fraction.samples(
                 adapter=adapter, batch_id=batch_id, control_samples=True
             ),

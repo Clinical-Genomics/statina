@@ -4,7 +4,7 @@ from typing import List, Optional
 import numpy as np
 from pydantic import BaseModel, validator
 
-from statina.API.external.constants import SEX_THRESHOLDS
+from statina.API.external.constants import FF_TRESHOLDS
 
 
 class ThresholdLine(BaseModel):
@@ -21,59 +21,61 @@ class ThresholdLine(BaseModel):
         return [np.mean(values["x"]), np.mean(values["y"])]
 
 
+def x_get_y(x: float, k: float, m: float) -> float:
+    return k * x + m
+
+
+def y_get_x(y: float, k: float, m: float) -> float:
+    return (y - m) / k
+
+
 class SexChromosomeThresholds:
     """Threshold lines for the Fetal Fraction XY plot"""
 
-    y_min: float = SEX_THRESHOLDS["y_min"]
-    y_max: float = SEX_THRESHOLDS["y_max"]
-    xx_lower: float = SEX_THRESHOLDS["xx_lower"]
-    xx_upper: float = SEX_THRESHOLDS["xx_upper"]
-    xy_lowest: float = SEX_THRESHOLDS["xy_lowest"]
-    k_upper: float = SEX_THRESHOLDS["k_upper"]
-    k_lower: float = SEX_THRESHOLDS["k_lower"]
+    y_axis_min: float = FF_TRESHOLDS["y_axis_min"]
+    y_axis_max: float = FF_TRESHOLDS["y_axis_max"]
+    xx_lower: float = FF_TRESHOLDS["fetal_fraction_XXX"]
+    xx_upper: float = FF_TRESHOLDS["fetal_fraction_X0"]
+    xy_lowest: float = FF_TRESHOLDS["fetal_fraction_y_min"]
+    k_upper: float = FF_TRESHOLDS["k_upper"]
+    k_lower: float = FF_TRESHOLDS["k_lower"]
+    m_lower: float = FF_TRESHOLDS["m_lower"]
+    m_upper: float = FF_TRESHOLDS["m_upper"]
 
     def __init__(self, x_min, x_max):
         self.x_min: float = x_min
         self.x_max: float = x_max
 
-    def xy_lower_get_y(self, x: float) -> float:
-        k = self.k_lower
-        m = self.xy_lowest - k * self.xx_upper
-        return k * x + m
-
-    def xy_upper_get_y(self, x: float) -> float:
-        k = self.k_upper
-        m = self.xy_lowest - k * self.xx_lower
-        return k * x + m
-
-    def xy_upper_get_x(self, y: float) -> float:
-        k = self.k_upper
-        m = self.xy_lowest - k * self.xx_lower
-        return (y - m) / k
-
     def XXY(self) -> ThresholdLine:
         """Returning a threshold line to separate XYY from XXY"""
         x = self.xx_upper
-        return ThresholdLine(x=[x, x], y=[self.y_max, self.xy_upper_get_y(x=x)], text=f"x={x}")
-
-    def XY_upper(self) -> ThresholdLine:
-        """Returning a threshold line to separate XY from XXY and XYY"""
         return ThresholdLine(
-            x=[self.x_max, self.xx_upper],
+            x=[x, x],
             y=[
-                self.xy_lower_get_y(x=self.x_max),
-                self.xy_lower_get_y(x=self.xx_upper),
+                x_get_y(x=x, k=self.k_upper, m=self.m_upper),
+                x_get_y(x=self.x_max, k=self.k_upper, m=self.m_upper),
             ],
-            text=f"hej",
+            text=f"x={x}",
         )
 
     def XY_lower(self) -> ThresholdLine:
         """Returning a threshold line to separate XY from other"""
         return ThresholdLine(
-            x=[self.x_max, self.xx_lower],
+            x=[y_get_x(y=self.xy_lowest, k=self.k_lower, m=self.m_lower), self.x_max],
             y=[
-                self.xy_upper_get_y(x=self.x_max),
-                self.xy_upper_get_y(x=self.xx_lower),
+                self.xy_lowest,
+                x_get_y(x=self.x_max, k=self.k_lower, m=self.m_lower),
+            ],
+            text=f"hej",
+        )
+
+    def XY_upper(self) -> ThresholdLine:
+        """Returning a threshold line to separate XY from XXY and XYY"""
+        return ThresholdLine(
+            x=[y_get_x(y=self.xy_lowest, k=self.k_upper, m=self.m_upper), self.x_max],
+            y=[
+                self.xy_lowest,
+                x_get_y(x=self.x_max, k=self.k_upper, m=self.m_upper),
             ],
             text=f"hej",
         )
@@ -87,10 +89,10 @@ class SexChromosomeThresholds:
         """Returning a threshold line to separate XX from XXX"""
         x = self.xx_upper
 
-        return ThresholdLine(x=[x, x], y=[self.y_min, self.xy_lowest], text=f"x={x}")
+        return ThresholdLine(x=[x, x], y=[self.y_axis_min, self.xy_lowest], text=f"x={x}")
 
     def XX_lower(self) -> ThresholdLine:
         """Returning a threshold line to separate XX from X0"""
         x = self.xx_lower
 
-        return ThresholdLine(x=[x, x], y=[self.y_min, self.xy_lowest], text=f"x={x}")
+        return ThresholdLine(x=[x, x], y=[self.y_axis_min, self.xy_lowest], text=f"x={x}")

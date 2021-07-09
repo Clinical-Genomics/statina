@@ -1,11 +1,21 @@
 # Change Log
 
 This change log will document the notable changes to this project in this file and it is following [Semantic Versioning](https://semver.org/)
-
-
 ## [x.x.x]
 ### Added
+
+### Fixed
+
+## [1.2.0]
+### Added
 - samples view
+- thresholds to the XY-plot
+- adding batch comment
+- unique colors in xy-plot and increased marker size
+
+### Fixed
+- truncates the html report
+- expands the XY-plot so no samples are hidden
 
 ## [1.1.0]
 

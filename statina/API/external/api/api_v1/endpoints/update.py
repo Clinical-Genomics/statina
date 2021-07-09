@@ -13,7 +13,7 @@ from statina.config import get_nipt_adapter
 from statina.crud import update
 from statina.crud.delete import delete_batches
 from statina.crud.find import find
-from statina.models.database import DataBaseSample, User
+from statina.models.database import DataBaseSample, User, Batch
 
 router = APIRouter()
 
@@ -82,6 +82,28 @@ async def set_sample_status(
         sample[f"status_change_{abnormality}"] = f"{user.username} {time_stamp}"
 
     update.sample(adapter=adapter, sample=DataBaseSample(**sample))
+    return RedirectResponse(request.headers.get("referer"))
+
+
+@router.post("/batch_comment")
+async def batch_comment(
+    request: Request,
+    adapter: StatinaAdapter = Depends(get_nipt_adapter),
+    user: User = Depends(get_current_user),
+):
+    """Update batch comment"""
+
+    form = await request.form()
+
+    if user.role not in ["RW", "admin"]:
+        return RedirectResponse(request.headers.get("referer"))
+    batch_id: str = form["batch_id"]
+    batch: Batch = find.batch(batch_id=batch_id, adapter=adapter)
+    comment: str = form.get("comment")
+    if comment != batch.comment:
+        batch.comment = comment
+        update.update_batch(adapter=adapter, batch=batch)
+
     return RedirectResponse(request.headers.get("referer"))
 
 

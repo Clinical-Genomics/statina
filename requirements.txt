@@ -1,5 +1,5 @@
 click
-bumpversion
+bump2version
 pymongo
 mongo_adapter
 coloredlogs

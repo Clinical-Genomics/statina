@@ -1,6 +1,5 @@
 from setuptools import find_packages, setup
 
-from statina import __version__ as version
 
 try:
     with open("requirements.txt", "r") as f:
@@ -14,7 +13,7 @@ with open("README.md", "r") as fh:
 
 setup(
     name="statina",
-    version=version,
+    version="1.2.5",
     description="NIPT data storage and visualisation",
     long_description=long_description,
     long_description_content_type="text/markdown",

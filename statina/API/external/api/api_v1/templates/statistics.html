@@ -69,6 +69,7 @@
     var box = {
         y: {{ box_stat[batch][plot_name] }},
         type: 'box',
+        text: {{ box_stat[batch]['sample_ids'] | tojson }},
         showlegend: false,
             boxpoints: 'all',
 

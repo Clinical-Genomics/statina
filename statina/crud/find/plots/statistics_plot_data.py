@@ -40,7 +40,12 @@ def get_statistics_for_box_plot(adapter: StatinaAdapter, batches: list, fields: 
         }
     }
     unwind = {"$unwind": {"path": "$batch"}}
-    group = {"$group": {"_id": {"batch": "$batch_id", "date": "$batch.SequencingDate"}}}
+    group = {
+        "$group": {
+            "_id": {"batch": "$batch_id", "date": "$batch.SequencingDate"},
+            "sample_ids": {"$push": "$sample_id"},
+        },
+    }
 
     for field in fields:
         group["$group"][field] = {"$push": f"${field}"}

@@ -55,7 +55,7 @@ class SexChromosomeThresholds:
                 x_get_y(x=x, k=self.k_upper, m=self.m_upper),
                 x_get_y(x=self.x_max, k=self.k_upper, m=self.m_upper),
             ],
-            text=f"x={x}",
+            text=f"x = {x}",
         )
 
     def XY_lower(self) -> ThresholdLine:
@@ -66,7 +66,7 @@ class SexChromosomeThresholds:
                 self.xy_lowest,
                 x_get_y(x=self.x_max, k=self.k_lower, m=self.m_lower),
             ],
-            text=f"hej",
+            text=f"y = {self.k_lower}x + {self.m_lower}",
         )
 
     def XY_upper(self) -> ThresholdLine:
@@ -77,22 +77,22 @@ class SexChromosomeThresholds:
                 self.xy_lowest,
                 x_get_y(x=self.x_max, k=self.k_upper, m=self.m_upper),
             ],
-            text=f"hej",
+            text=f"y = {self.k_upper}x + {self.m_upper}",
         )
 
     def XY_fetal_fraction_y(self) -> ThresholdLine:
         """Returning a threshold line to separate XY from XX"""
         y = self.xy_lowest
-        return ThresholdLine(x=[self.x_min, self.x_max], y=[y, y], text=f"y={y}")
+        return ThresholdLine(x=[self.x_min, self.x_max], y=[y, y], text=f"y = {y}")
 
     def XX_upper(self) -> ThresholdLine:
         """Returning a threshold line to separate XX from XXX"""
         x = self.xx_upper
 
-        return ThresholdLine(x=[x, x], y=[self.y_axis_min, self.xy_lowest], text=f"x={x}")
+        return ThresholdLine(x=[x, x], y=[self.y_axis_min, self.xy_lowest], text=f"x = {x}")
 
     def XX_lower(self) -> ThresholdLine:
         """Returning a threshold line to separate XX from X0"""
         x = self.xx_lower
 
-        return ThresholdLine(x=[x, x], y=[self.y_axis_min, self.xy_lowest], text=f"x={x}")
+        return ThresholdLine(x=[x, x], y=[self.y_axis_min, self.xy_lowest], text=f"x = {x}")

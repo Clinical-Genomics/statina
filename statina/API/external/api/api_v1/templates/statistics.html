@@ -68,10 +68,10 @@
     {% for batch in batch_ids %}
     var box = {
         y: {{ box_stat[batch][plot_name] }},
-        x: Array({{ nr_batches }}).fill({{ loop.index }}),
         type: 'box',
         showlegend: false,
-        boxpoints: 'suspectedoutliers',
+            boxpoints: 'all',
+
         };
     data.push(box);
     {% endfor %}

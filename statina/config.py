@@ -34,6 +34,7 @@ class EmailSettings(BaseSettings):
     smtp_server: str = "smtp.gmail.com"
     sender_email: EmailStr
     sender_password: str
+    admin_email: EmailStr
 
     class Config:
         env_file = str(ENV_FILE)

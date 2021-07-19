@@ -18,7 +18,6 @@ class NewUser(BaseModel):
 
 
 class NewUserRequestEmail(EmailSettings):
-    admin_email: EmailStr = "maya.brandi@scilifelab.se"
     subject: str = "Statina User Request"
     user_email: EmailStr
     message: str

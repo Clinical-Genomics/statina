@@ -67,6 +67,7 @@ def test_get_statistics_for_box_plot(database, small_helpers):
     # THEN the results shoule be:
     for batch_id in batches:
         assert results[batch_id] == {
+            "sample_ids": [f"{batch_id}1", f"{batch_id}2", f"{batch_id}3"],
             "FF_Formatted": [1, 2, 3],
             "Ratio_13": [1, 2, 3],
             "_id": {"batch": batch_id, "date": "2022-03-10"},

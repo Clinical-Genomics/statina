@@ -46,8 +46,8 @@ To run the image use the following command: `docker run --name statina statina s
 To remove the container, type: `docker rm statina`
 
 ## Release model
-Statina development is organised on a flexible Git "Release Flow" branching system. This more or less means that we 
-make releases in release branches which corresponds to stable versions of Statina.
+Statina is using github flow release model as described in our development manual.
+
 
 ### Steps to make a new release:
 

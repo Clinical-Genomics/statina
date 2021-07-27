@@ -78,13 +78,13 @@
         var normal = {
             y: {{data.ncv_values}},
             x: {{data.x_axis}},
+            text: {{ data.names|tojson }},
             pointpos: 30,
             type: 'box',
             showlegend: true,
             marker: {
                 color: '#ccccb3'},
                 name: 'Negative T{{chrom}} (N={{data.count}})',
-                hoverinfo:'none',
                 boxpoints: 'suspectedoutliers',
             };
                     

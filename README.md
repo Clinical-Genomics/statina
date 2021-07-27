@@ -46,22 +46,17 @@ To run the image use the following command: `docker run --name statina statina s
 To remove the container, type: `docker rm statina`
 
 ## Release model
-Statina development is organised on a flexible Git "Release Flow" branching system. This more or less means that we 
-make releases in release branches which corresponds to stable versions of Statina.
+Statina is using github flow release model as described in our development manual.
+
 
 ### Steps to make a new release:
 
-2) Update change log with the new version.
-3) Update statina/__init__.py with the new version.
-4) Make a PR to master,
-	- Justify if its a patch/minor/major version bump
-	- Paste the latest changelog to the text body
-	- get it approved and merge to master.
-5) Make a [new release](https://github.com/Clinical-Genomics/statina/releases/new).
-	- `git checkout master`
-	- `git tag "vX.X.X"`
-	- `git push --tag`
-	- got to the new release on [releases](https://github.com/Clinical-Genomics/statina/releases) and click 'Create Release'
+1) Get you PR approved.
+2) Append the version bump to PR title. Eg. __Update README__ becomes __Update Readme (patch)__
+3) Select __squash and merge__
+4) Write a change log comment.
+5) Merge.
+
 	
 ### Deploying to staging
 

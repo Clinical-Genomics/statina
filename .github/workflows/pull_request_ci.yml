@@ -1,6 +1,6 @@
 ---
 
-name: Push image to Docker Hub on push to open pull request event
+name: Pull Request Actions
 
 on: [pull_request]
 

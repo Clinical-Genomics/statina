@@ -20,7 +20,7 @@ jobs:
 
   docker-image-push:
     runs-on: ubuntu-latest
-    name: Push staging docker image to dockerhub
+    name: Create staging image
     steps:
       - name: Check out git repository
         uses: actions/checkout@v2

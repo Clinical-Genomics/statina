@@ -36,7 +36,7 @@ jobs:
           context: ./
           file: ./Dockerfile
           push: true
-           tags: "clinicalgenomics/statina:${{github.event.release.tag_name}}, clinicalgenomics/statina:latest"
+          tags: "clinicalgenomics/statina:${{github.event.release.tag_name}}, clinicalgenomics/statina:latest"
 
   build-n-publish:
     name: Build and publish Python distribution to PyPI

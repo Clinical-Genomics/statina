@@ -1,6 +1,6 @@
 ---
 
-name: Build container from latest release
+name: Release Actions
 on:
   release:
     types:

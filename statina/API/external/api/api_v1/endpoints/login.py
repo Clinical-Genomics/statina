@@ -41,7 +41,14 @@ async def validate_user(
     adapter: StatinaAdapter = Depends(get_nipt_adapter),
 ):
     update_user: User = find.user(user_name=username, adapter=adapter)
-    if update_user.verification_hex == verification_hex:
+    response = RedirectResponse("../batches")
+    if not update_user:
+        response.set_cookie(key="info_type", value="danger")
+        response.set_cookie(
+            key="user_info",
+            value="No such user in the database",
+        )
+    elif update_user.verification_hex == verification_hex and update_user.role == "unconfirmed":
         try:
             email_form = FormDataRequest(
                 sender_prefix=email_settings.sender_prefix,
@@ -54,14 +61,17 @@ async def validate_user(
             email_form.submit()
             update_user.role = "inactive"
             update.update_user(adapter=adapter, user=update_user)
-            response = RedirectResponse("../batches")
             response.set_cookie(
                 key="user_info",
                 value="Email confirmed! Your account will be activated after manual review",
             )
-            return response
         except Exception as e:
-            return str(e.__class__.__name__)
+            response.set_cookie(key="info_type", value="danger")
+            response.set_cookie(
+                key="user_info",
+                value=f"Backend error ({e.__class__.__name__})! Your account will be activated after manual review",
+            )
+    return response
 
 
 @router.get("/logout")

@@ -54,8 +54,14 @@ async def validate_user(
             email_form.submit()
             update_user.role = "inactive"
             update.update_user(adapter=adapter, user=update_user)
+            response = RedirectResponse("../batches")
+            response.set_cookie(
+                key="user_info",
+                value="Email confirmed! Your account will be activated after manual review",
+            )
+            return response
         except Exception as e:
-            return str(e)
+            return str(e.__class__.__name__)
 
 
 @router.get("/logout")

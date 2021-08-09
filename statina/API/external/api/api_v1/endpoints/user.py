@@ -54,7 +54,7 @@ async def add_new_user(request: Request, adapter: StatinaAdapter = Depends(get_n
 
     except Exception as error:
         response.set_cookie(key="info_type", value="danger")
-        response.set_cookie(key="user_info", value=f"{error}")
+        response.set_cookie(key="user_info", value=f"{error.__class__.__name__}")
         pass
 
     return response

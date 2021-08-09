@@ -3,17 +3,16 @@ from email.message import EmailMessage
 from typing import List
 
 from fastapi import Depends
-from pydantic import EmailStr
 from starlette.requests import Request
 from starlette.responses import RedirectResponse
 
 from statina.API.external.api.api_v1.endpoints.login import router
 from statina.API.external.api.deps import get_password_hash, get_current_user
 from statina.adapter import StatinaAdapter
-from statina.config import get_nipt_adapter, templates
+from statina.config import get_nipt_adapter, templates, email_settings
 from statina.crud.find import find
 from statina.crud.insert import insert_user
-from statina.exeptions import EmailNotSentError, CredentialsError
+from statina.exeptions import CredentialsError
 from statina.models.database import User
 from statina.models.server.new_user import NewUser
 
@@ -38,11 +37,12 @@ async def add_new_user(request: Request, adapter: StatinaAdapter = Depends(get_n
     try:
         insert_user(adapter=adapter, user=user)
         email_form = FormDataRequest(
-            sender_prefix="statina.admin",
-            request_uri="http://localhost:25000/sendmail",
-            recipients="maria.ropat@scilifelab.se",
+            sender_prefix=email_settings.sender_prefix,
+            request_uri=email_settings.mail_uri,
+            recipients=email_settings.admin_email,
             mail_title="New user request",
-            mail_body='Follow <a href="https://statina-stage.scilifelab.se">link</a> to activate user',
+            mail_body=f"User {new_user.username} ({new_user.email}) requested an account <br>"
+            f'Follow <a href="{email_settings.website_uri}">link</a> to activate user',
         )
         email_form.submit()
         response.set_cookie(key="info_type", value="success")

@@ -4,12 +4,13 @@ from typing import Iterable
 
 from fastapi import APIRouter, Depends, Request
 from fastapi.responses import RedirectResponse
+from sendmail_container import FormDataRequest
 from starlette.datastructures import FormData
 
 from statina.adapter import StatinaAdapter
 from statina.API.external.api.deps import get_current_user
 from statina.API.external.constants import CHROM_ABNORM
-from statina.config import get_nipt_adapter
+from statina.config import get_nipt_adapter, email_settings
 from statina.crud import update
 from statina.crud.delete import delete_batches
 from statina.crud.find import find
@@ -18,6 +19,28 @@ from statina.models.database import DataBaseSample, User, Batch
 router = APIRouter()
 
 LOG = logging.getLogger(__name__)
+
+
+@router.post("/validate_user/{username}/{verification_hex}")
+async def validate_user(
+    request: Request,
+    username: str,
+    verification_hex: str,
+    adapter: StatinaAdapter = Depends(get_nipt_adapter),
+):
+    update_user: User = find.user(user_name=username, adapter=adapter)
+    if update_user.verification_hex == verification_hex:
+        update_user.role = "inactive"
+        update.update_user(adapter=adapter, user=update_user)
+        email_form = FormDataRequest(
+            sender_prefix=email_settings.sender_prefix,
+            request_uri=email_settings.mail_uri,
+            recipients=email_settings.admin_email,
+            mail_title="New user request",
+            mail_body=f"User {update_user.username} ({update_user.email}) requested new account <br>"
+            f'Follow <a href="{email_settings.website_uri}">link</a> to activate user',
+        )
+        email_form.submit()
 
 
 @router.post("/update_user")

@@ -1,5 +1,5 @@
 import datetime
-from email.message import EmailMessage
+import secrets
 from typing import List
 
 from fastapi import Depends
@@ -28,7 +28,7 @@ async def add_new_user(request: Request, adapter: StatinaAdapter = Depends(get_n
     user = User(
         **new_user.dict(),
         added=datetime.datetime.now(),
-        role="inactive",
+        role="unconfirmed",
         hashed_password=get_password_hash(new_user.password),
     )
 
@@ -39,10 +39,11 @@ async def add_new_user(request: Request, adapter: StatinaAdapter = Depends(get_n
         email_form = FormDataRequest(
             sender_prefix=email_settings.sender_prefix,
             request_uri=email_settings.mail_uri,
-            recipients=email_settings.admin_email,
-            mail_title="New user request",
-            mail_body=f"User {new_user.username} ({new_user.email}) requested new account <br>"
-            f'Follow <a href="{email_settings.website_uri}">link</a> to activate user',
+            recipients=user.email,
+            mail_title="Verify your email",
+            mail_body=f"<body>Your email has been used to register account at {email_settings.website_uri} <br>"
+            f'Follow this <a href="{email_settings.website_uri}/validate_user'
+            f'/{user.username}/{user.verification_hex}">link</a> to confirm your email address <br></body>',
         )
         email_form.submit()
         response.set_cookie(key="info_type", value="success")
@@ -54,7 +55,9 @@ async def add_new_user(request: Request, adapter: StatinaAdapter = Depends(get_n
 
     except Exception as error:
         response.set_cookie(key="info_type", value="danger")
-        response.set_cookie(key="user_info", value=f"{error}")
+        response.set_cookie(
+            key="user_info", value=f"Error occurred when creating new user. Please try again later"
+        )
         pass
 
     return response

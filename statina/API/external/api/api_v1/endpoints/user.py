@@ -41,7 +41,7 @@ async def add_new_user(request: Request, adapter: StatinaAdapter = Depends(get_n
             request_uri=email_settings.mail_uri,
             recipients=email_settings.admin_email,
             mail_title="New user request",
-            mail_body=f"User {new_user.username} ({new_user.email}) requested an account <br>"
+            mail_body=f"User {new_user.username} ({new_user.email}) requested new account <br>"
             f'Follow <a href="{email_settings.website_uri}">link</a> to activate user',
         )
         email_form.submit()
@@ -54,7 +54,7 @@ async def add_new_user(request: Request, adapter: StatinaAdapter = Depends(get_n
 
     except Exception as error:
         response.set_cookie(key="info_type", value="danger")
-        response.set_cookie(key="user_info", value=f"{error.__class__.__name__}")
+        response.set_cookie(key="user_info", value=f"{error}")
         pass
 
     return response

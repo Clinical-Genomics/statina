@@ -34,7 +34,7 @@ def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends()) -> 
     )
 
 
-@router.post("/validate_user")
+@router.get("/validate_user")
 async def validate_user(
     username: str,
     verification_hex: str,

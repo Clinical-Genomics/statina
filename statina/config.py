@@ -37,6 +37,7 @@ class EmailSettings(BaseSettings):
 
     class Config:
         env_file = str(ENV_FILE)
+        validate_assignment = True
 
 
 settings = Settings()

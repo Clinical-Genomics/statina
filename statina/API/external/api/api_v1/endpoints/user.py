@@ -42,7 +42,7 @@ async def add_new_user(request: Request, adapter: StatinaAdapter = Depends(get_n
             recipients=user.email,
             mail_title="Verify your email",
             mail_body=f"<body>Your email has been used to register account at {email_settings.website_uri} <br>"
-            f'Follow this <a href="{email_settings.website_uri}/login/validate_user/'
+            f'Follow this <a href="{email_settings.website_uri}/validate_user/'
             f'?username={user.username}&verification_hex={user.verification_hex}">link</a> '
             f"to confirm your email address <br></body>",
         )
@@ -50,8 +50,7 @@ async def add_new_user(request: Request, adapter: StatinaAdapter = Depends(get_n
         response.set_cookie(key="info_type", value="success")
         response.set_cookie(
             key="user_info",
-            value=f"Your user account has been created and an email has been sent to the Statina admin. "
-            f"They will send an email to {new_user.email} when your user has been confirmed and activated.",
+            value=f"Your user account has been created and a validation email has been sent to your email address.",
         )
 
     except Exception as error:

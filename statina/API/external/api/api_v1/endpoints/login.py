@@ -43,8 +43,6 @@ async def validate_user(
     update_user: User = find.user(user_name=username, adapter=adapter)
     if update_user.verification_hex == verification_hex:
         try:
-            update_user.role = "inactive"
-            update.update_user(adapter=adapter, user=update_user)
             email_form = FormDataRequest(
                 sender_prefix=email_settings.sender_prefix,
                 request_uri=email_settings.mail_uri,
@@ -54,6 +52,8 @@ async def validate_user(
                 f'Follow <a href="{email_settings.website_uri}">link</a> to activate user',
             )
             email_form.submit()
+            update_user.role = "inactive"
+            update.update_user(adapter=adapter, user=update_user)
         except Exception as e:
             return str(e)
 

@@ -1,4 +1,5 @@
 from pathlib import Path
+from typing import Optional
 
 from fastapi.templating import Jinja2Templates
 from pydantic import BaseSettings
@@ -30,14 +31,13 @@ class Settings(BaseSettings):
 class EmailSettings(BaseSettings):
     """Settings for sending email"""
 
-    admin_email: str
-    sender_prefix: str
-    mail_uri: str
-    website_uri: str
+    admin_email: Optional[str]
+    sender_prefix: Optional[str]
+    mail_uri: Optional[str]
+    website_uri: Optional[str]
 
     class Config:
         env_file = str(ENV_FILE)
-        validate_assignment = True
 
 
 settings = Settings()

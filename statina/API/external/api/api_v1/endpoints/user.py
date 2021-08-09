@@ -42,7 +42,7 @@ async def add_new_user(request: Request, adapter: StatinaAdapter = Depends(get_n
             recipients=user.email,
             mail_title="Verify your email",
             mail_body=f"<body>Your email has been used to register account at {email_settings.website_uri} <br>"
-            f'Follow this <a href="{email_settings.website_uri}/validate_user'
+            f'Follow this <a href="{email_settings.website_uri}/login/validate_user'
             f'/{user.username}/{user.verification_hex}">link</a> to confirm your email address <br></body>',
         )
         email_form.submit()

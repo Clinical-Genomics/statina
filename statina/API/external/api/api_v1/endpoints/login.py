@@ -34,7 +34,7 @@ def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends()) -> 
     )
 
 
-@router.put("/validate_user/{username}/{verification_hex}")
+@router.post("/validate_user")
 async def validate_user(
     username: str,
     verification_hex: str,
@@ -42,17 +42,20 @@ async def validate_user(
 ):
     update_user: User = find.user(user_name=username, adapter=adapter)
     if update_user.verification_hex == verification_hex:
-        update_user.role = "inactive"
-        update.update_user(adapter=adapter, user=update_user)
-        email_form = FormDataRequest(
-            sender_prefix=email_settings.sender_prefix,
-            request_uri=email_settings.mail_uri,
-            recipients=email_settings.admin_email,
-            mail_title="New user request",
-            mail_body=f"User {update_user.username} ({update_user.email}) requested new account <br>"
-            f'Follow <a href="{email_settings.website_uri}">link</a> to activate user',
-        )
-        email_form.submit()
+        try:
+            update_user.role = "inactive"
+            update.update_user(adapter=adapter, user=update_user)
+            email_form = FormDataRequest(
+                sender_prefix=email_settings.sender_prefix,
+                request_uri=email_settings.mail_uri,
+                recipients=email_settings.admin_email,
+                mail_title="New user request",
+                mail_body=f"User {update_user.username} ({update_user.email}) requested new account <br>"
+                f'Follow <a href="{email_settings.website_uri}">link</a> to activate user',
+            )
+            email_form.submit()
+        except Exception as e:
+            return str(e)
 
 
 @router.get("/logout")

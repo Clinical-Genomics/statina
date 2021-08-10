@@ -50,7 +50,7 @@ async def add_new_user(request: Request, adapter: StatinaAdapter = Depends(get_n
             recipients=user.email,
             mail_title="Verify your email",
             mail_body=CONFIRMATION_MESSAGE_TEMPLATE.format(
-                website_uri=email_settings.website_uri, confirmation_link=confirmation_link
+                email_settings.website_uri, confirmation_link
             ),
         )
         email_form.submit()

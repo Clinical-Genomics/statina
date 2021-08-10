@@ -7,6 +7,9 @@ from starlette.requests import Request
 from starlette.responses import RedirectResponse
 
 from statina.API.external.api.api_v1.endpoints.login import router
+from statina.API.external.api.api_v1.templates.email.confirmation import (
+    CONFIRMATION_MESSAGE_TEMPLATE,
+)
 from statina.API.external.api.deps import get_password_hash, get_current_user
 from statina.adapter import StatinaAdapter
 from statina.config import get_nipt_adapter, templates, email_settings
@@ -36,16 +39,19 @@ async def add_new_user(request: Request, adapter: StatinaAdapter = Depends(get_n
 
     try:
         insert_user(adapter=adapter, user=user)
+        confirmation_link = (
+            f"{email_settings.website_uri}/validate_user/"
+            f"?username={user.username}&verification_hex={user.verification_hex}"
+        )
         email_form = FormDataRequest(
             sender_prefix=email_settings.sender_prefix,
             email_server_alias=email_settings.email_server_alias,
             request_uri=email_settings.mail_uri,
             recipients=user.email,
             mail_title="Verify your email",
-            mail_body=f"<body>Your email has been used to register account at {email_settings.website_uri} <br>"
-            f'Follow this <a href="{email_settings.website_uri}/validate_user/'
-            f'?username={user.username}&verification_hex={user.verification_hex}">link</a> '
-            f"to confirm your email address <br></body>",
+            mail_body=CONFIRMATION_MESSAGE_TEMPLATE.format(
+                website_uri=email_settings.website_uri, confirmation_link=confirmation_link
+            ),
         )
         email_form.submit()
         response.set_cookie(key="info_type", value="success")

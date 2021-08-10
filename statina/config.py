@@ -35,6 +35,7 @@ class EmailSettings(BaseSettings):
     sender_prefix: Optional[str]
     mail_uri: Optional[str]
     website_uri: Optional[str]
+    email_server_alias: Optional[str]
 
     class Config:
         env_file = str(ENV_FILE)

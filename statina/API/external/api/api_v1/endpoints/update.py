@@ -41,6 +41,7 @@ async def validate_user(
             update.update_user(adapter=adapter, user=update_user)
             email_form = FormDataRequest(
                 sender_prefix=email_settings.sender_prefix,
+                email_server_alias=email_settings.email_server_alias,
                 request_uri=email_settings.mail_uri,
                 recipients=email_settings.admin_email,
                 mail_title="New user request",
@@ -78,6 +79,7 @@ async def update_user(
     if old_role in ["inactive", "unconfirmed"] and new_role not in ["inactive", "unconfirmed"]:
         email_form = FormDataRequest(
             sender_prefix=email_settings.sender_prefix,
+            email_server_alias=email_settings.email_server_alias,
             request_uri=email_settings.mail_uri,
             recipients=update_user.email,
             mail_title="Your account has been activated",

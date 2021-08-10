@@ -38,6 +38,7 @@ async def add_new_user(request: Request, adapter: StatinaAdapter = Depends(get_n
         insert_user(adapter=adapter, user=user)
         email_form = FormDataRequest(
             sender_prefix=email_settings.sender_prefix,
+            email_server_alias=email_settings.email_server_alias,
             request_uri=email_settings.mail_uri,
             recipients=user.email,
             mail_title="Verify your email",

@@ -242,9 +242,9 @@ CONFIRMATION_MESSAGE_TEMPLATE = """
                   <table border="0" cellpadding="0" cellspacing="0">
                     <tr>
                       <td>
-                        <h1>Confirm your email</h1>
+                        <h1>Hello, {2} </h1>
                         <h2>Your email has been used to register an account at <a href="{0}">Statina</a>.
-                         Click on the button to confirm your email.</h2>      
+                         To complete your registration, please confirm your email.</h2>      
                          <table border="0" cellpadding="0" cellspacing="0" class="btn btn-primary">
                           <tbody>
                             <tr>

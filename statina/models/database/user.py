@@ -17,4 +17,4 @@ class User(BaseModel):
         "admin",
     ]
     hashed_password: str
-    verification_hex: str = secrets.token_hex(64)
+    verification_hex: str = secrets.token_urlsafe(64)

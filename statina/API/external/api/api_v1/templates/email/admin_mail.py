@@ -1,14 +1,14 @@
 # FORMAT ARGS:
 # website_uri
 # username
-# confirmation_link
+# user_email
 
-CONFIRMATION_MESSAGE_TEMPLATE = """
+ADMIN_MESSAGE_TEMPLATE = """
 <html>
   <head>
     <meta name="viewport" content="width=device-width" />
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-    <title>Statina Confirmation Email</title>
+    <title>Account activation request</title>
     <style>
       img {{
         border: none;
@@ -247,21 +247,16 @@ CONFIRMATION_MESSAGE_TEMPLATE = """
                   <table border="0" cellpadding="0" cellspacing="0">
                     <tr>
                       <td>
-                        <h1>Hello, {username} </h1>
-                        <h2>Your email has been used to register an account at <a href="{website_uri}">Statina</a>.
-                         To complete your registration, please confirm your email.</h2>      
+                        <h1>New Account Request</h1>
+                        <h2>
+                        New user with following credentials would like to to gain access to 
+                        <a href="{website_uri}">Statina</a>: <br>
+                        Username: {username} <br>
+                        Email: {user_email} <br>
+                        </h2>      
                          <table border="0" cellpadding="0" cellspacing="0" class="btn btn-primary">
                           <tbody>
                             <tr>
-                              <td align="left">
-                                <table border="0" cellpadding="0" cellspacing="0">
-                                  <tbody>
-                                    <tr>
-                                      <td> <a href="{confirmation_link}" target="_blank">confirm email</a> </td>
-                                    </tr>
-                                  </tbody>
-                                </table>
-                              </td>
                             </tr>
                           </tbody>
                         </table>

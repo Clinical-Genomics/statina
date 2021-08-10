@@ -7,6 +7,10 @@ from fastapi.responses import RedirectResponse
 from sendmail_container import FormDataRequest
 from starlette.datastructures import FormData
 
+from statina.API.external.api.api_v1.templates.email.account_activated import (
+    ACTIVATION_MESSAGE_TEMPLATE,
+)
+from statina.API.external.api.api_v1.templates.email.admin_mail import ADMIN_MESSAGE_TEMPLATE
 from statina.adapter import StatinaAdapter
 from statina.API.external.api.deps import get_current_user
 from statina.API.external.constants import CHROM_ABNORM
@@ -45,8 +49,11 @@ async def validate_user(
                 request_uri=email_settings.mail_uri,
                 recipients=email_settings.admin_email,
                 mail_title="New user request",
-                mail_body=f"User {update_user.username} ({update_user.email}) requested new account <br>"
-                f'Follow <a href="{email_settings.website_uri}">link</a> to activate user',
+                mail_body=ADMIN_MESSAGE_TEMPLATE.format(
+                    username=update_user.username,
+                    user_email=update_user.email,
+                    website_uri=email_settings.website_uri,
+                ),
             )
             email_form.submit()
             response.set_cookie(
@@ -83,8 +90,9 @@ async def update_user(
             request_uri=email_settings.mail_uri,
             recipients=update_user.email,
             mail_title="Your account has been activated",
-            mail_body=f'Your <a href="{email_settings.website_uri}">statina</a> account ({update_user.username})'
-            f" has been activated!",
+            mail_body=ACTIVATION_MESSAGE_TEMPLATE.format(
+                website_uri=email_settings.website_uri, username=update_user.username
+            ),
         )
         email_form.submit()
     return RedirectResponse(request.headers.get("referer"))

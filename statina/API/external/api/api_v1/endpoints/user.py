@@ -1,8 +1,8 @@
 import datetime
-import secrets
 from typing import List
 
 from fastapi import Depends
+from starlette.background import BackgroundTasks
 from starlette.requests import Request
 from starlette.responses import RedirectResponse
 
@@ -20,10 +20,15 @@ from statina.models.database import User
 from statina.models.server.new_user import NewUser
 
 from sendmail_container import FormDataRequest
+from statina.tools.email import send_email
 
 
 @router.post("/add_new_user")
-async def add_new_user(request: Request, adapter: StatinaAdapter = Depends(get_nipt_adapter)):
+async def add_new_user(
+    request: Request,
+    background_tasks: BackgroundTasks,
+    adapter: StatinaAdapter = Depends(get_nipt_adapter),
+):
     """Redirects back to index, if invalid username or password"""
     form = await request.form()
     new_user = NewUser(**form)
@@ -55,7 +60,7 @@ async def add_new_user(request: Request, adapter: StatinaAdapter = Depends(get_n
                 username=user.username,
             ),
         )
-        email_form.submit()
+        background_tasks.add_task(send_email, email_form)
         response.set_cookie(key="info_type", value="success")
         response.set_cookie(
             key="user_info",

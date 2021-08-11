@@ -2,7 +2,7 @@ import logging
 from datetime import datetime
 from typing import Iterable
 
-from fastapi import APIRouter, Depends, Request
+from fastapi import APIRouter, Depends, Request, BackgroundTasks
 from fastapi.responses import RedirectResponse
 from sendmail_container import FormDataRequest
 from starlette.datastructures import FormData
@@ -19,6 +19,7 @@ from statina.crud import update
 from statina.crud.delete import delete_batches
 from statina.crud.find import find
 from statina.models.database import DataBaseSample, User, Batch
+from statina.tools.email import send_email
 
 router = APIRouter()
 
@@ -29,6 +30,7 @@ LOG = logging.getLogger(__name__)
 async def validate_user(
     username: str,
     verification_hex: str,
+    background_tasks: BackgroundTasks,
     adapter: StatinaAdapter = Depends(get_nipt_adapter),
 ):
     update_user: User = find.user(user_name=username, adapter=adapter)
@@ -55,7 +57,7 @@ async def validate_user(
                     website_uri=email_settings.website_uri,
                 ),
             )
-            email_form.submit()
+            background_tasks.add_task(send_email, email_form)
             response.set_cookie(
                 key="user_info",
                 value="Email confirmed! Your account will be activated after manual review",
@@ -72,6 +74,7 @@ async def validate_user(
 @router.post("/update_user")
 async def update_user(
     request: Request,
+    background_tasks: BackgroundTasks,
     adapter: StatinaAdapter = Depends(get_nipt_adapter),
     user: User = Depends(get_current_user),
 ):
@@ -94,7 +97,7 @@ async def update_user(
                 website_uri=email_settings.website_uri, username=update_user.username
             ),
         )
-        email_form.submit()
+        background_tasks.add_task(send_email, email_form)
     return RedirectResponse(request.headers.get("referer"))
 
 

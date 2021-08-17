@@ -1,7 +1,8 @@
 from pathlib import Path
+from typing import Optional
 
 from fastapi.templating import Jinja2Templates
-from pydantic import BaseSettings, EmailStr
+from pydantic import BaseSettings
 from pymongo import MongoClient
 
 from statina.adapter.plugin import StatinaAdapter
@@ -30,17 +31,18 @@ class Settings(BaseSettings):
 class EmailSettings(BaseSettings):
     """Settings for sending email"""
 
-    sll_port: int = 465
-    smtp_server: str = "smtp.gmail.com"
-    sender_email: EmailStr
-    sender_password: str
-    admin_email: EmailStr
+    admin_email: Optional[str]
+    sender_prefix: Optional[str]
+    mail_uri: Optional[str]
+    website_uri: Optional[str]
+    email_server_alias: Optional[str]
 
     class Config:
         env_file = str(ENV_FILE)
 
 
 settings = Settings()
+email_settings = EmailSettings()
 templates = Jinja2Templates(directory=str(TEMPLATES_DIR))
 
 

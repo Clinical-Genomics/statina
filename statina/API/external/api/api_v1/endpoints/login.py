@@ -6,7 +6,9 @@ from fastapi.responses import RedirectResponse
 from fastapi.security import OAuth2PasswordRequestForm
 
 from statina.API.external.api.deps import authenticate_user, create_access_token
+
 from statina.config import settings
+
 from statina.models.database import User
 
 router = APIRouter()

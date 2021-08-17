@@ -38,6 +38,8 @@
                                                             </option>
                                                             <option {% if user.role=='RW' %}selected{% endif %}>RW
                                                             </option>
+                                                            <option {% if user.role=='unconfirmed' %}selected{% endif %}>unconfirmed
+                                                            </option>
                                                             <option {% if user.role=='admin' %}selected{% endif %}>
                                                                 admin
                                                             </option>

@@ -15,13 +15,3 @@ class NewUser(BaseModel):
         if v != values["password_repeated"]:
             raise MissMatchingPasswordError
         return v
-
-
-class NewUserRequestEmail(EmailSettings):
-    subject: str = "Statina User Request"
-    user_email: EmailStr
-    message: str
-
-    @validator("message", always=True)
-    def make_message(cls, v, values: dict) -> str:
-        return f"User request from {v}. Give the user proper credentials and send an email to {values['user_email']} when done."

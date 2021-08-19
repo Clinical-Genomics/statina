@@ -35,13 +35,14 @@ def cli(context: click.Context):
 @click.option(
     "--api", default="external", type=click.Choice(["external", "internal"]), show_default=True
 )
+@click.option("--version", default="v1", type=click.Choice(["v1", "v2"]), show_default=True)
 @click.option("--reload", is_flag=True)
-def serve_command(reload: bool, api: str):
+def serve_command(reload: bool, api: str, version: str):
     """Serve the Statina app for testing purpose.
 
     This command will serve the user interface (external) as default
     """
-    app = f"statina.main:{api}_app"
+    app = f"statina.main:{api}_{version}_app"
     LOG.info("Running %s api on host:%s and port:%s", api, settings.host, settings.port)
     uvicorn.run(app=app, host=settings.host, port=settings.port, reload=reload)
 

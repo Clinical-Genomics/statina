@@ -9,7 +9,6 @@ def index(request: Request):
     """Log in view."""
     return JSONResponse(
         content={
-            "request": request,
             "current_user": "",
             "info_type": request.cookies.get("info_type"),
             "user_info": request.cookies.get("user_info"),
@@ -22,7 +21,6 @@ def index(request: Request):
     """Log in view."""
     return JSONResponse(
         content={
-            "request": request,
             "current_user": "",
             "info_type": request.cookies.get("info_type"),
             "user_info": request.cookies.get("user_info"),

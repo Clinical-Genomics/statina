@@ -1,4 +1,5 @@
 from fastapi import APIRouter, Depends, Request
+from fastapi.encoders import jsonable_encoder
 from fastapi.responses import JSONResponse
 
 from statina.adapter.plugin import StatinaAdapter
@@ -12,13 +13,13 @@ from statina.crud.find.plots.statistics_plot_data import (
 from statina.models.database import User
 
 router = APIRouter()
+user = {}
 
 
 @router.get("/statistics")
 def statistics(
     request: Request,
     adapter: StatinaAdapter = Depends(get_nipt_adapter),
-    user: User = Depends(get_current_user),
 ):
     """Statistics view."""
 
@@ -42,16 +43,17 @@ def statistics(
     box_stat = get_statistics_for_box_plot(adapter=adapter, batches=batch_ids, fields=box_plots)
     scatter_stat = get_statistics_for_scatter_plot(batches=batches, fields=scatter_plots)
     return JSONResponse(
-        content=dict(
-            request=request,
-            current_user=user,
-            ticks=list(range(0, nr_batches)),
-            nr_batches=nr_batches,
-            batch_ids=batch_ids,
-            box_stat=box_stat,
-            box_plots=box_plots,
-            scatter_stat=scatter_stat,
-            scatter_plots=scatter_plots,
-            page_id="statistics",
+        content=jsonable_encoder(
+            dict(
+                current_user=user,
+                ticks=list(range(0, nr_batches)),
+                nr_batches=nr_batches,
+                batch_ids=batch_ids,
+                box_stat=box_stat,
+                box_plots=box_plots,
+                scatter_stat=scatter_stat,
+                scatter_plots=scatter_plots,
+                page_id="statistics",
+            )
         ),
     )

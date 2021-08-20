@@ -1,6 +1,7 @@
 from typing import Dict, List
 
 from fastapi import APIRouter, Depends, Request
+from fastapi.encoders import jsonable_encoder
 from fastapi.responses import JSONResponse
 import statina.crud.find.plots.fetal_fraction_plot_data as get_fetal_fraction
 from statina.adapter import StatinaAdapter
@@ -28,20 +29,20 @@ from statina.models.server.sample import Sample
 
 router = APIRouter()
 
+user = {}
+
 
 @router.post("/")
 def batches(
     request: Request,
     adapter: StatinaAdapter = Depends(get_nipt_adapter),
-    user: User = Depends(get_current_user),
 ):
     """List of all batches"""
 
     all_batches: List[Batch] = find.batches(adapter=adapter)
     return JSONResponse(
         content={
-            "request": request,
-            "batches": all_batches,
+            "batches": jsonable_encoder(all_batches),
             "current_user": user,
             "page_id": "all_batches",
         },
@@ -52,17 +53,17 @@ def batches(
 def batches(
     request: Request,
     adapter: StatinaAdapter = Depends(get_nipt_adapter),
-    user: User = Depends(get_current_user),
 ):
     """List of all batches"""
     all_batches: List[Batch] = find.batches(adapter=adapter)
     return JSONResponse(
-        content={
-            "request": request,
-            "batches": all_batches,
-            "current_user": user,
-            "page_id": "all_batches",
-        },
+        content=jsonable_encoder(
+            {
+                "batches": all_batches,
+                "current_user": user,
+                "page_id": "all_batches",
+            }
+        ),
     )
 
 
@@ -71,19 +72,19 @@ def batch(
     request: Request,
     batch_id: str,
     adapter: StatinaAdapter = Depends(get_nipt_adapter),
-    user: User = Depends(get_current_user),
 ):
     """Batch view with table of all samples in the batch."""
 
     samples: List[DataBaseSample] = find.batch_samples(batch_id=batch_id, adapter=adapter)
     return JSONResponse(
-        content={
-            "request": request,
-            "batch": find.batch(batch_id=batch_id, adapter=adapter),
-            "sample_info": [Sample(**sample.dict()) for sample in samples],
-            "page_id": "batches",
-            "current_user": user,
-        },
+        content=jsonable_encoder(
+            {
+                "batch": find.batch(batch_id=batch_id, adapter=adapter),
+                "sample_info": [Sample(**sample.dict()) for sample in samples],
+                "page_id": "batches",
+                "current_user": user,
+            }
+        ),
     )
 
 
@@ -92,19 +93,19 @@ def batch(
     request: Request,
     batch_id: str,
     adapter: StatinaAdapter = Depends(get_nipt_adapter),
-    user: User = Depends(get_current_user),
 ):
     """Batch view with table of all samples in the batch."""
 
     samples: List[DataBaseSample] = find.batch_samples(batch_id=batch_id, adapter=adapter)
     return JSONResponse(
-        content={
-            "request": request,
-            "batch": find.batch(batch_id=batch_id, adapter=adapter),
-            "sample_info": [Sample(**sample.dict()) for sample in samples],
-            "page_id": "batches",
-            "current_user": user,
-        },
+        content=jsonable_encoder(
+            {
+                "batch": find.batch(batch_id=batch_id, adapter=adapter),
+                "sample_info": [Sample(**sample.dict()) for sample in samples],
+                "page_id": "batches",
+                "current_user": user,
+            }
+        ),
     )
 
 
@@ -114,23 +115,23 @@ def Zscore(
     batch_id: str,
     ncv: str,
     adapter: StatinaAdapter = Depends(get_nipt_adapter),
-    user: User = Depends(get_current_user),
 ):
     """Batch view with with Zscore plot"""
 
     batch: Batch = find.batch(batch_id=batch_id, adapter=adapter)
 
     return JSONResponse(
-        content=dict(
-            request=request,
-            tris_thresholds=TRISOMI_TRESHOLDS,
-            batch=batch.dict(),
-            chromosomes=[ncv],
-            ncv_chrom_data={ncv: get_tris_samples(adapter=adapter, chr=ncv, batch_id=batch_id)},
-            normal_data={ncv: get_tris_control_normal(adapter, ncv)},
-            abnormal_data={ncv: get_tris_control_abnormal(adapter, ncv, 0)},
-            page_id=f"batches_NCV{ncv}",
-            current_user=user,
+        content=jsonable_encoder(
+            dict(
+                tris_thresholds=TRISOMI_TRESHOLDS,
+                batch=batch.dict(),
+                chromosomes=[ncv],
+                ncv_chrom_data={ncv: get_tris_samples(adapter=adapter, chr=ncv, batch_id=batch_id)},
+                normal_data={ncv: get_tris_control_normal(adapter, ncv)},
+                abnormal_data={ncv: get_tris_control_abnormal(adapter, ncv, 0)},
+                page_id=f"batches_NCV{ncv}",
+                current_user=user,
+            )
         ),
     )
 
@@ -140,7 +141,6 @@ def fetal_fraction_XY(
     request: Request,
     batch_id: str,
     adapter: StatinaAdapter = Depends(get_nipt_adapter),
-    user: User = Depends(get_current_user),
 ):
     """Batch view with fetal fraction (X against Y) plot"""
 
@@ -166,25 +166,26 @@ def fetal_fraction_XY(
 
     sex_thresholds = SexChromosomeThresholds(x_min=x_min, x_max=x_max)
     return JSONResponse(
-        content=dict(
-            sex_thresholds={
-                "XY_fetal_fraction_y": sex_thresholds.XY_fetal_fraction_y(),
-                "XX_lower": sex_thresholds.XX_lower(),
-                "XX_upper": sex_thresholds.XX_upper(),
-                "XY_upper": sex_thresholds.XY_upper(),
-                "XY_lower": sex_thresholds.XY_lower(),
-                "XXY": sex_thresholds.XXY(),
-            },
-            request=request,
-            current_user=user,
-            colors=COLORS,
-            control=control,
-            abnormal=abnormal_dict,
-            cases=cases,
-            max_x=x_max,
-            min_x=x_min,
-            batch=batch.dict(),
-            page_id="batches_FF_XY",
+        content=jsonable_encoder(
+            dict(
+                sex_thresholds={
+                    "XY_fetal_fraction_y": sex_thresholds.XY_fetal_fraction_y(),
+                    "XX_lower": sex_thresholds.XX_lower(),
+                    "XX_upper": sex_thresholds.XX_upper(),
+                    "XY_upper": sex_thresholds.XY_upper(),
+                    "XY_lower": sex_thresholds.XY_lower(),
+                    "XXY": sex_thresholds.XXY(),
+                },
+                current_user=user,
+                colors=COLORS,
+                control=control,
+                abnormal=abnormal_dict,
+                cases=cases,
+                max_x=x_max,
+                min_x=x_min,
+                batch=batch.dict(),
+                page_id="batches_FF_XY",
+            )
         ),
     )
 
@@ -194,21 +195,21 @@ def fetal_fraction(
     request: Request,
     batch_id: str,
     adapter: StatinaAdapter = Depends(get_nipt_adapter),
-    user: User = Depends(get_current_user),
 ):
     """Batch view with fetal fraction plot"""
     batch: Batch = find.batch(batch_id=batch_id, adapter=adapter)
     return JSONResponse(
-        content=dict(
-            request=request,
-            current_user=user,
-            colors=COLORS,
-            control=get_fetal_fraction.samples(
-                adapter=adapter, batch_id=batch_id, control_samples=True
-            ),
-            cases=get_fetal_fraction.samples(adapter=adapter, batch_id=batch_id),
-            batch=batch.dict(),
-            page_id="batches_FF",
+        content=jsonable_encoder(
+            dict(
+                current_user=user,
+                colors=COLORS,
+                control=get_fetal_fraction.samples(
+                    adapter=adapter, batch_id=batch_id, control_samples=True
+                ),
+                cases=get_fetal_fraction.samples(adapter=adapter, batch_id=batch_id),
+                batch=batch.dict(),
+                page_id="batches_FF",
+            )
         ),
     )
 
@@ -218,7 +219,6 @@ def coverage(
     request: Request,
     batch_id: str,
     adapter: StatinaAdapter = Depends(get_nipt_adapter),
-    user: User = Depends(get_current_user),
 ):
     """Batch view with coverage plot"""
     batch: Batch = find.batch(batch_id=batch_id, adapter=adapter)
@@ -228,13 +228,14 @@ def coverage(
     scatter_data: Dict[str, CoveragePlotSampleData] = get_scatter_data_for_coverage_plot(samples)
     box_data: Dict[int, List[float]] = get_box_data_for_coverage_plot(samples)
     return JSONResponse(
-        content=dict(
-            request=request,
-            current_user=user,
-            batch=batch.dict(),
-            x_axis=list(range(1, 23)),
-            scatter_data=scatter_data,
-            box_data=box_data,
-            page_id="batches_cov",
+        content=jsonable_encoder(
+            dict(
+                current_user=user,
+                batch=batch.dict(),
+                x_axis=list(range(1, 23)),
+                scatter_data=scatter_data,
+                box_data=box_data,
+                page_id="batches_cov",
+            )
         ),
     )

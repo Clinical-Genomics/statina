@@ -25,6 +25,7 @@ from statina.models.database import DataBaseSample, User, Batch
 from statina.parse.batch import validate_file_path
 
 router = APIRouter()
+user = {}
 
 
 def zip_dir(source_dir: Union[str, PathLike]) -> io.BytesIO:
@@ -46,7 +47,6 @@ def batch_download(
     file_id: str,
     file_name: str,
     adapter: StatinaAdapter = Depends(get_nipt_adapter),
-    user: User = Depends(get_current_user),
 ):
     """View for batch downloads"""
     batch: dict = find.batch(adapter=adapter, batch_id=batch_id).dict()
@@ -70,7 +70,6 @@ def sample_download(
     sample_id: str,
     file_id: str,
     adapter: StatinaAdapter = Depends(get_nipt_adapter),
-    user: User = Depends(get_current_user),
 ):
     """View for sample downloads"""
 
@@ -92,7 +91,6 @@ def report(
     batch_id: str,
     file_name: str,
     adapter: StatinaAdapter = Depends(get_nipt_adapter),
-    user: User = Depends(get_current_user),
 ):
     """Report view, collecting all tables and plots from one batch."""
 

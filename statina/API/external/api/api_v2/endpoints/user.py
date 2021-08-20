@@ -2,6 +2,7 @@ import datetime
 from typing import List
 
 from fastapi import Depends
+from fastapi.encoders import jsonable_encoder
 from starlette.background import BackgroundTasks
 from starlette.requests import Request
 from starlette.responses import RedirectResponse, JSONResponse
@@ -21,6 +22,8 @@ from statina.models.server.new_user import NewUser
 
 from sendmail_container import FormDataRequest
 from statina.tools.email import send_email
+
+user = {}
 
 
 @router.post("/add_new_user")
@@ -89,12 +92,13 @@ def new_user(request: Request):
 def new_user(request: Request):
     """Log in view."""
     return JSONResponse(
-        content={
-            "request": request,
-            "current_user": "",
-            "info_type": request.cookies.get("info_type"),
-            "user_info": request.cookies.get("user_info"),
-        },
+        content=jsonable_encoder(
+            {
+                "current_user": "",
+                "info_type": request.cookies.get("info_type"),
+                "user_info": request.cookies.get("user_info"),
+            }
+        ),
     )
 
 
@@ -102,7 +106,6 @@ def new_user(request: Request):
 def users(
     request: Request,
     adapter: StatinaAdapter = Depends(get_nipt_adapter),
-    user: User = Depends(get_current_user),
 ):
     """Admin view with table of all users."""
     if user.role != "admin":
@@ -110,12 +113,13 @@ def users(
 
     user_list: List[User] = find.users(adapter=adapter)
     return JSONResponse(
-        content={
-            "request": request,
-            "users": user_list,
-            "page_id": "users",
-            "current_user": user,
-        },
+        content=jsonable_encoder(
+            {
+                "users": user_list,
+                "page_id": "users",
+                "current_user": user,
+            }
+        ),
     )
 
 
@@ -123,7 +127,6 @@ def users(
 def users(
     request: Request,
     adapter: StatinaAdapter = Depends(get_nipt_adapter),
-    user: User = Depends(get_current_user),
 ):
     """Admin view with table of all users."""
     if user.role != "admin":
@@ -131,10 +134,11 @@ def users(
 
     user_list: List[User] = find.users(adapter=adapter)
     return JSONResponse(
-        content={
-            "request": request,
-            "users": user_list,
-            "page_id": "users",
-            "current_user": user,
-        },
+        content=jsonable_encoder(
+            {
+                "users": user_list,
+                "page_id": "users",
+                "current_user": user,
+            }
+        ),
     )

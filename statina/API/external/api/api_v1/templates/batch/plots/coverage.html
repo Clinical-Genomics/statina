@@ -1,0 +1,48 @@
+{% block scripts %}
+<script>
+        var XY_plot = document.getElementById('cov_plot')
+        var data = []
+        var layout = {
+        legend:{hovermode:'closest' },
+        hovermode:'closest',
+        xaxis :{showline: true,
+                zeroline: false,
+                linecolor: '#636363',
+                linewidth: 5,
+                showgrid: true,
+                gridcolor: '#bdbdbd',
+                title: 'Chromosome',
+                tickvals :{{x_axis}},
+                },            
+        yaxis :{zeroline: false,
+                showline: true,
+                showgrid: false,
+                linecolor: '#636363',
+                linewidth: 5,
+                title : 'Coverage Ratio'
+                },};
+        {% for samp, samp_data in scatter_data.items() %}
+        var scatter_plot = {
+            name: {{samp|tojson}},
+            y: {{samp_data.y_axis}},
+            x: {{samp_data.x_axis}},
+            mode: 'markers',
+            text: {{samp|tojson}},
+            type: 'scatter'};
+        data.push(scatter_plot);
+        {% endfor %}
+        {% for chr, box in box_data.items() %}
+        var box_plot = {
+            name: {{chr}},
+            y: {{box}},
+            x: {{chr}},
+            showlegend: false,
+            boxpoints: false,
+            text: {{chr}},
+            marker:{color: '#ccccb3'},
+            type: 'box'};
+        data.push(box_plot);
+        {% endfor %}
+        Plotly.newPlot('cov_plot', data, layout);
+</script>
+{% endblock %}

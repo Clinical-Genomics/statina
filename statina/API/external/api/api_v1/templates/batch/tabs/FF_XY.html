@@ -1,0 +1,23 @@
+{% extends 'layout/layout.html' %}
+{% include 'layout/navigation.html' %}
+{% block body %}
+<div class="container-fluid">
+    {% include 'batch/header.html' %}
+    <div class="tab-content">
+        <div class="tab-pane active" id='NCV_XY'>
+            <div class="panel panel-default">
+                <div class="panel-body">
+                    <div id="FFXY" style="min-width:400px; height:800px; ">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+{% block scripts %}
+{% include 'batch/plots/FF_XY.html' %}
+{% endblock %}
+
+
+

@@ -1,7 +1,6 @@
-flask_debugtoolbar
-pytest-flask
 pytest>=5.2
 pytest-cov
 coveralls
 pylint
-werkzeug<1.0.0              # due to breaking changes in 1.0.0
+mongomock
+bump2version

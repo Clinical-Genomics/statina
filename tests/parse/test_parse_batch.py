@@ -1,10 +1,11 @@
 from pathlib import Path
 from typing import List
-from pydantic import ValidationError
+
 import pytest
-from NIPTool.parse.batch import get_samples, get_batch, parse_csv, pars_segmental_calls
-from NIPTool.schemas.db_models.sample import SampleModel
-from NIPTool.schemas.db_models.batch import BatchModel
+from pydantic import ValidationError
+
+from statina.models.database import Batch, DataBaseSample
+from statina.parse.batch import get_batch, get_samples, parse_csv, parse_segmental_calls
 
 
 def get_nr_csv_entries(csv_path: Path) -> int:
@@ -19,7 +20,7 @@ def get_nr_csv_entries(csv_path: Path) -> int:
 def test_parse_segmental_calls(segmental_calls: str):
     # GIVEN a result files directory with 3 segmental calls files
     # WHEN running pars_segmental_calls
-    result = pars_segmental_calls(segmental_calls)
+    result = parse_segmental_calls(segmental_calls)
 
     # THEN assert that the result is a dict
     assert isinstance(result, dict)
@@ -33,10 +34,10 @@ def test_parse_segmental_calls_no_path(caplog):
     path = "non_existing_path"
 
     # WHEN running pars_segmental_calls
-    result = pars_segmental_calls(path)
+    result = parse_segmental_calls(path)
 
     # THEN assert a waring about missing path is being logged
-    assert 'Segmental Calls file path missing' in caplog.text
+    assert "Segmental Calls file path missing" in caplog.text
 
     # THEN assert that the result is a empty dict
     assert result == {}
@@ -62,12 +63,12 @@ def test_get_samples(valid_csv: Path):
     nr_samples = get_nr_csv_entries(valid_csv)
 
     # WHEN running get_samples
-    results: List[SampleModel] = get_samples(valid_csv)
+    results: List[DataBaseSample] = get_samples(valid_csv)
 
     # THEN assert results is a list and it has length 3
     assert isinstance(results, list)
     # THEN assert that the objects are samples
-    assert isinstance(results[0], SampleModel)
+    assert isinstance(results[0], DataBaseSample)
 
 
 def test_get_samples_with_missing_sample_id_in_csv(csv_with_missing_sample_id):
@@ -83,10 +84,10 @@ def test_get_batch(valid_csv: Path):
     # GIVEN a valid csv file
 
     # WHEN running get_samples
-    results: BatchModel = get_batch(valid_csv)
+    results: Batch = get_batch(valid_csv)
 
     # THEN assert that the objects are samples
-    assert isinstance(results, BatchModel)
+    assert isinstance(results, Batch)
 
 
 def test_get_batch_with_missing_sample_project_in_csv(csv_with_missing_sample_project):

@@ -1,14 +1,13 @@
-# NIPTool  [![Coverage Status](https://coveralls.io/repos/github/Clinical-Genomics/NIPTool/badge.svg?branch=master)](https://coveralls.io/github/Clinical-Genomics/NIPTool?branch=master) [![Build Status](https://travis-ci.org/Clinical-Genomics/NIPTool.svg?branch=master)](https://travis-ci.org/Clinical-Genomics/NIPTool) ![Latest Release](https://img.shields.io/github/v/release/clinical-genomics/NIPTool)
+# Statina  [![Coverage Status](https://coveralls.io/repos/github/Clinical-Genomics/statina/badge.svg?branch=master)](https://coveralls.io/github/Clinical-Genomics/statina?branch=master) [![Build Status](https://travis-ci.org/Clinical-Genomics/statina.svg?branch=master)](https://travis-ci.org/Clinical-Genomics/statina) ![Latest Release](https://img.shields.io/github/v/release/clinical-genomics/statina)
 
 
-NIPTool is a visualisation tool for NIPT data.
+Statina is a visualisation tool for the data produced by the [Fluffy] pipeline running [WisecondorX] to analyze NIPT.
 
 ## Installation
 
-
 ```bash
-git clone https://github.com/Clinical-Genomics/NIPTool.git
-cd NIPTool
+git clone https://github.com/Clinical-Genomics/statina
+cd statina
 pip install -r requirements.txt -e .
 ```
 
@@ -16,78 +15,86 @@ pip install -r requirements.txt -e .
 
 ### Demo
 
-Once installed, you can setup NIPTool by running a few commands using the included command line interface. Given you have a MongoDB server listening on the default port (27017), this is how you would setup a fully working NIPTool demo:
+**The CLI is intended for development/testing purpose only. To run in a production setting please refer to documentation
+for suggestions how.**
+
+Once installed, you can set up Statina by running a few commands using the included command line interface. 
+Given you have a MongoDB server listening on the default port (27017), this is how you would set up a fully working 
+Statina demo:
 
 ```bash
-nipt -c NIPTool/tests/fixtures/nipt_config.yaml load batch -b NIPTool/tests/fixtures/valid_fluffy.csv
-nipt -c NIPTool/tests/fixtures/nipt_config.yaml load user -n <mane> -r RW -e <mail>
+statina load batch --result-file statina/tests/fixtures/valid_fluffy.csv
 ```
 
-This will setup an instance of NIPTool with a database called `nipt-demo`. Now run
+Settings can be used by exporting the environment variables: `DB_NAME`, `DB_URI`, `HOST`, `PORT`
+This will set up an instance of Statina with a database called `statina-demo`. Now run
 
 ```bash
-nipt run
+statina serve --reload
 ```
-And play around with the interface.
+ and play around with the interface.
 
 ### Docker image
 
-NIPTool can be runned also as a container. The image is available [on Docker Hub](https://hub.docker.com/repository/docker/clinicalgenomics/niptool) or can be build using the Dockerfile provided in this repository.
+Statina can also run as a container. The image is available [on Docker Hub][docker-hub] or can be build using the 
+Dockerfile provided in this repository.
 
-To build a new image from the Dockerfile use the commands: `docker build -t niptool .`
+To build a new image from the Dockerfile use the commands: `docker build -t statina .`
 
-To run the image use the following command: `docker run --name niptool niptool nipt `
+To run the image use the following command: `docker run --name statina statina statina `
 
-To remove the container, type: `docker rm niptool`
-
+To remove the container, type: `docker rm statina`
 
 ## Release model
-NIPTool development is organised on a flexible Git "Release Flow" branching system. This more or less means that we make releases in release branches which corresponds to stable versions of NIPTool.
+Statina is using github flow release model as described in our development manual.
+
 
 ### Steps to make a new release:
 
-1) Create a release branch from master named `version_X.X.X`
-2) Update change log with the new version.
-3) Update NIPTool/__init__.py with the new version.
-4) Make a PR to master,
-	- Name PR `release version X.X.X`
-	- Justify if its a patch/minor/major version bump
-	- Paste the latest changelog to the text body
-	- get it approved and merge to master. **Dont delete the release branch!**
-5) Make a [new release](https://github.com/Clinical-Genomics/NIPTool/releases/new).
-	- Name tag version as `vX.X.X`
-	- Set target to the release branch
-	- Make descriptive title
-	- Paste latest changelog to the text body
-	- Release!
+1) Get you PR approved.
+2) Append the version bump to PR title. Eg. __Update README__ becomes __Update Readme (patch)__
+3) Select __squash and merge__
+4) Write a change log comment.
+5) Merge.
+
+	
+### Deploying to staging
+
+Opening pull requests in Statina repository will enable a Github Action to build containers and publish to 
+[statina-stage dockerhub](https://hub.docker.com/repository/docker/clinicalgenomics/statina-stage) with each commit.
+
+Two tags will be published: one with the name of the branch and another tagged "latest".
+
+
+Steps to test current branch on staging:
+
+`ssh firstname.lastname@cg-vm1.scilifelab.se`
+
+`sudo -iu hiseq.clinical`
+
+`ssh localhost`
+  
+If you made changes to internal app : `systemctl --user restart statina.target` 
+
+Your branch should be deployed to staging at https://statina-stage.scilifelab.se 
+
+If for some reason you cannot access the application at given address, check status of the container: `systemctl --user status statinaApp.service`
 
 ### Deploying to production
 
-Use `update-nipt-prod.sh` script to update production both on Hasta and clinical-db. **Please follow the development guide and `servers` repo when doing so. It is also important to keep those involved informed.**
+Use `update-statina.sh` script to update production both on Hasta and CGVS. 
+**Please follow the development guide and `servers` repo when doing so. It is also important to keep those involved informed.**
 
 ## Back End
-The NIPT database is a Mongo database consisting of following collections:
+The Statina database is a Mongo database consisting of following collections:
 
 - **batch** - holds batch level information.
 - **sample** - holds sample level information.
 - **user** - holds user names, emails and roles.
 
-The database is loaded through the CLI with data generated by the [FluFFyPipe](https://github.com/Clinical-Genomics/fluffy).
-
-## CLI
-The CLI has two base commands - load and run. The load command is for loading batch and sample data into the nipt database, and the run command is for running the web application.
-
-### Load
+The database is loaded through the CLI with data generated by the [FluFFyPipe][Fluffy]
 
 
-```
-Usage: nipt -c <config.yaml> load batch  [OPTIONS] ...
-```
-
-
-
-### Run
-```
-Usage: nipt run [OPTIONS] ...
-
-```
+[Fluffy]: https://github.com/Clinical-Genomics/fluffy
+[WisecondorX]: https://github.com/CenterForMedicalGeneticsGhent/WisecondorX
+[docker-hub]: https://hub.docker.com/repository/docker/clinicalgenomics/statina

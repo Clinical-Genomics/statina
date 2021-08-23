@@ -1,0 +1,95 @@
+{% extends 'layout/layout.html' %}
+{% include 'layout/navigation.html' %}
+{% block body %}
+
+<div class="container-fluid">
+    {% include 'batch/header.html' %}
+    <div class="tab-content">
+        <div class="tab-pane fade in active" id='table'>
+            <div class="col-lg-16">
+                <div class="panel panel-default">
+                    <div class="panel-body">
+                        <form action="{{ url_for('include_samples') }}" method="post">
+                            <input type=text name="form_id" value="include_samples" hidden>
+                        <table>
+                            <tbody>
+                                <tr>
+                                    {% if current_user.role in ['RW','admin']  %}
+                                    <p align="right">
+                                        <button type="submit" class="btn btn-light" name="button_id" value="include all samples"> Include all and Save</button>
+                                        <input type="submit" class="btn btn-light" name="button_id" value="Save">
+                                    </p>
+                                    {% endif %}
+                                </tr>
+                                <tr>
+                                    <input type=text name="current_user" value="{{current_user.name}}" hidden>
+                                </tr>
+                            </tbody>
+                        </table>
+
+                                <table id="batch_table" class="table table-bordered table-hover  table-wrapper-scroll-y tableFixHead" >
+                                    <thead>
+                                        <tr>
+                                            <th>Sample Name</th>
+                                            <th>Zscore13</th>
+                                            <th>Zscore18</th>
+                                            <th>Zscore21</th>
+                                            <th>ZscoreX</th>
+                                            <th>FFPF(%)</th>
+                                            <th>FFX(%)</th>
+                                            <th>FFY(%)</th>
+                                            <th>Sex</th>
+                                            <th>CNVSegment</th>
+                                            <th><a href="#" data-toggle="tooltip" data-placement="bottom" title="Warning for chomosome abnormality. Automatically generated. Based on pre defined Zscore and Fetal Fraction trsholds">Warning</a></th>
+                                            <th>QC-Flagg</th>
+                                            <th><a href="#" data-toggle="tooltip" data-placement="bottom" title="Chomosome abnormalies. Manually classified by user through the sample page">Status</a></th>
+                                            <th>Download</th>
+                                            <th><a href="#" data-toggle="tooltip" data-placement="bottom" title="Samples checked in the 'Include' column are added to the validation sample set for comparison. Check the checkboxes for samples to include and save. If all samples are ok, just press 'set all OK'.">Include</a></th>
+                                            <th>Comment</th>
+                                            <th>Last Change</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for sample in sample_info %}
+                                        <input type=text name="samples" value="{{ sample.sample_id }}" hidden>
+                                        <tr>
+                                            <td width="10%"> <a href={{ url_for('sample', sample_id=sample.sample_id) }}>{{ sample.sample_id }}</a></td>
+                                            <td width="3%" class = "{{ sample.warnings.Zscore_13}}">{{ sample.Zscore_13 }}</td>
+                                            <td width="3%" class = "{{ sample.warnings.Zscore_18}}">{{ sample.Zscore_18 }}</td>
+                                            <td width="3%" class = "{{ sample.warnings.Zscore_21}}">{{ sample.Zscore_21 }}</td>
+                                            <td width="3%" class = "{{ sample.warnings.Zscore_X}}">{{ sample.Zscore_X }}</td>
+                                            <td width="3%" class = "{{sample.warnings.FF_Formatted}}">{{sample.FF_Formatted}}</td>
+                                            <td width="3%" class = "default">{{sample.FFX}}</td>
+                                            <td width="3%" class =  "{{sample.warnings.FFY}}">{{sample.FFY}}</td>
+                                            <td width="3%" class = "default">{{sample.sex}}</td>
+                                            <td width="3%" class = "default">{{sample.CNVSegment}}</td>
+                                            <td width="3%"><p> <small>{{ sample.text_warning }}</small></p></td>
+                                            <td width="3%" class = "default">{{sample.QCFlag}}</td>
+                                            <td><p> <small>{{ sample.status }}</small></p></td>
+                                            <td><a class="dropdown-item" href="{{ url_for('sample_download', file_id='segmental_calls', sample_id=sample.sample_id) }}">segmental calls</a></td>
+                                            {% if current_user.role in ['RW','admin']  %}
+                                            <td width="1%" {% if sample.include %}class="success"{% endif %}> <input type="checkbox" name="include_{{ sample.sample_id }}" {% if sample.include %}checked
+                                            {% endif %}></td>
+                                            <td width="18%">
+                                                <div class="form-group">
+                                                    <textarea class="form-control" rows="1" name = "comment_{{ sample.sample_id }}" >{{sample.comment}}</textarea>
+                                                </div>
+                                            </td>
+                                            {% else %}
+                                            <td width="1%" {% if sample.include %}class="success"{% endif %}>{{sample.include }}</td>
+                                            <td width="18%">{{sample.comment}}</td>
+                                            {% endif %}
+                                            <td ><small>{{sample.change_include_date}}</small></td>
+                                        </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div> <!--container-->
+</div>
+{% endblock %}

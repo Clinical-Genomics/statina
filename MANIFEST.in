@@ -1,2 +1,2 @@
-include NIPTool/server/templates/*.html
-include NIPTool/server/templates/*/*.html
+include statina/server/templates/*.html
+include statina/server/templates/*/*.html

@@ -1,5 +1,5 @@
-from NIPTool import __version__ as version
-from setuptools import setup, find_packages
+from setuptools import find_packages, setup
+
 
 try:
     with open("requirements.txt", "r") as f:
@@ -12,19 +12,21 @@ with open("README.md", "r") as fh:
     long_description = fh.read()
 
 setup(
-    name="NIPTool",
-    version=version,
+    name="statina",
+    version="1.5.0",
     description="NIPT data storage and visualisation",
     long_description=long_description,
     long_description_content_type="text/markdown",
-    url="https://github.com/Clinical-Genomics/NIPTool",
+    url="https://github.com/Clinical-Genomics/statina",
     author="Maya Brandi",
     author_email="maya.brandi@scilifelab.se",
     install_requires=install_requires,
     packages=find_packages(),
     include_package_data=True,
     zip_safe=False,
-    entry_points={"console_scripts": ["nipt=NIPTool.commands:cli"],},
+    entry_points={
+        "console_scripts": ["statina=statina.commands:cli"],
+    },
     classifiers=[
         "Programming Language :: Python :: 3",
         "License :: OSI Approved :: MIT License",

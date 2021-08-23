@@ -56,5 +56,5 @@ def internal(version: str) -> FastAPI:
     return internal_app
 
 
-external_v1_app = external("v1")
-internal_v1_app = internal("v1")
+external_app = external("v1")
+internal_app = internal("v1")

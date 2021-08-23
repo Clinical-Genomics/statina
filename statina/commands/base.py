@@ -42,7 +42,7 @@ def serve_command(reload: bool, api: str, version: str):
 
     This command will serve the user interface (external) as default
     """
-    app = f"statina.main:{api}_{version}_app"
+    app = f"statina.main:{api}_app"
     LOG.info("Running %s api on host:%s and port:%s", api, settings.host, settings.port)
     uvicorn.run(app=app, host=settings.host, port=settings.port, reload=reload)
 

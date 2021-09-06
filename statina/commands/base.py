@@ -35,8 +35,9 @@ def cli(context: click.Context):
 @click.option(
     "--api", default="external", type=click.Choice(["external", "internal"]), show_default=True
 )
+@click.option("--version", default="v1", type=click.Choice(["v1", "v2"]), show_default=True)
 @click.option("--reload", is_flag=True)
-def serve_command(reload: bool, api: str):
+def serve_command(reload: bool, api: str, version: str):
     """Serve the Statina app for testing purpose.
 
     This command will serve the user interface (external) as default

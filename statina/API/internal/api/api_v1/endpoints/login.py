@@ -1,4 +1,5 @@
 import datetime
+import logging
 from typing import Optional
 
 from fastapi import APIRouter, Depends, HTTPException
@@ -21,11 +22,14 @@ credentials_exception = HTTPException(
     detail="Could not validate credentials",
     headers={"WWW-Authenticate": "Bearer"},
 )
+LOG = logging.getLogger(__name__)
 
 
 async def get_current_user(token: str = Depends(oauth2_scheme)):
     try:
         payload = jwt.decode(token, settings.secret_key, algorithms=settings.algorithm)
+        print(payload)
+        LOG.info(payload)
         username: str = payload.get("sub")
         if username is None:
             raise credentials_exception

@@ -1,6 +1,7 @@
 from fastapi import FastAPI
 from fastapi.responses import RedirectResponse, Response
 from fastapi import Request
+from fastapi.middleware.cors import CORSMiddleware
 
 from statina.exeptions import CredentialsError
 
@@ -13,11 +14,13 @@ internal_versions = {"v1": internal_api_v1}
 
 def external(version: str) -> FastAPI:
     api = external_versions[version]
-    external_app = FastAPI(
-        servers=[
-            {"url": "https://nipttol-stage.scilifelab.se", "description": "Staging environment"}
-        ],
-        root_path_in_servers=False,
+    external_app = FastAPI()
+    external_app.add_middleware(
+        CORSMiddleware,
+        allow_origins=["*"],
+        allow_credentials=True,
+        allow_methods=["*"],
+        allow_headers=["*"],
     )
 
     @external_app.exception_handler(CredentialsError)
@@ -41,6 +44,13 @@ def external(version: str) -> FastAPI:
 def internal(version: str) -> FastAPI:
     api = internal_versions[version]
     internal_app = FastAPI()
+    internal_app.add_middleware(
+        CORSMiddleware,
+        allow_origins=["*"],
+        allow_credentials=True,
+        allow_methods=["*"],
+        allow_headers=["*"],
+    )
     internal_app.include_router(api.insert.router, prefix="/insert", tags=["insert"])
     internal_app.include_router(api.login.router, prefix="/login", tags=["login"])
     internal_app.include_router(

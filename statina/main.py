@@ -15,13 +15,6 @@ internal_versions = {"v1": internal_api_v1}
 def external(version: str) -> FastAPI:
     api = external_versions[version]
     external_app = FastAPI()
-    external_app.add_middleware(
-        CORSMiddleware,
-        allow_origins=["*"],
-        allow_credentials=True,
-        allow_methods=["*"],
-        allow_headers=["*"],
-    )
 
     @external_app.exception_handler(CredentialsError)
     async def exception_handler(request: Request, exc: CredentialsError) -> Response:

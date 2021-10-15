@@ -58,6 +58,17 @@ def authenticate_user(username: str, password: str) -> Optional[User]:
     return user
 
 
+def find_user(username: str) -> Optional[User]:
+    adapter: StatinaAdapter = get_nipt_adapter()
+    user: User = find.user(adapter=adapter, user_name=username)
+
+    if not user:
+        return None
+    if user.role == "inactive":
+        return None
+    return user
+
+
 def create_access_token(
     username: str, form_data: OAuth2PasswordRequestForm, expires_delta: Optional[timedelta] = None
 ) -> str:

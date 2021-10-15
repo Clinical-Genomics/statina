@@ -18,7 +18,7 @@ uvicorn
 uvloop
 httptools
 gunicorn
-python-jose
+python-jose[cryptography]
 bcrypt
 numpy
 aiofiles

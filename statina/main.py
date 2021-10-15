@@ -42,7 +42,7 @@ def internal(version: str) -> FastAPI:
     api = internal_versions[version]
     internal_app = FastAPI()
     internal_app.include_router(api.insert.router, prefix="/insert", tags=["insert"])
-    internal_app.include_router(api.login.router, prefix="/login", tags=["login"])
+    internal_app.include_router(api.login.router)
     internal_app.include_router(
         api.batches.router,
         prefix="/batches",

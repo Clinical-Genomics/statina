@@ -4,6 +4,11 @@ import secrets
 
 from pydantic import BaseModel, EmailStr
 
+inactive_roles = [
+    "unconfirmed",
+    "inactive",
+]
+
 
 class User(BaseModel):
     username: str

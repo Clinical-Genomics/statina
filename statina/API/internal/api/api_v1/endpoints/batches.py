@@ -63,7 +63,7 @@ def batch(
                 "batch": find.batch(batch_id=batch_id, adapter=adapter),
                 "sample_info": [Sample(**sample.dict()) for sample in samples],
                 "page_id": "batches",
-                "current_user": user,
+                "current_user": current_user,
             }
         ),
     )

@@ -49,33 +49,25 @@ def authenticate_user(username: str, password: str) -> Optional[User]:
     adapter: StatinaAdapter = get_nipt_adapter()
     user: User = find.user(adapter=adapter, user_name=username)
 
-    if not user:
-        return None
-    if user.role == "inactive":
-        return None
-    if not verify_password(password, user.hashed_password):
-        return None
-    return user
+    if user and user.role != "inactive" and verify_password(password, user.hashed_password):
+        return user
+    return None
 
 
 def find_user(username: str) -> Optional[User]:
     adapter: StatinaAdapter = get_nipt_adapter()
     user: User = find.user(adapter=adapter, user_name=username)
 
-    if not user:
-        return None
-    if user.role == "inactive":
-        return None
-    return user
+    if user and user.role != "inactive":
+        return user
+    return None
 
 
 def create_access_token(
-    username: str, form_data: OAuth2PasswordRequestForm, expires_delta: Optional[timedelta] = None
+    username: str,
+    form_data: OAuth2PasswordRequestForm,
+    expires_delta: Optional[timedelta] = timedelta(minutes=15),
 ) -> str:
-    to_encode = {"sub": username, "scopes": form_data.scopes}
-    if expires_delta:
-        expire = datetime.utcnow() + expires_delta
-    else:
-        expire = datetime.utcnow() + timedelta(minutes=15)
-    to_encode.update({"exp": expire})
+    expire = datetime.utcnow() + timedelta(minutes=settings.access_token_expire_minutes)
+    to_encode = {"sub": form_data.username, "scopes": form_data.scopes, "exp": expire}
     return jwt.encode(to_encode, settings.secret_key, algorithm=settings.algorithm)

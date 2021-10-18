@@ -21,7 +21,7 @@ class Settings(BaseSettings):
     secret_key: str = "dummy"
     algorithm: str = "ABC"
     host: str = "localhost"
-    access_token_expire_minutes: int = 60
+    access_token_expire_minutes: int = 15
     port: int = 8000
 
     class Config:

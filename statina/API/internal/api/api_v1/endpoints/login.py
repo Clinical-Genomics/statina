@@ -58,7 +58,5 @@ def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends()):
     user: User = authenticate_user(form_data.username, form_data.password)
     if not user:
         raise credentials_exception
-    access_token = create_access_token(
-        form_data=form_data,
-    )
+    access_token = create_access_token(form_data=form_data, username=user.username)
     return {"access_token": access_token, "token_type": "bearer"}

@@ -50,12 +50,11 @@ async def get_current_active_user(current_user: User = Depends(get_current_user)
     return current_user
 
 
-@router.get("/users/me/", response_model=TokenData)
+@router.get("/users/me/")
 async def read_users_me(credentials: HTTPAuthorizationCredentials = Security(security)):
     token = credentials.credentials
     payload = jwt.decode(token, settings.secret_key, algorithms=settings.algorithm)
-    token_data = TokenData(username=payload.get("sub"))
-    return token_data
+    return payload
 
 
 @router.post("/token", response_model=Token)

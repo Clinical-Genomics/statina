@@ -12,6 +12,7 @@ from statina.API.external.api.api_v1.templates.email.confirmation import (
     CONFIRMATION_MESSAGE_TEMPLATE,
 )
 from statina.API.external.api.deps import get_password_hash, get_current_user
+from statina.API.internal.api.api_v1.endpoints.login import get_current_active_user
 from statina.adapter import StatinaAdapter
 from statina.config import get_nipt_adapter, templates, email_settings
 from statina.crud.find import find
@@ -23,28 +24,20 @@ from statina.models.server.new_user import NewUser
 from sendmail_container import FormDataRequest
 from statina.tools.email import send_email
 
-user = {}
 
-
-@router.post("/add_new_user")
-async def add_new_user(
-    request: Request,
+@router.post("/register_user")
+async def register_user(
+    new_user: NewUser,
     background_tasks: BackgroundTasks,
     adapter: StatinaAdapter = Depends(get_nipt_adapter),
 ):
     """Redirects back to index, if invalid username or password"""
-    form = await request.form()
-    new_user = NewUser(**form)
-
     user = User(
         **new_user.dict(),
         added=datetime.datetime.now(),
         role="unconfirmed",
         hashed_password=get_password_hash(new_user.password),
     )
-
-    response = RedirectResponse("new_user")
-
     try:
         insert_user(adapter=adapter, user=user)
         confirmation_link = (
@@ -64,51 +57,20 @@ async def add_new_user(
             ),
         )
         background_tasks.add_task(send_email, email_form)
-        response.set_cookie(key="info_type", value="success")
-        response.set_cookie(
-            key="user_info",
-            value=f"Your user account has been created and a validation email has been sent to your email address.",
-        )
+    except Exception as e:
+        return JSONResponse(f"Could not insert, {e}")
 
-    except Exception as error:
-        response.set_cookie(key="info_type", value="danger")
-        response.set_cookie(
-            key="user_info", value=f"Error occurred when creating new user. Please try again later"
-        )
-        pass
-
-    return response
-
-
-@router.get("/new_user")
-def new_user(request: Request):
-    """Log in view."""
-    return templates.TemplateResponse(
-        "new_user.html", context={"request": request, "current_user": ""}
-    )
-
-
-@router.post("/new_user")
-def new_user(request: Request):
-    """Log in view."""
-    return JSONResponse(
-        content=jsonable_encoder(
-            {
-                "current_user": "",
-                "info_type": request.cookies.get("info_type"),
-                "user_info": request.cookies.get("user_info"),
-            }
-        ),
-    )
+    return JSONResponse(content=jsonable_encoder(user))
 
 
 @router.get("/users")
 def users(
     request: Request,
+    current_user: User = Depends(get_current_active_user),
     adapter: StatinaAdapter = Depends(get_nipt_adapter),
 ):
     """Admin view with table of all users."""
-    if user.role != "admin":
+    if current_user.role != "admin":
         raise CredentialsError(message="Only admin users can access the users page")
 
     user_list: List[User] = find.users(adapter=adapter)
@@ -117,28 +79,7 @@ def users(
             {
                 "users": user_list,
                 "page_id": "users",
-                "current_user": user,
-            }
-        ),
-    )
-
-
-@router.post("/users")
-def users(
-    request: Request,
-    adapter: StatinaAdapter = Depends(get_nipt_adapter),
-):
-    """Admin view with table of all users."""
-    if user.role != "admin":
-        CredentialsError(message="Only admin users can access the users page")
-
-    user_list: List[User] = find.users(adapter=adapter)
-    return JSONResponse(
-        content=jsonable_encoder(
-            {
-                "users": user_list,
-                "page_id": "users",
-                "current_user": user,
+                "current_user": current_user,
             }
         ),
     )

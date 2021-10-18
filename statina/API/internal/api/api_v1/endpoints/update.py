@@ -1,16 +1,19 @@
 import logging
 from datetime import datetime
 from typing import Iterable
+import secrets
 
 from fastapi import APIRouter, Depends, Request, BackgroundTasks
 from fastapi.responses import RedirectResponse
 from sendmail_container import FormDataRequest
 from starlette.datastructures import FormData
+from starlette.responses import JSONResponse
 
 from statina.API.external.api.api_v1.templates.email.account_activated import (
     ACTIVATION_MESSAGE_TEMPLATE,
 )
 from statina.API.external.api.api_v1.templates.email.admin_mail import ADMIN_MESSAGE_TEMPLATE
+from statina.API.internal.api.api_v1.endpoints.login import get_current_active_user
 from statina.adapter import StatinaAdapter
 from statina.API.external.api.deps import get_current_user
 from statina.API.external.constants import CHROM_ABNORM
@@ -34,14 +37,11 @@ async def validate_user(
     adapter: StatinaAdapter = Depends(get_nipt_adapter),
 ):
     update_user: User = find.user(user_name=username, adapter=adapter)
-    response = RedirectResponse("/batches")
-    if not update_user:
-        response.set_cookie(key="info_type", value="danger")
-        response.set_cookie(
-            key="user_info",
-            value="No such user in the database",
-        )
-    elif update_user.verification_hex == verification_hex and update_user.role == "unconfirmed":
+    if (
+        update_user
+        and update_user.role == "unconfirmed"
+        and secrets.compare_digest(update_user.verification_hex, verification_hex)
+    ):
         try:
             update_user.role = "inactive"
             update.update_user(adapter=adapter, user=update_user)
@@ -58,17 +58,10 @@ async def validate_user(
                 ),
             )
             background_tasks.add_task(send_email, email_form)
-            response.set_cookie(
-                key="user_info",
-                value="Email confirmed! Your account will be activated after manual review",
-            )
         except Exception as e:
-            response.set_cookie(key="info_type", value="danger")
-            response.set_cookie(
-                key="user_info",
-                value=f"Backend error ({e.__class__.__name__})! Your account will be activated after manual review",
-            )
-    return response
+            return JSONResponse(f"Could not validate user")
+
+    return JSONResponse(f"New status: {update_user.role}")
 
 
 @router.post("/update_user")
@@ -76,9 +69,9 @@ async def update_user(
     request: Request,
     background_tasks: BackgroundTasks,
     adapter: StatinaAdapter = Depends(get_nipt_adapter),
-    user: User = Depends(get_current_user),
+    current_user: User = Depends(get_current_active_user),
 ):
-    if user.role != "admin":
+    if current_user.role != "admin":
         return RedirectResponse(request.headers.get("referer"))
     form = await request.form()
     update_user: User = find.user(email=form["user_email"], adapter=adapter)
@@ -105,9 +98,9 @@ async def update_user(
 async def delete_batch(
     request: Request,
     adapter: StatinaAdapter = Depends(get_nipt_adapter),
-    user: User = Depends(get_current_user),
+    current_user: User = Depends(get_current_active_user),
 ):
-    if user.role != "admin":
+    if current_user.role != "admin":
         return RedirectResponse(request.headers.get("referer"))
     form = await request.form()
     batches: Iterable[str] = form.getlist("delete")
@@ -119,13 +112,13 @@ async def delete_batch(
 async def set_sample_status(
     request: Request,
     adapter: StatinaAdapter = Depends(get_nipt_adapter),
-    user: User = Depends(get_current_user),
+    current_user: User = Depends(get_current_active_user),
 ):
     """Update the manualy interpreted chromosome abnormality status for a sample."""
 
     form = await request.form()
 
-    if user.role not in ["RW", "admin"]:
+    if current_user.role not in ["RW", "admin"]:
         return RedirectResponse(request.headers.get("referer"))
 
     sample_id: str = form["sample_id"]
@@ -145,7 +138,7 @@ async def set_sample_status(
         )
         time_stamp: str = datetime.now().strftime("%Y/%m/%d %H:%M:%S")
         sample[abnormality_key] = new_abnormality_status
-        sample[f"status_change_{abnormality}"] = f"{user.username} {time_stamp}"
+        sample[f"status_change_{abnormality}"] = f"{current_user.username} {time_stamp}"
 
     update.sample(adapter=adapter, sample=DataBaseSample(**sample))
     return RedirectResponse(request.headers.get("referer"))
@@ -155,13 +148,13 @@ async def set_sample_status(
 async def batch_comment(
     request: Request,
     adapter: StatinaAdapter = Depends(get_nipt_adapter),
-    user: User = Depends(get_current_user),
+    current_user: User = Depends(get_current_active_user),
 ):
     """Update batch comment"""
 
     form = await request.form()
 
-    if user.role not in ["RW", "admin"]:
+    if current_user.role not in ["RW", "admin"]:
         return RedirectResponse(request.headers.get("referer"))
     batch_id: str = form["batch_id"]
     batch: Batch = find.batch(batch_id=batch_id, adapter=adapter)
@@ -177,13 +170,13 @@ async def batch_comment(
 async def sample_comment(
     request: Request,
     adapter: StatinaAdapter = Depends(get_nipt_adapter),
-    user: User = Depends(get_current_user),
+    current_user: User = Depends(get_current_active_user),
 ):
     """Update sample comment"""
 
     form = await request.form()
 
-    if user.role not in ["RW", "admin"]:
+    if current_user.role not in ["RW", "admin"]:
         return RedirectResponse(request.headers.get("referer"))
 
     sample_id: str = form["sample_id"]
@@ -200,21 +193,21 @@ async def sample_comment(
 async def include_samples(
     request: Request,
     adapter: StatinaAdapter = Depends(get_nipt_adapter),
-    user: User = Depends(get_current_user),
+    current_user: User = Depends(get_current_active_user),
 ):
     """Update include status and comment for samples in batch"""
 
     form = await request.form()
 
-    if user.role not in ["RW", "admin"]:
+    if current_user.role not in ["RW", "admin"]:
         return RedirectResponse(request.headers.get("referer"))
 
     button_id = form.get("button_id")
     samples: Iterable[str] = form.getlist("samples")
     if button_id == "include all samples":
-        include_all_samples(samples=samples, adapter=adapter, user=user)
+        include_all_samples(samples=samples, adapter=adapter, user=current_user)
     elif button_id == "Save":
-        save_samples(samples=samples, form=form, adapter=adapter, user=user)
+        save_samples(samples=samples, form=form, adapter=adapter, user=current_user)
 
     return RedirectResponse(request.headers.get("referer"))
 

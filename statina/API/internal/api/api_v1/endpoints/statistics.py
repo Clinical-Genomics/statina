@@ -2,6 +2,7 @@ from fastapi import APIRouter, Depends, Request
 from fastapi.encoders import jsonable_encoder
 from fastapi.responses import JSONResponse
 
+from statina.API.internal.api.api_v1.endpoints.login import get_current_active_user
 from statina.adapter.plugin import StatinaAdapter
 from statina.API.external.api.deps import get_current_user
 from statina.config import get_nipt_adapter
@@ -13,12 +14,11 @@ from statina.crud.find.plots.statistics_plot_data import (
 from statina.models.database import User
 
 router = APIRouter()
-user = {}
 
 
 @router.get("/statistics")
 def statistics(
-    request: Request,
+    current_user: User = Depends(get_current_active_user),
     adapter: StatinaAdapter = Depends(get_nipt_adapter),
 ):
     """Statistics view."""
@@ -45,7 +45,7 @@ def statistics(
     return JSONResponse(
         content=jsonable_encoder(
             dict(
-                current_user=user,
+                current_user=current_user,
                 ticks=list(range(0, nr_batches)),
                 nr_batches=nr_batches,
                 batch_ids=batch_ids,

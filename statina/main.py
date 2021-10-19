@@ -26,6 +26,14 @@ def external(version: str) -> FastAPI:
     async def exception_handler(request: Request, exc: CredentialsError) -> Response:
         return RedirectResponse(url="/")
 
+    external_app.add_middleware(
+        CORSMiddleware,
+        allow_origins=["*"],
+        allow_credentials=True,
+        allow_methods=["*"],
+        allow_headers=["*"],
+    )
+
     external_app.include_router(api.login.router, prefix="/login", tags=["login"])
     external_app.include_router(
         api.batches.router,
@@ -37,6 +45,22 @@ def external(version: str) -> FastAPI:
     external_app.include_router(api.update.router, tags=["update"])
     external_app.include_router(api.download.router, tags=["download"])
     external_app.include_router(api.statistics.router, tags=["statistics"])
+
+    external_app.include_router(external_api_v2.login.router, prefix="v2", tags=["login", "v2"])
+    external_app.include_router(
+        external_api_v2.batches.router,
+        prefix="v2",
+        tags=["batches", "v2"],
+    )
+    external_app.include_router(external_api_v2.sample.router, prefix="v2", tags=["sample", "v2"])
+    external_app.include_router(external_api_v2.update.router, prefix="v2", tags=["update", "v2"])
+    external_app.include_router(
+        external_api_v2.download.router, prefix="v2", tags=["download", "v2"]
+    )
+    external_app.include_router(
+        external_api_v2.statistics.router, prefix="v2", tags=["statistics", "v2"]
+    )
+    external_app.include_router(external_api_v2.user.router, prefix="v2", tags=["user", "v2"])
     return external_app
 
 

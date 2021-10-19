@@ -36,20 +36,12 @@ router = APIRouter()
 
 @router.get("/")
 def batches(
-    current_user: User = Depends(get_current_active_user),
+    current_user: User = Security(get_current_active_user, scopes=["R"]),
     adapter: StatinaAdapter = Depends(get_nipt_adapter),
 ):
     """List of all batches"""
     all_batches: List[Batch] = find.batches(adapter=adapter)
-    return JSONResponse(
-        content=jsonable_encoder(
-            {
-                "batches": all_batches,
-                "current_user": current_user,
-                "page_id": "all_batches",
-            }
-        ),
-    )
+    return JSONResponse(all_batches)
 
 
 @router.post("/batch/")

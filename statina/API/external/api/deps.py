@@ -65,7 +65,12 @@ def find_user(username: str) -> Optional[User]:
 
 def get_user_scopes(username: str) -> list:
     user_obj: Optional[User] = find_user(username=username)
-    return [user_obj.role]
+    if user_obj.role == "admin":
+        return ["R", "RW", "admin"]
+    elif user_obj.role == "RW":
+        return ["R", "RW"]
+    elif user_obj.role == "R":
+        return ["R"]
 
 
 def create_access_token(

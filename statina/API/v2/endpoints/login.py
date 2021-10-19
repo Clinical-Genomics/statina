@@ -14,7 +14,7 @@ from statina.models.database import User
 from statina.models.database.user import inactive_roles
 from statina.models.server.auth import Token, TokenData
 
-router = APIRouter()
+router = APIRouter(prefix="/v2")
 oauth2_scheme = OAuth2PasswordBearer(
     tokenUrl="token",
     scopes={

@@ -1,21 +1,16 @@
 import logging
 from datetime import datetime
-from typing import Iterable, Literal, Optional, List
-import secrets
+from typing import Literal, Optional, List
 
-from fastapi import APIRouter, Depends, Request, BackgroundTasks, Security, Form, Query
-from fastapi.responses import RedirectResponse
+from fastapi import APIRouter, Depends, BackgroundTasks, Security, Form, Query
 from sendmail_container import FormDataRequest
-from starlette.datastructures import FormData
 from starlette.responses import JSONResponse
 
 from statina.API.external.api.api_v1.templates.email.account_activated import (
     ACTIVATION_MESSAGE_TEMPLATE,
 )
-from statina.API.external.api.api_v1.templates.email.admin_mail import ADMIN_MESSAGE_TEMPLATE
 from statina.API.v2.endpoints.login import get_current_active_user
 from statina.adapter import StatinaAdapter
-from statina.API.external.constants import CHROM_ABNORM, STATUSES
 from statina.config import get_nipt_adapter, email_settings
 from statina.crud import update
 from statina.crud.delete import delete_batch
@@ -23,7 +18,7 @@ from statina.crud.find import find
 from statina.models.database import DataBaseSample, User, Batch
 from statina.tools.email import send_email
 
-router = APIRouter()
+router = APIRouter(prefix="/v2")
 
 LOG = logging.getLogger(__name__)
 

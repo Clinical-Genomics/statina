@@ -24,8 +24,7 @@ from typing import Union, List
 from statina.models.database import DataBaseSample, User, Batch
 from statina.parse.batch import validate_file_path
 
-router = APIRouter()
-user = {}
+router = APIRouter(prefix="/v2")
 
 
 def zip_dir(source_dir: Union[str, PathLike]) -> io.BytesIO:

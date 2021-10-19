@@ -26,7 +26,7 @@ import secrets
 from sendmail_container import FormDataRequest
 from statina.tools.email import send_email
 
-router = APIRouter()
+router = APIRouter(prefix="/v2")
 
 LOG = logging.getLogger(__name__)
 

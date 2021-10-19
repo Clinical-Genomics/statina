@@ -16,7 +16,7 @@ from statina.crud.find.plots.zscore_plot_data import (
 from statina.models.database import Batch, DataBaseSample, User
 from statina.models.server.plots.ncv import Zscore131821, ZscoreSamples
 
-router = APIRouter()
+router = APIRouter(prefix="/v2")
 
 
 @router.get("/samples/")

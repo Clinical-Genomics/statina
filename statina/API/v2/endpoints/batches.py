@@ -31,7 +31,7 @@ from statina.models.server.plots.fetal_fraction_sex import SexChromosomeThreshol
 from statina.models.server.sample import Sample
 from statina.parse.batch import get_samples, get_batch
 
-router = APIRouter()
+router = APIRouter(prefix="/v2")
 
 
 @router.get("/batches")

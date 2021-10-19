@@ -1,7 +1,7 @@
 from pathlib import Path
-from typing import Dict, List
+from typing import Dict, List, Optional
 
-from fastapi import APIRouter, Depends, Security
+from fastapi import APIRouter, Depends, Security, Query
 from fastapi.encoders import jsonable_encoder
 from fastapi.responses import JSONResponse
 import statina.crud.find.plots.fetal_fraction_plot_data as get_fetal_fraction
@@ -34,13 +34,15 @@ from statina.parse.batch import get_samples, get_batch
 router = APIRouter()
 
 
-@router.get("/")
+@router.get("/batches")
 def batches(
+    page_size: Optional[int] = Query(5),
+    page_num: Optional[int] = Query(0),
     current_user: User = Security(get_current_active_user, scopes=["R"]),
     adapter: StatinaAdapter = Depends(get_nipt_adapter),
 ):
     """List of all batches"""
-    all_batches: List[Batch] = find.batches(adapter=adapter)
+    all_batches: List[Batch] = find.batches(adapter=adapter, page_size=page_size, page_num=page_num)
     return JSONResponse(all_batches)
 
 

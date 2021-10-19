@@ -21,13 +21,15 @@ router = APIRouter()
 
 @router.get("/samples/")
 def samples(
-    page_size: Optional[int] = Query(0),
+    page_size: Optional[int] = Query(5),
     page_num: Optional[int] = Query(0),
     current_user: User = Security(get_current_active_user, scopes=["R"]),
     adapter: StatinaAdapter = Depends(get_nipt_adapter),
 ):
     """Get sample with id"""
-    samples: List[DataBaseSample] = find.samples(adapter=adapter)
+    samples: List[DataBaseSample] = find.samples(
+        adapter=adapter, page_size=page_size, page_num=page_num
+    )
     return JSONResponse(content=jsonable_encoder(samples))
 
 

@@ -78,7 +78,7 @@ async def register_user(
 
 @router.get("/users/")
 def users(
-    page_size: Optional[int] = Query(0),
+    page_size: Optional[int] = Query(5),
     page_num: Optional[int] = Query(0),
     current_user: User = Security(get_current_active_user, scopes=["admin"]),
     adapter: StatinaAdapter = Depends(get_nipt_adapter),

@@ -79,12 +79,19 @@ def get_batch(
 @router.get("/batch/{batch_id}/samples")
 def batch_samples(
     batch_id: str,
+    page_size: Optional[int] = Query(5),
+    page_num: Optional[int] = Query(0),
     current_user: User = Security(get_current_active_user, scopes=["R"]),
     adapter: StatinaAdapter = Depends(get_nipt_adapter),
 ):
     """Batch view with table of all samples in the batch."""
 
-    return JSONResponse(find.batch_samples(batch_id=batch_id, adapter=adapter), status_code=200)
+    return JSONResponse(
+        find.batch_samples(
+            batch_id=batch_id, adapter=adapter, page_size=page_size, page_num=page_num
+        ),
+        status_code=200,
+    )
 
 
 @router.get("/{batch_id}/{ncv}")

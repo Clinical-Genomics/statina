@@ -1,6 +1,7 @@
 from fastapi import FastAPI
 from fastapi.responses import RedirectResponse, Response
 from fastapi import Request
+from fastapi.middleware.cors import CORSMiddleware
 
 from statina.exeptions import CredentialsError
 
@@ -41,6 +42,13 @@ def external(version: str) -> FastAPI:
 
 def internal(version: str) -> FastAPI:
     internal_app = FastAPI()
+    internal_app.add_middleware(
+        CORSMiddleware,
+        allow_origins=["*"],
+        allow_credentials=True,
+        allow_methods=["*"],
+        allow_headers=["*"],
+    )
     internal_app.include_router(external_api_v2.login.router)
     internal_app.include_router(
         external_api_v2.batches.router,

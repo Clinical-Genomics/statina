@@ -1,7 +1,8 @@
 import datetime
+import logging
 from typing import List
 
-from fastapi import Depends, Security
+from fastapi import Depends, Security, APIRouter
 from fastapi.encoders import jsonable_encoder
 from starlette.background import BackgroundTasks
 from starlette.requests import Request
@@ -23,6 +24,10 @@ from statina.models.server.new_user import NewUser
 
 from sendmail_container import FormDataRequest
 from statina.tools.email import send_email
+
+router = APIRouter()
+
+LOG = logging.getLogger(__name__)
 
 
 @router.post("/register_user")

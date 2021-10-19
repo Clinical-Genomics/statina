@@ -38,7 +38,7 @@ async def get_current_user(security_scopes: SecurityScopes, token: str = Depends
         username: str = payload.get("sub")
         if username is None:
             raise credentials_exception
-        token_data = TokenData(username=username)
+        token_data = TokenData(username=username, scopes=payload.get("scopes", []))
     except JWTError:
         raise credentials_exception
     user = find_user(username=token_data.username)

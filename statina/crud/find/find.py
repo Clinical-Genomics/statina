@@ -29,10 +29,10 @@ def user(
     return User(**raw_user)
 
 
-def samples(adapter: StatinaAdapter) -> List[DataBaseSample]:
+def samples(adapter: StatinaAdapter, page_size: int = 0, page_num: int = 0) -> List[DataBaseSample]:
     """Return all batches from the batch collection"""
-
-    raw_samples: Iterable[dict] = adapter.sample_collection.find()
+    skip, limit = paginate(page_size=page_size, page_num=page_num)
+    raw_samples: Iterable[dict] = adapter.sample_collection.find().skip(skip).limit(limit)
     return parse_obj_as(List[DataBaseSample], list(raw_samples))
 
 
@@ -55,10 +55,10 @@ def batch(adapter: StatinaAdapter, batch_id: str) -> Optional[Batch]:
     return Batch(**raw_batch)
 
 
-def batches(adapter: StatinaAdapter) -> List[Batch]:
+def batches(adapter: StatinaAdapter, page_size: int = 0, page_num: int = 0) -> List[Batch]:
     """Return all batches from the batch collection"""
-
-    raw_batches: Iterable[dict] = adapter.batch_collection.find()
+    skip, limit = paginate(page_size=page_size, page_num=page_num)
+    raw_batches: Iterable[dict] = adapter.batch_collection.find().skip(skip).limit(limit)
     return parse_obj_as(List[Batch], list(raw_batches))
 
 

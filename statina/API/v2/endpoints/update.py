@@ -28,42 +28,6 @@ router = APIRouter()
 LOG = logging.getLogger(__name__)
 
 
-@router.get("/validate_user")
-async def validate_user(
-    username: str,
-    verification_hex: str,
-    background_tasks: BackgroundTasks,
-    adapter: StatinaAdapter = Depends(get_nipt_adapter),
-):
-    update_user: User = find.user(user_name=username, adapter=adapter)
-    if not update_user:
-        return JSONResponse(content="No such user", status_code=404)
-    if update_user.role != "unconfirmed":
-        return JSONResponse(content="User already confirmed", status_code=400)
-    if not secrets.compare_digest(update_user.verification_hex, verification_hex):
-        return JSONResponse(content="URL is wrong or token has expired", status_code=401)
-    try:
-        update_user.role = "inactive"
-        update.update_user(adapter=adapter, user=update_user)
-        email_form = FormDataRequest(
-            sender_prefix=email_settings.sender_prefix,
-            email_server_alias=email_settings.email_server_alias,
-            request_uri=email_settings.mail_uri,
-            recipients=email_settings.admin_email,
-            mail_title="New user request",
-            mail_body=ADMIN_MESSAGE_TEMPLATE.format(
-                username=update_user.username,
-                user_email=update_user.email,
-                website_uri=email_settings.website_uri,
-            ),
-        )
-        background_tasks.add_task(send_email, email_form)
-        return JSONResponse(content=f"New status: {update_user.role}", status_code=202)
-    except Exception as e:
-        LOG.error(e)
-        return JSONResponse(content="Server could not verify user", status_code=500)
-
-
 @router.put("/user/{username}")
 async def update_user_role(
     username: str,

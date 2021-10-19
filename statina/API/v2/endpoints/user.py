@@ -1,7 +1,7 @@
 import datetime
 from typing import List
 
-from fastapi import Depends
+from fastapi import Depends, Security
 from fastapi.encoders import jsonable_encoder
 from starlette.background import BackgroundTasks
 from starlette.requests import Request
@@ -65,20 +65,16 @@ async def register_user(
 @router.get("/users")
 def users(
     request: Request,
-    current_user: User = Depends(get_current_active_user),
+    current_user: User = Security(get_current_active_user, scopes=["admin"]),
     adapter: StatinaAdapter = Depends(get_nipt_adapter),
 ):
     """Admin view with table of all users."""
-    if current_user.role != "admin":
-        raise CredentialsError(message="Only admin users can access the users page")
-
     user_list: List[User] = find.users(adapter=adapter)
     return JSONResponse(
         content=jsonable_encoder(
             {
                 "users": user_list,
                 "page_id": "users",
-                "current_user": current_user,
             }
         ),
     )

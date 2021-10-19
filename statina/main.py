@@ -52,6 +52,7 @@ def internal(version: str) -> FastAPI:
     internal_app.include_router(external_api_v2.update.router, tags=["update"])
     internal_app.include_router(external_api_v2.download.router, tags=["download"])
     internal_app.include_router(external_api_v2.statistics.router, tags=["statistics"])
+    internal_app.include_router(external_api_v2.user.router, tags=["user"])
     return internal_app
 
 

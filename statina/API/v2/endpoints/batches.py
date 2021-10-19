@@ -1,14 +1,14 @@
 from pathlib import Path
 from typing import Dict, List
 
-from fastapi import APIRouter, Depends, Request, Security
+from fastapi import APIRouter, Depends, Security
 from fastapi.encoders import jsonable_encoder
 from fastapi.responses import JSONResponse
 import statina.crud.find.plots.fetal_fraction_plot_data as get_fetal_fraction
 from statina.API.v2.endpoints.login import get_current_active_user
 from statina.adapter import StatinaAdapter
-from statina.API.external.constants import TRISOMI_TRESHOLDS, COLORS
-from statina.config import get_nipt_adapter, templates
+from statina.API.external.constants import TRISOMI_TRESHOLDS
+from statina.config import get_nipt_adapter
 from statina.crud.find import find
 from statina.crud.find.plots.coverage_plot_data import (
     get_box_data_for_coverage_plot,
@@ -102,8 +102,6 @@ def Zscore(
 ):
     """Batch view with with Zscore plot"""
 
-    batch: Batch = find.batch(batch_id=batch_id, adapter=adapter)
-
     return JSONResponse(
         content=jsonable_encoder(
             dict(
@@ -124,8 +122,6 @@ def fetal_fraction_XY(
     adapter: StatinaAdapter = Depends(get_nipt_adapter),
 ):
     """Batch view with fetal fraction (X against Y) plot"""
-
-    batch: Batch = find.batch(batch_id=batch_id, adapter=adapter)
 
     cases = get_fetal_fraction.samples(adapter=adapter, batch_id=batch_id)
     control: FetalFractionSamples = get_fetal_fraction.samples(

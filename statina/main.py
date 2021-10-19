@@ -44,7 +44,6 @@ def internal(version: str) -> FastAPI:
     internal_app.include_router(external_api_v2.login.router)
     internal_app.include_router(
         external_api_v2.batches.router,
-        prefix="/batches",
         tags=["batches"],
     )
     internal_app.include_router(external_api_v2.sample.router, tags=["sample"])

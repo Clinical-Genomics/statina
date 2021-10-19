@@ -6,7 +6,6 @@ from fastapi.responses import JSONResponse
 
 from statina.API.v2.endpoints.login import get_current_active_user
 from statina.adapter import StatinaAdapter
-from statina.API.external.constants import CHROM_ABNORM, STATUS_CLASSES, STATUS_COLORS
 from statina.config import get_nipt_adapter
 from statina.crud.find import find
 from statina.crud.find.plots.zscore_plot_data import (
@@ -16,7 +15,6 @@ from statina.crud.find.plots.zscore_plot_data import (
 )
 from statina.models.database import Batch, DataBaseSample, User
 from statina.models.server.plots.ncv import Zscore131821, ZscoreSamples
-from statina.models.server.sample import Sample
 
 router = APIRouter()
 

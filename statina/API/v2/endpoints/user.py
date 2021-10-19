@@ -2,10 +2,10 @@ import datetime
 import logging
 from typing import List, Optional
 
-from fastapi import Depends, Security, APIRouter, Query
+from fastapi import Depends, Security, APIRouter, Query, Form
 from fastapi.encoders import jsonable_encoder
+from pydantic import EmailStr
 from starlette.background import BackgroundTasks
-from starlette.requests import Request
 from starlette.responses import JSONResponse
 
 from statina.API.external.api.api_v1.templates.email.confirmation import (
@@ -17,8 +17,9 @@ from statina.adapter import StatinaAdapter
 from statina.config import get_nipt_adapter, email_settings
 from statina.crud.find import find
 from statina.crud.insert import insert_user
+from statina.exeptions import MissMatchingPasswordError
 from statina.models.database import User
-from statina.models.server.new_user import NewUser
+import secrets
 
 from sendmail_container import FormDataRequest
 from statina.tools.email import send_email
@@ -30,15 +31,22 @@ LOG = logging.getLogger(__name__)
 
 @router.post("/register")
 async def register_user(
-    new_user: NewUser,
     background_tasks: BackgroundTasks,
+    email: EmailStr = Form(...),
+    username: str = Form(...),
+    password_repeated: str = Form(...),
+    password: str = Form(...),
     adapter: StatinaAdapter = Depends(get_nipt_adapter),
 ):
+    if not secrets.compare_digest(password, password_repeated):
+        raise MissMatchingPasswordError
+
     user = User(
-        **new_user.dict(),
+        username=username,
+        email=email,
         added=datetime.datetime.now(),
         role="unconfirmed",
-        hashed_password=get_password_hash(new_user.password),
+        hashed_password=get_password_hash(password),
     )
     try:
         insert_user(adapter=adapter, user=user)
@@ -60,9 +68,10 @@ async def register_user(
         )
         background_tasks.add_task(send_email, email_form)
     except Exception as e:
-        return JSONResponse(f"Could not insert, {e}")
+        LOG.error(e)
+        return JSONResponse(f"Could not register user")
 
-    return JSONResponse(content=jsonable_encoder(user))
+    return JSONResponse(content=user.json(exclude={"role", "hashed_password", "verification_hex"}))
 
 
 @router.get("/users/")

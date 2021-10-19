@@ -73,7 +73,9 @@ def get_batch(
 ):
     """Batch view with table of all samples in the batch."""
 
-    return JSONResponse(find.batch(batch_id=batch_id, adapter=adapter), status_code=200)
+    return JSONResponse(
+        jsonable_encoder(find.batch(batch_id=batch_id, adapter=adapter)), status_code=200
+    )
 
 
 @router.get("/batch/{batch_id}/samples")
@@ -87,8 +89,10 @@ def batch_samples(
     """Batch view with table of all samples in the batch."""
 
     return JSONResponse(
-        find.batch_samples(
-            batch_id=batch_id, adapter=adapter, page_size=page_size, page_num=page_num
+        jsonable_encoder(
+            find.batch_samples(
+                batch_id=batch_id, adapter=adapter, page_size=page_size, page_num=page_num
+            )
         ),
         status_code=200,
     )

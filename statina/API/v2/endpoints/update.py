@@ -13,9 +13,8 @@ from statina.API.external.api.api_v1.templates.email.account_activated import (
     ACTIVATION_MESSAGE_TEMPLATE,
 )
 from statina.API.external.api.api_v1.templates.email.admin_mail import ADMIN_MESSAGE_TEMPLATE
-from statina.API.internal.api.api_v1.endpoints.login import get_current_active_user
+from statina.API.v2.endpoints.login import get_current_active_user
 from statina.adapter import StatinaAdapter
-from statina.API.external.api.deps import get_current_user
 from statina.API.external.constants import CHROM_ABNORM
 from statina.config import get_nipt_adapter, email_settings
 from statina.crud import update

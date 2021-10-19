@@ -6,9 +6,8 @@ from starlette.requests import Request
 from starlette.responses import StreamingResponse
 
 from statina.API.external.constants import COLORS
-from statina.API.internal.api.api_v1.endpoints.login import get_current_active_user
+from statina.API.v2.endpoints.login import get_current_active_user
 from statina.adapter.plugin import StatinaAdapter
-from statina.API.external.api.deps import get_current_user
 from statina.config import get_nipt_adapter, templates
 from statina.crud.find import find
 from statina.crud.find.plots import fetal_fraction_plot_data as get_fetal_fraction

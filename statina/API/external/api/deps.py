@@ -63,11 +63,20 @@ def find_user(username: str) -> Optional[User]:
     return None
 
 
+def get_user_scopes(username: str) -> list:
+    user_obj: Optional[User] = find_user(username=username)
+    return [user_obj.role]
+
+
 def create_access_token(
     username: str,
     form_data: OAuth2PasswordRequestForm,
     expires_delta: Optional[timedelta] = timedelta(minutes=15),
 ) -> str:
     expire = datetime.utcnow() + timedelta(minutes=settings.access_token_expire_minutes)
-    to_encode = {"sub": form_data.username, "scopes": form_data.scopes, "exp": expire}
+    to_encode = {
+        "sub": form_data.username,
+        "scopes": get_user_scopes(username=username),
+        "exp": expire,
+    }
     return jwt.encode(to_encode, settings.secret_key, algorithm=settings.algorithm)

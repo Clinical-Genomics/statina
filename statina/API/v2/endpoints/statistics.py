@@ -2,9 +2,8 @@ from fastapi import APIRouter, Depends, Request
 from fastapi.encoders import jsonable_encoder
 from fastapi.responses import JSONResponse
 
-from statina.API.internal.api.api_v1.endpoints.login import get_current_active_user
+from statina.API.v2.endpoints.login import get_current_active_user
 from statina.adapter.plugin import StatinaAdapter
-from statina.API.external.api.deps import get_current_user
 from statina.config import get_nipt_adapter
 from statina.crud.find.plots.statistics_plot_data import (
     get_last_batches,

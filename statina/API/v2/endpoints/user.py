@@ -5,16 +5,16 @@ from fastapi import Depends
 from fastapi.encoders import jsonable_encoder
 from starlette.background import BackgroundTasks
 from starlette.requests import Request
-from starlette.responses import RedirectResponse, JSONResponse
+from starlette.responses import JSONResponse
 
 from statina.API.external.api.api_v1.endpoints.login import router
 from statina.API.external.api.api_v1.templates.email.confirmation import (
     CONFIRMATION_MESSAGE_TEMPLATE,
 )
-from statina.API.external.api.deps import get_password_hash, get_current_user
-from statina.API.internal.api.api_v1.endpoints.login import get_current_active_user
+from statina.API.external.api.deps import get_password_hash
+from statina.API.v2.endpoints.login import get_current_active_user
 from statina.adapter import StatinaAdapter
-from statina.config import get_nipt_adapter, templates, email_settings
+from statina.config import get_nipt_adapter, email_settings
 from statina.crud.find import find
 from statina.crud.insert import insert_user
 from statina.exeptions import CredentialsError
@@ -31,7 +31,6 @@ async def register_user(
     background_tasks: BackgroundTasks,
     adapter: StatinaAdapter = Depends(get_nipt_adapter),
 ):
-    """Redirects back to index, if invalid username or password"""
     user = User(
         **new_user.dict(),
         added=datetime.datetime.now(),

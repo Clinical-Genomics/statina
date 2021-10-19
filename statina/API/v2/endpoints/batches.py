@@ -4,7 +4,7 @@ from fastapi import APIRouter, Depends, Request
 from fastapi.encoders import jsonable_encoder
 from fastapi.responses import JSONResponse
 import statina.crud.find.plots.fetal_fraction_plot_data as get_fetal_fraction
-from statina.API.internal.api.api_v1.endpoints.login import get_current_active_user
+from statina.API.v2.endpoints.login import get_current_active_user
 from statina.adapter import StatinaAdapter
 from statina.API.external.constants import TRISOMI_TRESHOLDS, COLORS
 from statina.config import get_nipt_adapter, templates

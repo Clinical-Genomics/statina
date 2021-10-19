@@ -4,12 +4,12 @@ from typing import List
 
 from fastapi import APIRouter, Depends, Response, status
 
-
+from statina.API.v2.endpoints.login import get_current_active_user
 from statina.adapter.plugin import StatinaAdapter
 from statina.config import get_nipt_adapter
 from statina.crud.find import find
 from statina.crud.insert import insert_batch, insert_samples
-from statina.models.database import Batch, DataBaseSample
+from statina.models.database import Batch, DataBaseSample, User
 from statina.models.server.load import BatchRequestBody
 from statina.parse.batch import get_batch, get_samples
 
@@ -20,6 +20,7 @@ router = APIRouter()
 def batch(
     response: Response,
     batch_files: BatchRequestBody,
+    current_user: User = Depends(get_current_active_user),
     adapter: StatinaAdapter = Depends(get_nipt_adapter),
 ):
     """Function to load batch data into the database with rest"""

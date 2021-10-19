@@ -3,13 +3,14 @@ from typing import Iterable, List, Optional
 from pydantic import parse_obj_as
 
 from statina.adapter import StatinaAdapter
+from statina.crud.utils import paginate
 from statina.models.database import Batch, DataBaseSample, User
 
 
-def users(adapter: StatinaAdapter) -> List[User]:
+def users(adapter: StatinaAdapter, page_size: int = 0, page_num: int = 0) -> List[User]:
     """Return all users from the batch collection"""
-
-    users: Iterable[dict] = adapter.user_collection.find()
+    skip, limit = paginate(page_size=page_size, page_num=page_num)
+    users: Iterable[dict] = adapter.user_collection.find().skip(skip).limit(limit)
     return parse_obj_as(List[User], list(users))
 
 

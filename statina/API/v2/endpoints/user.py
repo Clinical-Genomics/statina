@@ -1,14 +1,13 @@
 import datetime
 import logging
-from typing import List
+from typing import List, Optional
 
-from fastapi import Depends, Security, APIRouter
+from fastapi import Depends, Security, APIRouter, Query
 from fastapi.encoders import jsonable_encoder
 from starlette.background import BackgroundTasks
 from starlette.requests import Request
 from starlette.responses import JSONResponse
 
-from statina.API.external.api.api_v1.endpoints.login import router
 from statina.API.external.api.api_v1.templates.email.confirmation import (
     CONFIRMATION_MESSAGE_TEMPLATE,
 )
@@ -18,7 +17,6 @@ from statina.adapter import StatinaAdapter
 from statina.config import get_nipt_adapter, email_settings
 from statina.crud.find import find
 from statina.crud.insert import insert_user
-from statina.exeptions import CredentialsError
 from statina.models.database import User
 from statina.models.server.new_user import NewUser
 
@@ -30,7 +28,7 @@ router = APIRouter()
 LOG = logging.getLogger(__name__)
 
 
-@router.post("/register_user")
+@router.post("/register")
 async def register_user(
     new_user: NewUser,
     background_tasks: BackgroundTasks,
@@ -67,19 +65,13 @@ async def register_user(
     return JSONResponse(content=jsonable_encoder(user))
 
 
-@router.get("/users")
+@router.get("/users/")
 def users(
-    request: Request,
+    page_size: Optional[int] = Query(0),
+    page_num: Optional[int] = Query(0),
     current_user: User = Security(get_current_active_user, scopes=["admin"]),
     adapter: StatinaAdapter = Depends(get_nipt_adapter),
 ):
     """Admin view with table of all users."""
-    user_list: List[User] = find.users(adapter=adapter)
-    return JSONResponse(
-        content=jsonable_encoder(
-            {
-                "users": user_list,
-                "page_id": "users",
-            }
-        ),
-    )
+    user_list: List[User] = find.users(adapter=adapter, page_size=page_size, page_num=page_num)
+    return JSONResponse(content=jsonable_encoder(user_list))

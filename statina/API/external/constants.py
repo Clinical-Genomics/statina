@@ -7,7 +7,7 @@ STATUS_CLASSES = {
     "Other": "warning",
     "Failed": "danger",
 }
-STATUSES = list(STATUS_CLASSES.keys())
+STATUSES = ["Suspected", "Verified", "Probable", "False Negative", "Other", "Failed"]
 CHROM_ABNORM = ["13", "18", "21", "X0", "XXX", "XXY", "XYY"]
 TRIS_CHROM_ABNORM = ["13", "18", "21"]
 SEX_CHROM_ABNORM = ["X0", "XXX", "XXY", "XYY"]

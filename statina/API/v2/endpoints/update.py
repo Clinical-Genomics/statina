@@ -108,9 +108,11 @@ async def batch_delete(
 
 
 @router.put("/sample/{sample_id}/13")
-async def set_sample_status(
+async def set_sample_status_13(
     sample_id: str,
-    status: Literal[STATUSES] = Query(...),
+    status: Literal[
+        "Suspected", "Verified", "Probable", "False Negative", "Other", "Failed"
+    ] = Query(...),
     adapter: StatinaAdapter = Depends(get_nipt_adapter),
     current_user: User = Security(get_current_active_user, scopes=["RW"]),
 ):
@@ -125,9 +127,11 @@ async def set_sample_status(
 
 
 @router.put("/sample/{sample_id}/18")
-async def set_sample_status(
+async def set_sample_status_18(
     sample_id: str,
-    status: Literal[STATUSES] = Query(...),
+    status: Literal[
+        "Suspected", "Verified", "Probable", "False Negative", "Other", "Failed"
+    ] = Query(...),
     adapter: StatinaAdapter = Depends(get_nipt_adapter),
     current_user: User = Security(get_current_active_user, scopes=["RW"]),
 ):
@@ -142,9 +146,11 @@ async def set_sample_status(
 
 
 @router.put("/sample/{sample_id}/21")
-async def set_sample_status(
+async def set_sample_status_21(
     sample_id: str,
-    status: Literal[STATUSES] = Query(...),
+    status: Literal[
+        "Suspected", "Verified", "Probable", "False Negative", "Other", "Failed"
+    ] = Query(...),
     adapter: StatinaAdapter = Depends(get_nipt_adapter),
     current_user: User = Security(get_current_active_user, scopes=["RW"]),
 ):
@@ -159,9 +165,11 @@ async def set_sample_status(
 
 
 @router.put("/sample/{sample_id}/X0")
-async def set_sample_status(
+async def set_sample_status_x0(
     sample_id: str,
-    status: Literal[STATUSES] = Query(...),
+    status: Literal[
+        "Suspected", "Verified", "Probable", "False Negative", "Other", "Failed"
+    ] = Query(...),
     adapter: StatinaAdapter = Depends(get_nipt_adapter),
     current_user: User = Security(get_current_active_user, scopes=["RW"]),
 ):
@@ -176,9 +184,11 @@ async def set_sample_status(
 
 
 @router.put("/sample/{sample_id}/XXY")
-async def set_sample_status(
+async def set_sample_status_xxy(
     sample_id: str,
-    status: Literal[STATUSES] = Query(...),
+    status: Literal[
+        "Suspected", "Verified", "Probable", "False Negative", "Other", "Failed"
+    ] = Query(...),
     adapter: StatinaAdapter = Depends(get_nipt_adapter),
     current_user: User = Security(get_current_active_user, scopes=["RW"]),
 ):
@@ -192,10 +202,12 @@ async def set_sample_status(
     return JSONResponse(content="Sample field updated", status_code=200)
 
 
-@router.put("/sample/{sample_id}/XXx")
-async def set_sample_status(
+@router.put("/sample/{sample_id}/XXX")
+async def set_sample_status_xxx(
     sample_id: str,
-    status: Literal[STATUSES] = Query(...),
+    status: Literal[
+        "Suspected", "Verified", "Probable", "False Negative", "Other", "Failed"
+    ] = Query(...),
     adapter: StatinaAdapter = Depends(get_nipt_adapter),
     current_user: User = Security(get_current_active_user, scopes=["RW"]),
 ):
@@ -210,9 +222,11 @@ async def set_sample_status(
 
 
 @router.put("/sample/{sample_id}/XYY")
-async def set_sample_status(
+async def set_sample_status_xyy(
     sample_id: str,
-    status: Literal[STATUSES] = Query(...),
+    status: Literal[
+        "Suspected", "Verified", "Probable", "False Negative", "Other", "Failed"
+    ] = Query(...),
     adapter: StatinaAdapter = Depends(get_nipt_adapter),
     current_user: User = Security(get_current_active_user, scopes=["RW"]),
 ):
@@ -259,7 +273,7 @@ async def sample_comment(
 
 
 @router.put("/sample/{sample_id}/include")
-async def sample_comment(
+async def sample_include(
     sample_id: str,
     include: bool = Query(...),
     adapter: StatinaAdapter = Depends(get_nipt_adapter),

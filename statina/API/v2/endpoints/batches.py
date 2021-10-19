@@ -43,7 +43,7 @@ def batches(
 ):
     """List of all batches"""
     all_batches: List[Batch] = find.batches(adapter=adapter, page_size=page_size, page_num=page_num)
-    return JSONResponse(all_batches)
+    return JSONResponse(jsonable_encoder(all_batches))
 
 
 @router.post("/batch/")

@@ -46,43 +46,28 @@ def external(version: str) -> FastAPI:
     external_app.include_router(api.download.router, tags=["download"])
     external_app.include_router(api.statistics.router, tags=["statistics"])
 
-    external_app.include_router(external_api_v2.login.router, prefix="v2", tags=["login", "v2"])
+    external_app.include_router(external_api_v2.login.router, prefix="/v2", tags=["login", "v2"])
     external_app.include_router(
         external_api_v2.batches.router,
-        prefix="v2",
+        prefix="/v2",
         tags=["batches", "v2"],
     )
-    external_app.include_router(external_api_v2.sample.router, prefix="v2", tags=["sample", "v2"])
-    external_app.include_router(external_api_v2.update.router, prefix="v2", tags=["update", "v2"])
+    external_app.include_router(external_api_v2.sample.router, prefix="/v2", tags=["sample", "v2"])
+    external_app.include_router(external_api_v2.update.router, prefix="/v2", tags=["update", "v2"])
     external_app.include_router(
-        external_api_v2.download.router, prefix="v2", tags=["download", "v2"]
+        external_api_v2.download.router, prefix="/v2", tags=["download", "v2"]
     )
     external_app.include_router(
-        external_api_v2.statistics.router, prefix="v2", tags=["statistics", "v2"]
+        external_api_v2.statistics.router, prefix="/v2", tags=["statistics", "v2"]
     )
-    external_app.include_router(external_api_v2.user.router, prefix="v2", tags=["user", "v2"])
+    external_app.include_router(external_api_v2.user.router, prefix="/v2", tags=["user", "v2"])
     return external_app
 
 
 def internal(version: str) -> FastAPI:
+    api = internal_versions[version]
     internal_app = FastAPI()
-    internal_app.add_middleware(
-        CORSMiddleware,
-        allow_origins=["*"],
-        allow_credentials=True,
-        allow_methods=["*"],
-        allow_headers=["*"],
-    )
-    internal_app.include_router(external_api_v2.login.router)
-    internal_app.include_router(
-        external_api_v2.batches.router,
-        tags=["batches"],
-    )
-    internal_app.include_router(external_api_v2.sample.router, tags=["sample"])
-    internal_app.include_router(external_api_v2.update.router, tags=["update"])
-    internal_app.include_router(external_api_v2.download.router, tags=["download"])
-    internal_app.include_router(external_api_v2.statistics.router, tags=["statistics"])
-    internal_app.include_router(external_api_v2.user.router, tags=["user"])
+    internal_app.include_router(api.insert.router, prefix="/insert", tags=["insert"])
     return internal_app
 
 

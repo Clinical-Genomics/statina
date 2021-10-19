@@ -1,6 +1,6 @@
 from pathlib import Path
 
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, Security
 from fastapi.responses import FileResponse, RedirectResponse
 from starlette.requests import Request
 from starlette.responses import StreamingResponse
@@ -46,7 +46,7 @@ def batch_download(
     batch_id: str,
     file_id: str,
     file_name: str,
-    current_user: User = Depends(get_current_active_user),
+    current_user: User = Security(get_current_active_user, scopes=["R"]),
     adapter: StatinaAdapter = Depends(get_nipt_adapter),
 ):
     """View for batch downloads"""
@@ -70,7 +70,7 @@ def sample_download(
     request: Request,
     sample_id: str,
     file_id: str,
-    current_user: User = Depends(get_current_active_user),
+    current_user: User = Security(get_current_active_user, scopes=["R"]),
     adapter: StatinaAdapter = Depends(get_nipt_adapter),
 ):
     """View for sample downloads"""
@@ -92,7 +92,7 @@ def report(
     request: Request,
     batch_id: str,
     file_name: str,
-    current_user: User = Depends(get_current_active_user),
+    current_user: User = Security(get_current_active_user, scopes=["R"]),
     adapter: StatinaAdapter = Depends(get_nipt_adapter),
 ):
     """Report view, collecting all tables and plots from one batch."""

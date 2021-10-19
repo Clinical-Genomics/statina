@@ -239,7 +239,7 @@ async def batch_update_comment(
     batch.comment = comment
     update.update_batch(adapter=adapter, batch=batch)
 
-    return JSONResponse(content="Batch coment updated", status_code=202)
+    return JSONResponse(content="Batch comment updated", status_code=202)
 
 
 @router.put("/sample/{sample_id}/comment")

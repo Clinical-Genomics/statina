@@ -1,6 +1,6 @@
 from typing import Dict, List
 
-from fastapi import APIRouter, Depends, Request
+from fastapi import APIRouter, Depends, Request, Security
 from fastapi.encoders import jsonable_encoder
 from fastapi.responses import JSONResponse
 
@@ -23,50 +23,31 @@ router = APIRouter()
 
 @router.get("/samples/")
 def samples(
-    current_user: User = Depends(get_current_active_user),
+    current_user: User = Security(get_current_active_user, scopes=["R"]),
     adapter: StatinaAdapter = Depends(get_nipt_adapter),
 ):
     """Get sample with id"""
     samples: List[DataBaseSample] = find.samples(adapter=adapter)
-    return JSONResponse(
-        content=jsonable_encoder(
-            dict(
-                current_user=current_user,
-                sample_info=[Sample(**sample.dict()) for sample in samples],
-                page_id="samples",
-            )
-        ),
-    )
+    return JSONResponse(content=jsonable_encoder(samples))
 
 
-@router.get("/samples/{sample_id}/")
+@router.get("/sample/{sample_id}")
 def sample(
     sample_id: str,
-    current_user: User = Depends(get_current_active_user),
+    current_user: User = Security(get_current_active_user, scopes=["R"]),
     adapter: StatinaAdapter = Depends(get_nipt_adapter),
 ):
     """Get sample with id"""
 
     sample: DataBaseSample = find.sample(sample_id=sample_id, adapter=adapter)
-    batch: Batch = find.batch(batch_id=sample.batch_id, adapter=adapter)
-    return JSONResponse(
-        content=jsonable_encoder(
-            dict(
-                current_user=current_user,
-                chrom_abnorm=CHROM_ABNORM,
-                sample=Sample(**sample.dict()),
-                status_classes=STATUS_CLASSES,
-                batch=batch,
-                page_id="sample",
-            )
-        ),
-    )
+
+    return JSONResponse(sample)
 
 
 @router.get("/samples/{sample_id}/tris")
 def sample_tris(
     sample_id: str,
-    current_user: User = Depends(get_current_active_user),
+    current_user: User = Security(get_current_active_user, scopes=["R"]),
     adapter: StatinaAdapter = Depends(get_nipt_adapter),
 ):
     """Sample view with trisomi plot."""
@@ -78,14 +59,9 @@ def sample_tris(
     return JSONResponse(
         content=jsonable_encoder(
             dict(
-                current_user=current_user,
                 normal_data=normal_data.dict(exclude_none=True, by_alias=True),
                 abnormal_data=abnormal_data,
                 sample_data=sample_data,
-                sample=Sample(**sample.dict()),
-                batch=batch,
-                status_colors=STATUS_COLORS,
-                page_id="sample_tris",
             )
         ),
     )

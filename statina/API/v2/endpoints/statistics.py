@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, Request
+from fastapi import APIRouter, Depends, Request, Security
 from fastapi.encoders import jsonable_encoder
 from fastapi.responses import JSONResponse
 
@@ -17,7 +17,7 @@ router = APIRouter()
 
 @router.get("/statistics")
 def statistics(
-    current_user: User = Depends(get_current_active_user),
+    current_user: User = Security(get_current_active_user, scopes=["R"]),
     adapter: StatinaAdapter = Depends(get_nipt_adapter),
 ):
     """Statistics view."""
@@ -44,15 +44,13 @@ def statistics(
     return JSONResponse(
         content=jsonable_encoder(
             dict(
-                current_user=current_user,
-                ticks=list(range(0, nr_batches)),
+                ticks=list(range(nr_batches)),
                 nr_batches=nr_batches,
                 batch_ids=batch_ids,
                 box_stat=box_stat,
                 box_plots=box_plots,
                 scatter_stat=scatter_stat,
                 scatter_plots=scatter_plots,
-                page_id="statistics",
             )
-        ),
+        )
     )

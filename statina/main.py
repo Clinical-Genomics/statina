@@ -6,6 +6,7 @@ from statina.exeptions import CredentialsError
 
 import statina.API.external.api.api_v1.endpoints as external_api_v1
 import statina.API.internal.api.api_v1.endpoints as internal_api_v1
+import statina.API.v2.endpoints as external_api_v2
 
 external_versions = {"v1": external_api_v1}
 internal_versions = {"v1": internal_api_v1}
@@ -39,19 +40,18 @@ def external(version: str) -> FastAPI:
 
 
 def internal(version: str) -> FastAPI:
-    api = internal_versions[version]
     internal_app = FastAPI()
-    internal_app.include_router(api.insert.router, prefix="/insert", tags=["insert"])
-    internal_app.include_router(api.login.router)
+    internal_app.include_router(external_api_v2.insert.router, prefix="/insert", tags=["insert"])
+    internal_app.include_router(external_api_v2.login.router)
     internal_app.include_router(
-        api.batches.router,
+        external_api_v2.batches.router,
         prefix="/batches",
         tags=["batches"],
     )
-    internal_app.include_router(api.sample.router, tags=["sample"])
-    internal_app.include_router(api.update.router, tags=["update"])
-    internal_app.include_router(api.download.router, tags=["download"])
-    internal_app.include_router(api.statistics.router, tags=["statistics"])
+    internal_app.include_router(external_api_v2.sample.router, tags=["sample"])
+    internal_app.include_router(external_api_v2.update.router, tags=["update"])
+    internal_app.include_router(external_api_v2.download.router, tags=["download"])
+    internal_app.include_router(external_api_v2.statistics.router, tags=["statistics"])
     return internal_app
 
 

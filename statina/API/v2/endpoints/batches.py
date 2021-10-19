@@ -45,7 +45,7 @@ def batches(
 
 
 @router.post("/batch/")
-def batch(
+def load_batch(
     batch_files: BatchRequestBody,
     current_user: User = Security(get_current_active_user, scopes=["RW"]),
     adapter: StatinaAdapter = Depends(get_nipt_adapter),
@@ -64,7 +64,7 @@ def batch(
 
 
 @router.get("/batch/{batch_id}")
-def batch(
+def get_batch(
     batch_id: str,
     current_user: User = Security(get_current_active_user, scopes=["R"]),
     adapter: StatinaAdapter = Depends(get_nipt_adapter),

@@ -1,9 +1,9 @@
 import logging
 from datetime import datetime
-from typing import Iterable
+from typing import Iterable, Literal, Optional, List
 import secrets
 
-from fastapi import APIRouter, Depends, Request, BackgroundTasks, Security
+from fastapi import APIRouter, Depends, Request, BackgroundTasks, Security, Form, Query
 from fastapi.responses import RedirectResponse
 from sendmail_container import FormDataRequest
 from starlette.datastructures import FormData
@@ -15,10 +15,10 @@ from statina.API.external.api.api_v1.templates.email.account_activated import (
 from statina.API.external.api.api_v1.templates.email.admin_mail import ADMIN_MESSAGE_TEMPLATE
 from statina.API.v2.endpoints.login import get_current_active_user
 from statina.adapter import StatinaAdapter
-from statina.API.external.constants import CHROM_ABNORM
+from statina.API.external.constants import CHROM_ABNORM, STATUSES
 from statina.config import get_nipt_adapter, email_settings
 from statina.crud import update
-from statina.crud.delete import delete_batches
+from statina.crud.delete import delete_batch
 from statina.crud.find import find
 from statina.models.database import DataBaseSample, User, Batch
 from statina.tools.email import send_email
@@ -64,20 +64,25 @@ async def validate_user(
         return JSONResponse(content="Server could not verify user", status_code=500)
 
 
-@router.post("/user")
-async def update_user(
-    request: Request,
+@router.put("/user/{username}")
+async def update_user_role(
+    username: str,
     background_tasks: BackgroundTasks,
+    role: Literal[
+        "unconfirmed",
+        "inactive",
+        "R",
+        "RW",
+        "admin",
+    ] = Query(...),
     adapter: StatinaAdapter = Depends(get_nipt_adapter),
     current_user: User = Security(get_current_active_user, scopes=["admin"]),
 ):
-    form = await request.form()
-    update_user: User = find.user(email=form["user_email"], adapter=adapter)
+    update_user: User = find.user(user_name=username, adapter=adapter)
     old_role = update_user.role
-    new_role = form["role"]
-    update_user.role = new_role
+    update_user.role = role
     update.update_user(adapter=adapter, user=update_user)
-    if old_role in ["inactive", "unconfirmed"] and new_role not in ["inactive", "unconfirmed"]:
+    if old_role in ["inactive", "unconfirmed"] and role not in ["inactive", "unconfirmed"]:
         email_form = FormDataRequest(
             sender_prefix=email_settings.sender_prefix,
             email_server_alias=email_settings.email_server_alias,
@@ -89,153 +94,199 @@ async def update_user(
             ),
         )
         background_tasks.add_task(send_email, email_form)
-    return RedirectResponse(request.headers.get("referer"))
+    return JSONResponse(content="User updated", status_code=202)
 
 
-@router.post("/delete_batch")
-async def delete_batch(
-    request: Request,
+@router.delete("/batch/{batch_id}")
+async def batch_delete(
+    batch_id: str,
     adapter: StatinaAdapter = Depends(get_nipt_adapter),
-    current_user: User = Depends(get_current_active_user),
+    current_user: User = Security(get_current_active_user, scopes=["admin"]),
 ):
-    if current_user.role != "admin":
-        return RedirectResponse(request.headers.get("referer"))
-    form = await request.form()
-    batches: Iterable[str] = form.getlist("delete")
-    delete_batches(adapter=adapter, batches=batches)
-    return RedirectResponse(request.headers.get("referer"))
+    await delete_batch(adapter=adapter, batch_id=batch_id)
+    return JSONResponse(content=f"Deleted batch {batch_id}", status_code=200)
 
 
-@router.post("/set_sample_status")
+@router.put("/sample/{sample_id}/13")
 async def set_sample_status(
-    request: Request,
+    sample_id: str,
+    status: Literal[STATUSES] = Query(...),
     adapter: StatinaAdapter = Depends(get_nipt_adapter),
-    current_user: User = Depends(get_current_active_user),
+    current_user: User = Security(get_current_active_user, scopes=["RW"]),
 ):
     """Update the manualy interpreted chromosome abnormality status for a sample."""
 
-    form = await request.form()
-
-    if current_user.role not in ["RW", "admin"]:
-        return RedirectResponse(request.headers.get("referer"))
-
-    sample_id: str = form["sample_id"]
-    sample: dict = find.sample(sample_id=sample_id, adapter=adapter).dict()
-
-    for abnormality in CHROM_ABNORM:
-        new_abnormality_status: str = form[abnormality]
-        abnormality_key: str = f"status_{abnormality}"
-        if sample.get(abnormality_key) == new_abnormality_status:
-            continue
-
-        LOG.debug(
-            "Updating %s to %s for sample %s",
-            abnormality_key,
-            new_abnormality_status,
-            sample_id,
-        )
-        time_stamp: str = datetime.now().strftime("%Y/%m/%d %H:%M:%S")
-        sample[abnormality_key] = new_abnormality_status
-        sample[f"status_change_{abnormality}"] = f"{current_user.username} {time_stamp}"
-
-    update.sample(adapter=adapter, sample=DataBaseSample(**sample))
-    return RedirectResponse(request.headers.get("referer"))
+    sample: DataBaseSample = find.sample(sample_id=sample_id, adapter=adapter)
+    sample.status_13 = status
+    time_stamp: str = datetime.now().strftime("%Y/%m/%d %H:%M:%S")
+    sample.status_change_13 = f"{current_user.username} {time_stamp}"
+    update.sample(adapter=adapter, sample=sample)
+    return JSONResponse(content="Sample field updated", status_code=200)
 
 
-@router.post("/batch_comment")
-async def batch_comment(
-    request: Request,
+@router.put("/sample/{sample_id}/18")
+async def set_sample_status(
+    sample_id: str,
+    status: Literal[STATUSES] = Query(...),
     adapter: StatinaAdapter = Depends(get_nipt_adapter),
-    current_user: User = Depends(get_current_active_user),
+    current_user: User = Security(get_current_active_user, scopes=["RW"]),
+):
+    """Update the manualy interpreted chromosome abnormality status for a sample."""
+
+    sample: DataBaseSample = find.sample(sample_id=sample_id, adapter=adapter)
+    sample.status_18 = status
+    time_stamp: str = datetime.now().strftime("%Y/%m/%d %H:%M:%S")
+    sample.status_change_18 = f"{current_user.username} {time_stamp}"
+    update.sample(adapter=adapter, sample=sample)
+    return JSONResponse(content="Sample field updated", status_code=200)
+
+
+@router.put("/sample/{sample_id}/21")
+async def set_sample_status(
+    sample_id: str,
+    status: Literal[STATUSES] = Query(...),
+    adapter: StatinaAdapter = Depends(get_nipt_adapter),
+    current_user: User = Security(get_current_active_user, scopes=["RW"]),
+):
+    """Update the manualy interpreted chromosome abnormality status for a sample."""
+
+    sample: DataBaseSample = find.sample(sample_id=sample_id, adapter=adapter)
+    sample.status_21 = status
+    time_stamp: str = datetime.now().strftime("%Y/%m/%d %H:%M:%S")
+    sample.status_change_21 = f"{current_user.username} {time_stamp}"
+    update.sample(adapter=adapter, sample=sample)
+    return JSONResponse(content="Sample field updated", status_code=200)
+
+
+@router.put("/sample/{sample_id}/X0")
+async def set_sample_status(
+    sample_id: str,
+    status: Literal[STATUSES] = Query(...),
+    adapter: StatinaAdapter = Depends(get_nipt_adapter),
+    current_user: User = Security(get_current_active_user, scopes=["RW"]),
+):
+    """Update the manualy interpreted chromosome abnormality status for a sample."""
+
+    sample: DataBaseSample = find.sample(sample_id=sample_id, adapter=adapter)
+    sample.status_X0 = status
+    time_stamp: str = datetime.now().strftime("%Y/%m/%d %H:%M:%S")
+    sample.status_change_X0 = f"{current_user.username} {time_stamp}"
+    update.sample(adapter=adapter, sample=sample)
+    return JSONResponse(content="Sample field updated", status_code=200)
+
+
+@router.put("/sample/{sample_id}/XXY")
+async def set_sample_status(
+    sample_id: str,
+    status: Literal[STATUSES] = Query(...),
+    adapter: StatinaAdapter = Depends(get_nipt_adapter),
+    current_user: User = Security(get_current_active_user, scopes=["RW"]),
+):
+    """Update the manualy interpreted chromosome abnormality status for a sample."""
+
+    sample: DataBaseSample = find.sample(sample_id=sample_id, adapter=adapter)
+    sample.status_XXY = status
+    time_stamp: str = datetime.now().strftime("%Y/%m/%d %H:%M:%S")
+    sample.status_change_XXY = f"{current_user.username} {time_stamp}"
+    update.sample(adapter=adapter, sample=sample)
+    return JSONResponse(content="Sample field updated", status_code=200)
+
+
+@router.put("/sample/{sample_id}/XXx")
+async def set_sample_status(
+    sample_id: str,
+    status: Literal[STATUSES] = Query(...),
+    adapter: StatinaAdapter = Depends(get_nipt_adapter),
+    current_user: User = Security(get_current_active_user, scopes=["RW"]),
+):
+    """Update the manualy interpreted chromosome abnormality status for a sample."""
+
+    sample: DataBaseSample = find.sample(sample_id=sample_id, adapter=adapter)
+    sample.status_XXX = status
+    time_stamp: str = datetime.now().strftime("%Y/%m/%d %H:%M:%S")
+    sample.status_change_XXX = f"{current_user.username} {time_stamp}"
+    update.sample(adapter=adapter, sample=sample)
+    return JSONResponse(content="Sample field updated", status_code=200)
+
+
+@router.put("/sample/{sample_id}/XYY")
+async def set_sample_status(
+    sample_id: str,
+    status: Literal[STATUSES] = Query(...),
+    adapter: StatinaAdapter = Depends(get_nipt_adapter),
+    current_user: User = Security(get_current_active_user, scopes=["RW"]),
+):
+    """Update the manualy interpreted chromosome abnormality status for a sample."""
+
+    sample: DataBaseSample = find.sample(sample_id=sample_id, adapter=adapter)
+    sample.status_XYY = status
+    time_stamp: str = datetime.now().strftime("%Y/%m/%d %H:%M:%S")
+    sample.status_change_XYY = f"{current_user.username} {time_stamp}"
+    update.sample(adapter=adapter, sample=sample)
+    return JSONResponse(content="Sample field updated", status_code=200)
+
+
+@router.put("/batch/{batch_id}/comment")
+async def batch_update_comment(
+    batch_id: str,
+    comment: Optional[str] = Form(...),
+    adapter: StatinaAdapter = Depends(get_nipt_adapter),
+    current_user: User = Security(get_current_active_user, scopes=["RW"]),
 ):
     """Update batch comment"""
 
-    form = await request.form()
-
-    if current_user.role not in ["RW", "admin"]:
-        return RedirectResponse(request.headers.get("referer"))
-    batch_id: str = form["batch_id"]
     batch: Batch = find.batch(batch_id=batch_id, adapter=adapter)
-    comment: str = form.get("comment")
-    if comment != batch.comment:
-        batch.comment = comment
-        update.update_batch(adapter=adapter, batch=batch)
+    batch.comment = comment
+    update.update_batch(adapter=adapter, batch=batch)
 
-    return RedirectResponse(request.headers.get("referer"))
+    return JSONResponse(content="Batch coment updated", status_code=202)
 
 
-@router.post("/sample_comment")
+@router.put("/sample/{sample_id}/comment")
 async def sample_comment(
-    request: Request,
+    sample_id: str,
+    comment: Optional[str] = Form(...),
     adapter: StatinaAdapter = Depends(get_nipt_adapter),
-    current_user: User = Depends(get_current_active_user),
+    current_user: User = Security(get_current_active_user, scopes=["RW"]),
 ):
     """Update sample comment"""
 
-    form = await request.form()
-
-    if current_user.role not in ["RW", "admin"]:
-        return RedirectResponse(request.headers.get("referer"))
-
-    sample_id: str = form["sample_id"]
     sample: DataBaseSample = find.sample(sample_id=sample_id, adapter=adapter)
-    comment: str = form.get("comment")
-    if comment != sample.comment:
-        sample.comment = comment
-        update.sample(adapter=adapter, sample=sample)
+    sample.comment = comment
+    update.sample(adapter=adapter, sample=sample)
 
-    return RedirectResponse(request.headers.get("referer"))
+    return JSONResponse(content="Sample comment updated", status_code=200)
 
 
-@router.post("/include_samples")
-async def include_samples(
-    request: Request,
+@router.put("/sample/{sample_id}/include")
+async def sample_comment(
+    sample_id: str,
+    include: bool = Query(...),
     adapter: StatinaAdapter = Depends(get_nipt_adapter),
-    current_user: User = Depends(get_current_active_user),
+    current_user: User = Security(get_current_active_user, scopes=["RW"]),
+):
+    """Update sample comment"""
+
+    sample: DataBaseSample = find.sample(sample_id=sample_id, adapter=adapter)
+    sample.include = include
+    update.sample(adapter=adapter, sample=sample)
+
+    return JSONResponse(content="Sample comment updated", status_code=200)
+
+
+@router.put("/batch/{batch_id}/include_samples")
+async def include_samples(
+    batch_id: str,
+    adapter: StatinaAdapter = Depends(get_nipt_adapter),
+    current_user: User = Security(get_current_active_user, scopes=["RW"]),
 ):
     """Update include status and comment for samples in batch"""
-
-    form = await request.form()
-
-    if current_user.role not in ["RW", "admin"]:
-        return RedirectResponse(request.headers.get("referer"))
-
-    button_id = form.get("button_id")
-    samples: Iterable[str] = form.getlist("samples")
-    if button_id == "include all samples":
-        include_all_samples(samples=samples, adapter=adapter, user=current_user)
-    elif button_id == "Save":
-        save_samples(samples=samples, form=form, adapter=adapter, user=current_user)
-
-    return RedirectResponse(request.headers.get("referer"))
-
-
-def save_samples(samples: Iterable[str], form: FormData, adapter: StatinaAdapter, user: User):
-    """Function to update sample.comment and sample.include."""
-
-    time_stamp: str = datetime.now().strftime("%Y/%m/%d %H:%M:%S")
-    for sample_id in samples:
-        sample: DataBaseSample = find.sample(sample_id=sample_id, adapter=adapter)
-        comment: str = form.get(f"comment_{sample_id}")
-        include: bool = form.get(f"include_{sample_id}")
-        if comment != sample.comment:
-            sample.comment = comment
-        if include and not sample.include:
-            sample.include = True
-            sample.change_include_date = f"{user.username} {time_stamp}"
-        elif not include and sample.include:
-            sample.include = False
-        update.sample(adapter=adapter, sample=sample)
-
-
-def include_all_samples(samples: Iterable[str], adapter: StatinaAdapter, user: User):
-    """Function to set sample.include=True for all samples."""
-
-    time_stamp: str = datetime.now().strftime("%Y/%m/%d %H:%M:%S")
-    for sample_id in samples:
-        sample: DataBaseSample = find.sample(sample_id=sample_id, adapter=adapter)
-        if sample.include:
-            continue
+    samples: List[DataBaseSample] = find.batch_samples(adapter=adapter, batch_id=batch_id)
+    for sample in samples:
         sample.include = True
-        sample.change_include_date = f"{user.username} {time_stamp}"
+        sample.change_include_date = (
+            f'{current_user.username} {datetime.now().strftime("%Y/%m/%d %H:%M:%S")}'
+        )
         update.sample(adapter=adapter, sample=sample)
+
+    return JSONResponse(content="All samples included in batch plots", status_code=200)

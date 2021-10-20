@@ -1,9 +1,8 @@
-import io
 from datetime import datetime
 from pathlib import Path
 from typing import Dict, List, Literal, Optional
 
-from fastapi import APIRouter, Depends, Form, Query, Security
+from fastapi import APIRouter, Depends, Form, Query, Security, Response
 from fastapi.encoders import jsonable_encoder
 from fastapi.responses import FileResponse, JSONResponse, StreamingResponse
 
@@ -115,9 +114,10 @@ def batch_samples(
     )
 
 
-@router.get("/batch/{batch_id}/download/")
+@router.get("/batch/{batch_id}/download")
 def batch_download(
     batch_id: str,
+    file_name: Optional[str],
     file_id: Literal["result_file", "multiqc_report", "segmental_calls"] = Query(...),
     current_user: User = Security(get_current_active_user, scopes=["R"]),
     adapter: StatinaAdapter = Depends(get_nipt_adapter),
@@ -131,12 +131,14 @@ def batch_download(
     path = Path(file_path)
     if path.is_dir():
         file_obj = zip_dir(source_dir=file_path)
-        return StreamingResponse(file_obj, media_type="application/octet-stream")
+        response = StreamingResponse(file_obj, media_type="application/octet-stream")
+        response.headers["Content-Disposition"] = f"attachment; filename={file_name}"
+        return response
 
     return FileResponse(
         str(path.absolute()),
         media_type="application/octet-stream",
-        filename=path.name,
+        filename=file_name or path.name,
     )
 
 

@@ -41,7 +41,7 @@ def external(version: str) -> FastAPI:
     external_app.include_router(api.download.router, tags=["download"])
     external_app.include_router(api.statistics.router, tags=["statistics"])
 
-    external_app.include_router(external_api_v2.base.router, prefix="/v2", tags=["base_v2"])
+    external_app.include_router(external_api_v2.base.router, tags=["base_v2"])
     external_app.include_router(
         external_api_v2.batches.router,
         prefix="/v2",

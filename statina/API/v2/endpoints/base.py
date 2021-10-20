@@ -7,7 +7,7 @@ from statina.API.v2.endpoints.user import credentials_exception
 from statina.models.database import User
 from statina.models.server.auth import Token
 
-router = APIRouter()
+router = APIRouter(prefix="/v2")
 
 
 @router.get("/")

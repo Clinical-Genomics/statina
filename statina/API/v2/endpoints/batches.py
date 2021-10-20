@@ -115,10 +115,9 @@ def batch_samples(
     )
 
 
-@router.get("/batch/{batch_id}/download/{file_name}")
+@router.get("/batch/{batch_id}/download/")
 def batch_download(
     batch_id: str,
-    file_name: str,
     file_id: Literal["result_file", "multiqc_report", "segmental_calls"] = Query(...),
     current_user: User = Security(get_current_active_user, scopes=["R"]),
     adapter: StatinaAdapter = Depends(get_nipt_adapter),

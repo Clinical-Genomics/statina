@@ -79,7 +79,7 @@ def load_batch(
     insert_batch(adapter=adapter, batch=batch, batch_files=batch_files)
     insert_samples(adapter=adapter, samples=samples, segmental_calls=batch_files.segmental_calls)
     inserted_batch = find.batch(adapter=adapter, batch_id=batch.batch_id)
-    return JSONResponse(content=inserted_batch.json(), status_code=200)
+    return JSONResponse(content=jsonable_encoder(inserted_batch), status_code=200)
 
 
 @router.get("/batch/{batch_id}", response_model=Batch)

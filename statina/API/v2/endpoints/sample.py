@@ -49,7 +49,7 @@ def sample(
 
     sample: DataBaseSample = find.sample(sample_id=sample_id, adapter=adapter)
 
-    return JSONResponse(sample.json())
+    return JSONResponse(content=jsonable_encoder(sample))
 
 
 @router.get("/samples/{sample_id}/tris")

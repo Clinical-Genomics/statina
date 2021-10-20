@@ -40,7 +40,7 @@ from statina.tools.email import send_email
 router = APIRouter(prefix="/v2")
 
 oauth2_scheme = OAuth2PasswordBearer(
-    tokenUrl="token",
+    tokenUrl="/v2/token",
     scopes={
         "R": "Read-only access to database",
         "RW": "Read and write access",

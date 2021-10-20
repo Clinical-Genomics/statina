@@ -1,15 +1,14 @@
 import io
 from datetime import datetime
 from pathlib import Path
-from typing import Dict, List, Optional, Literal
+from typing import Dict, List, Literal, Optional
 
-from fastapi import APIRouter, Depends, Security, Query, Form
+from fastapi import APIRouter, Depends, Form, Query, Security
 from fastapi.encoders import jsonable_encoder
-from fastapi.responses import JSONResponse, FileResponse
-
-from statina.API.v2.endpoints.user import get_current_active_user
+from fastapi.responses import FileResponse, JSONResponse
 
 from statina.adapter import StatinaAdapter
+from statina.API.v2.endpoints.user import get_current_active_user
 from statina.config import get_nipt_adapter
 from statina.crud import update
 from statina.crud.find import find

@@ -1,16 +1,19 @@
 import datetime
 import logging
-from typing import List, Optional, Literal
+import secrets
+from typing import List, Literal, Optional
 
-from fastapi import Depends, Security, APIRouter, Query, Form, HTTPException
+from fastapi import APIRouter, Depends, Form, HTTPException, Query, Security
 from fastapi.encoders import jsonable_encoder
 from fastapi.security import OAuth2PasswordBearer, SecurityScopes
-from jose import jwt, JWTError
+from jose import JWTError, jwt
 from pydantic import EmailStr
+from sendmail_container import FormDataRequest
 from starlette import status
 from starlette.background import BackgroundTasks
 from starlette.responses import JSONResponse
 
+from statina.adapter import StatinaAdapter
 from statina.API.external.api.api_v1.templates.email.account_activated import (
     ACTIVATION_MESSAGE_TEMPLATE,
 )
@@ -18,18 +21,13 @@ from statina.API.external.api.api_v1.templates.email.admin_mail import ADMIN_MES
 from statina.API.external.api.api_v1.templates.email.confirmation import (
     CONFIRMATION_MESSAGE_TEMPLATE,
 )
-from statina.API.external.api.deps import get_password_hash, find_user
-from statina.adapter import StatinaAdapter
-from statina.config import get_nipt_adapter, email_settings, settings
-from statina.crud import update, delete
+from statina.API.external.api.deps import find_user, get_password_hash
+from statina.config import email_settings, get_nipt_adapter, settings
+from statina.crud import delete, update
 from statina.crud.find import find
 from statina.crud.insert import insert_user
 from statina.exeptions import MissMatchingPasswordError
 from statina.models.database import User
-import secrets
-
-from sendmail_container import FormDataRequest
-
 from statina.models.database.user import inactive_roles
 from statina.models.server.auth import TokenData
 from statina.tools.email import send_email

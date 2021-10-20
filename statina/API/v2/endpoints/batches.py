@@ -1,16 +1,16 @@
 import io
 from datetime import datetime
 from pathlib import Path
-from typing import Dict, List, Optional, Literal
+from typing import Dict, List, Literal, Optional
 
-from fastapi import APIRouter, Depends, Security, Query, Form
+from fastapi import APIRouter, Depends, Form, Query, Security
 from fastapi.encoders import jsonable_encoder
-from fastapi.responses import JSONResponse, FileResponse, StreamingResponse
+from fastapi.responses import FileResponse, JSONResponse, StreamingResponse
 
 import statina.crud.find.plots.fetal_fraction_plot_data as get_fetal_fraction
-from statina.API.v2.endpoints.user import get_current_active_user
 from statina.adapter import StatinaAdapter
 from statina.API.external.constants import TRISOMI_TRESHOLDS
+from statina.API.v2.endpoints.user import get_current_active_user
 from statina.config import get_nipt_adapter
 from statina.crud import update
 from statina.crud.delete import delete_batch
@@ -35,7 +35,7 @@ from statina.models.server.plots.fetal_fraction import (
 )
 from statina.models.server.plots.fetal_fraction_sex import SexChromosomeThresholds
 from statina.models.server.sample import Sample
-from statina.parse.batch import get_samples, get_batch, validate_file_path
+from statina.parse.batch import get_batch, get_samples, validate_file_path
 
 router = APIRouter()
 

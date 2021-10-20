@@ -240,7 +240,7 @@ async def sample_include(
     return JSONResponse(content="Sample comment updated", status_code=200)
 
 
-@router.get("/sample/{sample_id}/segmental_calls/download")
+@router.get("/sample/{sample_id}/download/segmental_calls")
 def sample_segmental_calls_download(
     sample_id: str,
     file_id: str = Query(...),

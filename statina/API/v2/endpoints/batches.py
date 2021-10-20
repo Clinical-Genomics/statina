@@ -1,14 +1,19 @@
+import io
+from datetime import datetime
 from pathlib import Path
-from typing import Dict, List, Optional
+from typing import Dict, List, Optional, Literal
 
-from fastapi import APIRouter, Depends, Security, Query
+from fastapi import APIRouter, Depends, Security, Query, Form
 from fastapi.encoders import jsonable_encoder
-from fastapi.responses import JSONResponse
+from fastapi.responses import JSONResponse, FileResponse, StreamingResponse
+
 import statina.crud.find.plots.fetal_fraction_plot_data as get_fetal_fraction
-from statina.API.v2.endpoints.login import get_current_active_user
+from statina.API.v2.endpoints.user import get_current_active_user
 from statina.adapter import StatinaAdapter
 from statina.API.external.constants import TRISOMI_TRESHOLDS
 from statina.config import get_nipt_adapter
+from statina.crud import update
+from statina.crud.delete import delete_batch
 from statina.crud.find import find
 from statina.crud.find.plots.coverage_plot_data import (
     get_box_data_for_coverage_plot,
@@ -20,6 +25,7 @@ from statina.crud.find.plots.zscore_plot_data import (
     get_tris_samples,
 )
 from statina.crud.insert import insert_batch, insert_samples
+from statina.crud.utils import zip_dir
 from statina.models.database import Batch, DataBaseSample, User
 from statina.models.server.load import BatchRequestBody
 from statina.models.server.plots.coverage import CoveragePlotSampleData
@@ -29,9 +35,9 @@ from statina.models.server.plots.fetal_fraction import (
 )
 from statina.models.server.plots.fetal_fraction_sex import SexChromosomeThresholds
 from statina.models.server.sample import Sample
-from statina.parse.batch import get_samples, get_batch
+from statina.parse.batch import get_samples, get_batch, validate_file_path
 
-router = APIRouter(prefix="/v2")
+router = APIRouter()
 
 
 @router.get("/batches")
@@ -46,7 +52,17 @@ def batches(
     return JSONResponse(jsonable_encoder(all_batches))
 
 
-@router.post("/batch/")
+@router.delete("/batch/{batch_id}")
+async def batch_delete(
+    batch_id: str,
+    adapter: StatinaAdapter = Depends(get_nipt_adapter),
+    current_user: User = Security(get_current_active_user, scopes=["admin"]),
+):
+    await delete_batch(adapter=adapter, batch_id=batch_id)
+    return JSONResponse(content=f"Deleted batch {batch_id}", status_code=200)
+
+
+@router.post("/batch/", response_model=Batch)
 def load_batch(
     batch_files: BatchRequestBody,
     current_user: User = Security(get_current_active_user, scopes=["RW"]),
@@ -62,10 +78,11 @@ def load_batch(
         return JSONResponse(content="Batch already in database!", status_code=422)
     insert_batch(adapter=adapter, batch=batch, batch_files=batch_files)
     insert_samples(adapter=adapter, samples=samples, segmental_calls=batch_files.segmental_calls)
-    return JSONResponse(content=f"Batch {batch.batch_id} inserted to the database", status_code=200)
+    inserted_batch = find.batch(adapter=adapter, batch_id=batch.batch_id)
+    return JSONResponse(content=inserted_batch.json(), status_code=200)
 
 
-@router.get("/batch/{batch_id}")
+@router.get("/batch/{batch_id}", response_model=Batch)
 def get_batch(
     batch_id: str,
     current_user: User = Security(get_current_active_user, scopes=["R"]),
@@ -78,7 +95,7 @@ def get_batch(
     )
 
 
-@router.get("/batch/{batch_id}/samples")
+@router.get("/batch/{batch_id}/samples", response_model=List[Sample])
 def batch_samples(
     batch_id: str,
     page_size: Optional[int] = Query(5),
@@ -98,10 +115,34 @@ def batch_samples(
     )
 
 
-@router.get("/{batch_id}/{ncv}")
-def Zscore(
+@router.get("/batch/{batch_id}/download")
+def batch_download(
     batch_id: str,
-    ncv: str,
+    file_id: Literal["result_file", "multiqc_report", "segmental_calls"] = Query(...),
+    file_name: str = Query(...),
+    current_user: User = Security(get_current_active_user, scopes=["R"]),
+    adapter: StatinaAdapter = Depends(get_nipt_adapter),
+):
+    """Download files, media type application/text or application/octet-stream"""
+    batch: Batch = find.batch(adapter=adapter, batch_id=batch_id).dict()
+    file_path = batch.get(file_id)
+    if not validate_file_path(file_path):
+        return JSONResponse
+
+    path = Path(file_path)
+    if path.is_dir():
+        file_obj = zip_dir(source_dir=file_path)
+        return StreamingResponse(file_obj, media_type="application/text")
+
+    return FileResponse(
+        str(path.absolute()), media_type="application/octet-stream", filename=path.name
+    )
+
+
+@router.get("/batch/{batch_id}/zscore")
+def zscore(
+    batch_id: str,
+    ncv: str = Query(...),
     current_user: User = Security(get_current_active_user, scopes=["R"]),
     adapter: StatinaAdapter = Depends(get_nipt_adapter),
 ):
@@ -208,3 +249,37 @@ def coverage(
             )
         ),
     )
+
+
+@router.put("/batch/{batch_id}/comment")
+async def batch_update_comment(
+    batch_id: str,
+    comment: Optional[str] = Form(...),
+    adapter: StatinaAdapter = Depends(get_nipt_adapter),
+    current_user: User = Security(get_current_active_user, scopes=["RW"]),
+):
+    """Update batch comment"""
+
+    batch: Batch = find.batch(batch_id=batch_id, adapter=adapter)
+    batch.comment = comment
+    update.update_batch(adapter=adapter, batch=batch)
+
+    return JSONResponse(content="Batch comment updated", status_code=202)
+
+
+@router.patch("/batch/{batch_id}/include_samples")
+async def include_samples(
+    batch_id: str,
+    adapter: StatinaAdapter = Depends(get_nipt_adapter),
+    current_user: User = Security(get_current_active_user, scopes=["RW"]),
+):
+    """Update include status and comment for samples in batch"""
+    samples: List[DataBaseSample] = find.batch_samples(adapter=adapter, batch_id=batch_id)
+    for sample in samples:
+        sample.include = True
+        sample.change_include_date = (
+            f'{current_user.username} {datetime.now().strftime("%Y/%m/%d %H:%M:%S")}'
+        )
+        update.sample(adapter=adapter, sample=sample)
+
+    return JSONResponse(content="All samples included in batch plots", status_code=200)

@@ -1,21 +1,26 @@
 import datetime
 import logging
-from typing import List, Optional
+from typing import List, Optional, Literal
 
-from fastapi import Depends, Security, APIRouter, Query, Form
+from fastapi import Depends, Security, APIRouter, Query, Form, HTTPException
 from fastapi.encoders import jsonable_encoder
+from fastapi.security import OAuth2PasswordBearer, SecurityScopes
+from jose import jwt, JWTError
 from pydantic import EmailStr
+from starlette import status
 from starlette.background import BackgroundTasks
 from starlette.responses import JSONResponse
 
+from statina.API.external.api.api_v1.templates.email.account_activated import (
+    ACTIVATION_MESSAGE_TEMPLATE,
+)
 from statina.API.external.api.api_v1.templates.email.admin_mail import ADMIN_MESSAGE_TEMPLATE
 from statina.API.external.api.api_v1.templates.email.confirmation import (
     CONFIRMATION_MESSAGE_TEMPLATE,
 )
-from statina.API.external.api.deps import get_password_hash
-from statina.API.v2.endpoints.login import get_current_active_user
+from statina.API.external.api.deps import get_password_hash, find_user
 from statina.adapter import StatinaAdapter
-from statina.config import get_nipt_adapter, email_settings
+from statina.config import get_nipt_adapter, email_settings, settings
 from statina.crud import update
 from statina.crud.find import find
 from statina.crud.insert import insert_user
@@ -24,14 +29,56 @@ from statina.models.database import User
 import secrets
 
 from sendmail_container import FormDataRequest
+
+from statina.models.database.user import inactive_roles
+from statina.models.server.auth import TokenData
 from statina.tools.email import send_email
 
-router = APIRouter(prefix="/v2")
+router = APIRouter()
+
+oauth2_scheme = OAuth2PasswordBearer(
+    tokenUrl="token",
+    scopes={
+        "R": "Read-only access to database",
+        "RW": "Read and write access",
+        "admin": "Admin permissions",
+    },
+)
+credentials_exception = HTTPException(
+    status_code=status.HTTP_401_UNAUTHORIZED,
+    detail="Could not validate credentials",
+    headers={"WWW-Authenticate": "Bearer"},
+)
+
 
 LOG = logging.getLogger(__name__)
 
 
-@router.post("/register")
+async def get_current_user(security_scopes: SecurityScopes, token: str = Depends(oauth2_scheme)):
+    try:
+        payload = jwt.decode(token, settings.secret_key, algorithms=settings.algorithm)
+        username: str = payload.get("sub")
+        if username is None:
+            raise credentials_exception
+        token_data = TokenData(username=username, scopes=payload.get("scopes", []))
+    except JWTError:
+        raise credentials_exception
+    user = find_user(username=token_data.username)
+    if user is None:
+        raise credentials_exception
+    for scope in security_scopes.scopes:
+        if scope not in token_data.scopes:
+            raise credentials_exception
+    return user
+
+
+async def get_current_active_user(current_user: User = Security(get_current_user, scopes=["R"])):
+    if current_user.role in inactive_roles:
+        raise HTTPException(status_code=400, detail="Inactive user")
+    return current_user
+
+
+@router.post("/user/register", response_model=User)
 async def register_user(
     background_tasks: BackgroundTasks,
     email: EmailStr = Form(...),
@@ -76,7 +123,7 @@ async def register_user(
     return JSONResponse(content=user.json(exclude={"role", "hashed_password", "verification_hex"}))
 
 
-@router.get("/users/")
+@router.get("/users/", response_model=List[User])
 def users(
     page_size: Optional[int] = Query(5),
     page_num: Optional[int] = Query(0),
@@ -88,11 +135,11 @@ def users(
     return JSONResponse(content=jsonable_encoder(user_list))
 
 
-@router.get("/validate_user")
-async def validate_user(
+@router.patch("/user/{username}/validate")
+async def validate_user_email(
     username: str,
-    verification_hex: str,
     background_tasks: BackgroundTasks,
+    verification_hex: str = Query(...),
     adapter: StatinaAdapter = Depends(get_nipt_adapter),
 ):
     update_user: User = find.user(user_name=username, adapter=adapter)
@@ -122,3 +169,41 @@ async def validate_user(
     except Exception as e:
         LOG.error(e)
         return JSONResponse(content="Server could not verify user", status_code=500)
+
+
+@router.put("/user/{username}/role")
+async def update_user_role(
+    username: str,
+    background_tasks: BackgroundTasks,
+    role: Literal[
+        "unconfirmed",
+        "inactive",
+        "R",
+        "RW",
+        "admin",
+    ] = Query(...),
+    adapter: StatinaAdapter = Depends(get_nipt_adapter),
+    current_user: User = Security(get_current_active_user, scopes=["admin"]),
+):
+    update_user: User = find.user(user_name=username, adapter=adapter)
+    old_role = update_user.role
+    update_user.role = role
+    update.update_user(adapter=adapter, user=update_user)
+    if old_role in inactive_roles and role not in inactive_roles:
+        email_form = FormDataRequest(
+            sender_prefix=email_settings.sender_prefix,
+            email_server_alias=email_settings.email_server_alias,
+            request_uri=email_settings.mail_uri,
+            recipients=update_user.email,
+            mail_title="Your account has been activated",
+            mail_body=ACTIVATION_MESSAGE_TEMPLATE.format(
+                website_uri=email_settings.website_uri, username=update_user.username
+            ),
+        )
+        background_tasks.add_task(send_email, email_form)
+    return JSONResponse(content="User updated", status_code=202)
+
+
+@router.get("/user/me/", response_model=User)
+async def read_users_me(current_user: User = Security(get_current_active_user, scopes=["R"])):
+    return current_user

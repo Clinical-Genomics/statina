@@ -15,12 +15,7 @@ internal_versions = {"v1": internal_api_v1}
 
 def external(version: str) -> FastAPI:
     api = external_versions[version]
-    external_app = FastAPI(
-        servers=[
-            {"url": "https://statina-stage.scilifelab.se", "description": "Staging environment"}
-        ],
-        root_path_in_servers=False,
-    )
+    external_app = FastAPI()
 
     @external_app.exception_handler(CredentialsError)
     async def exception_handler(request: Request, exc: CredentialsError) -> Response:
@@ -46,16 +41,17 @@ def external(version: str) -> FastAPI:
     external_app.include_router(api.download.router, tags=["download"])
     external_app.include_router(api.statistics.router, tags=["statistics"])
 
-    external_app.include_router(external_api_v2.login.router, tags=["login_v2"])
+    external_app.include_router(external_api_v2.base.router, prefix="/v2", tags=["base_v2"])
     external_app.include_router(
         external_api_v2.batches.router,
+        prefix="/v2",
         tags=["batches_v2"],
     )
-    external_app.include_router(external_api_v2.sample.router, tags=["sample_v2"])
-    external_app.include_router(external_api_v2.update.router, tags=["update_v2"])
-    external_app.include_router(external_api_v2.download.router, tags=["download_v2"])
-    external_app.include_router(external_api_v2.statistics.router, tags=["statistics_v2"])
-    external_app.include_router(external_api_v2.user.router, tags=["user_v2"])
+    external_app.include_router(external_api_v2.sample.router, prefix="/v2", tags=["sample_v2"])
+    external_app.include_router(
+        external_api_v2.statistics.router, prefix="/v2", tags=["statistics_v2"]
+    )
+    external_app.include_router(external_api_v2.user.router, prefix="/v2", tags=["user_v2"])
     return external_app
 
 

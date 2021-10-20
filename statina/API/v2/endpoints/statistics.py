@@ -1,8 +1,8 @@
 from fastapi import APIRouter, Depends, Security
 from fastapi.encoders import jsonable_encoder
 from fastapi.responses import JSONResponse
+from statina.API.v2.endpoints.user import get_current_active_user
 
-from statina.API.v2.endpoints.login import get_current_active_user
 from statina.adapter.plugin import StatinaAdapter
 from statina.config import get_nipt_adapter
 from statina.crud.find.plots.statistics_plot_data import (
@@ -12,7 +12,7 @@ from statina.crud.find.plots.statistics_plot_data import (
 )
 from statina.models.database import User
 
-router = APIRouter(prefix="/v2")
+router = APIRouter()
 
 
 @router.get("/statistics")

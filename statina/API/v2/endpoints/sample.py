@@ -22,7 +22,7 @@ from statina.models.server.plots.ncv import Zscore131821, ZscoreSamples
 from statina.models.server.sample import Sample
 from statina.parse.batch import validate_file_path
 
-router = APIRouter()
+router = APIRouter(prefix="/v2")
 
 
 @router.get("/samples/", response_model=List[Sample])

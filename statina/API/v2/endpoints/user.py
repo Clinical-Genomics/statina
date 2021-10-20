@@ -5,7 +5,7 @@ from typing import List, Literal, Optional
 
 from fastapi import APIRouter, Depends, Form, HTTPException, Query, Security
 from fastapi.encoders import jsonable_encoder
-from fastapi.security import OAuth2PasswordBearer, SecurityScopes
+from fastapi.security import OAuth2PasswordBearer, SecurityScopes, OAuth2PasswordRequestForm
 from jose import JWTError, jwt
 from pydantic import EmailStr
 from sendmail_container import FormDataRequest
@@ -21,7 +21,12 @@ from statina.API.external.api.api_v1.templates.email.admin_mail import ADMIN_MES
 from statina.API.external.api.api_v1.templates.email.confirmation import (
     CONFIRMATION_MESSAGE_TEMPLATE,
 )
-from statina.API.external.api.deps import find_user, get_password_hash
+from statina.API.external.api.deps import (
+    find_user,
+    get_password_hash,
+    authenticate_user,
+    create_access_token,
+)
 from statina.config import email_settings, get_nipt_adapter, settings
 from statina.crud import delete, update
 from statina.crud.find import find
@@ -29,10 +34,10 @@ from statina.crud.insert import insert_user
 from statina.exeptions import MissMatchingPasswordError
 from statina.models.database import User
 from statina.models.database.user import inactive_roles
-from statina.models.server.auth import TokenData
+from statina.models.server.auth import TokenData, Token
 from statina.tools.email import send_email
 
-router = APIRouter()
+router = APIRouter(prefix="/v2")
 
 oauth2_scheme = OAuth2PasswordBearer(
     tokenUrl="token",
@@ -74,6 +79,17 @@ async def get_current_active_user(current_user: User = Security(get_current_user
     if current_user.role in inactive_roles:
         raise HTTPException(status_code=400, detail="Inactive user")
     return current_user
+
+
+@router.post("/token", response_model=Token)
+def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends()):
+    """Creating a time delimited access token if the user is found in the database."""
+
+    user: User = authenticate_user(form_data.username, form_data.password)
+    if not user:
+        raise credentials_exception
+    access_token = create_access_token(form_data=form_data, username=user.username)
+    return Token(access_token=access_token, token_type="bearer").dict()
 
 
 @router.post("/user/register", response_model=User)

@@ -12,7 +12,7 @@ from statina.crud.find.plots.statistics_plot_data import (
 )
 from statina.models.database import User
 
-router = APIRouter()
+router = APIRouter(prefix="/v2")
 
 
 @router.get("/statistics")

@@ -115,18 +115,19 @@ def batch_samples(
     )
 
 
-@router.get("/batch/{batch_id}/download")
+@router.get("/batch/{batch_id}/download/{file_name}")
 def batch_download(
     batch_id: str,
+    file_name: str,
     file_id: Literal["result_file", "multiqc_report", "segmental_calls"] = Query(...),
     current_user: User = Security(get_current_active_user, scopes=["R"]),
     adapter: StatinaAdapter = Depends(get_nipt_adapter),
 ):
     """Download files, media type application/text or application/octet-stream"""
-    batch: Batch = find.batch(adapter=adapter, batch_id=batch_id).dict()
-    file_path = batch.get(file_id)
+    batch: Batch = find.batch(adapter=adapter, batch_id=batch_id)
+    file_path = batch.file_id
     if not validate_file_path(file_path):
-        return JSONResponse
+        return JSONResponse(content="File not found", status_code=404)
 
     path = Path(file_path)
     if path.is_dir():
@@ -140,10 +141,10 @@ def batch_download(
     )
 
 
-@router.get("/batch/{batch_id}/zscore")
-def zscore(
+@router.get("/batch/{batch_id}/zscore_plot")
+def zscore_plot(
     batch_id: str,
-    ncv: str = Query(...),
+    ncv: Literal["13", "18", "21"] = Query(...),
     current_user: User = Security(get_current_active_user, scopes=["R"]),
     adapter: StatinaAdapter = Depends(get_nipt_adapter),
 ):
@@ -162,7 +163,7 @@ def zscore(
     )
 
 
-@router.get("/batches/{batch_id}/fetal_fraction_XY")
+@router.get("/batch/{batch_id}/fetal_fraction_XY")
 def fetal_fraction_XY(
     batch_id: str,
     current_user: User = Security(get_current_active_user, scopes=["R"]),
@@ -210,7 +211,7 @@ def fetal_fraction_XY(
     )
 
 
-@router.get("/batches/{batch_id}/fetal_fraction")
+@router.get("/batch/{batch_id}/fetal_fraction")
 def fetal_fraction(
     batch_id: str,
     current_user: User = Security(get_current_active_user, scopes=["R"]),
@@ -229,7 +230,7 @@ def fetal_fraction(
     )
 
 
-@router.get("/batches/{batch_id}/coverage")
+@router.get("/batch/{batch_id}/coverage")
 def coverage(
     batch_id: str,
     current_user: User = Security(get_current_active_user, scopes=["R"]),

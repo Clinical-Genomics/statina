@@ -52,7 +52,7 @@ def sample(
     return JSONResponse(content=jsonable_encoder(sample))
 
 
-@router.get("/samples/{sample_id}/tris")
+@router.get("/sample/{sample_id}/tris")
 def sample_tris(
     sample_id: str,
     current_user: User = Security(get_current_active_user, scopes=["R"]),

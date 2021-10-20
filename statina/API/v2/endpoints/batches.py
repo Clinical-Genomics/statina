@@ -119,7 +119,6 @@ def batch_samples(
 def batch_download(
     batch_id: str,
     file_id: Literal["result_file", "multiqc_report", "segmental_calls"] = Query(...),
-    file_name: str = Query(...),
     current_user: User = Security(get_current_active_user, scopes=["R"]),
     adapter: StatinaAdapter = Depends(get_nipt_adapter),
 ):
@@ -132,12 +131,11 @@ def batch_download(
     path = Path(file_path)
     if path.is_dir():
         file_obj = zip_dir(source_dir=file_path)
-        return StreamingResponse(file_obj, media_type="application/text")
+        return StreamingResponse(file_obj, media_type="application/octet-stream")
 
     return FileResponse(
         str(path.absolute()),
         media_type="application/octet-stream",
-        headers={"content-type": "application/octet-stream"},
         filename=path.name,
     )
 

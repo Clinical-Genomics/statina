@@ -124,8 +124,8 @@ def batch_download(
     adapter: StatinaAdapter = Depends(get_nipt_adapter),
 ):
     """Download files, media type application/text or application/octet-stream"""
-    batch: Batch = find.batch(adapter=adapter, batch_id=batch_id)
-    file_path = batch.file_id
+    batch: dict = find.batch(adapter=adapter, batch_id=batch_id).dict()
+    file_path = batch.get(file_id)
     if not validate_file_path(file_path):
         return JSONResponse(content="File not found", status_code=404)
 

@@ -21,7 +21,7 @@ from statina.API.external.api.api_v1.templates.email.confirmation import (
 from statina.API.external.api.deps import get_password_hash, find_user
 from statina.adapter import StatinaAdapter
 from statina.config import get_nipt_adapter, email_settings, settings
-from statina.crud import update
+from statina.crud import update, delete
 from statina.crud.find import find
 from statina.crud.insert import insert_user
 from statina.exeptions import MissMatchingPasswordError
@@ -207,3 +207,14 @@ async def update_user_role(
 @router.get("/user/me/", response_model=User)
 async def read_users_me(current_user: User = Security(get_current_active_user, scopes=["R"])):
     return current_user
+
+
+@router.delete("/user/{username}")
+async def delete_user(
+    username: str,
+    background_tasks: BackgroundTasks,
+    adapter: StatinaAdapter = Depends(get_nipt_adapter),
+    current_user: User = Security(get_current_active_user, scopes=["admin"]),
+):
+    await delete.delete_user(adapter=adapter, username=username)
+    return JSONResponse(content=f"User {username} deleted", status_code=201)

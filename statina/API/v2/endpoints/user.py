@@ -89,7 +89,7 @@ def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends()):
     if not user:
         raise credentials_exception
     access_token = create_access_token(form_data=form_data, username=user.username)
-    return Token(access_token=access_token, token_type="bearer").dict()
+    return {"access_token": access_token, "token_type": "bearer"}
 
 
 @router.post("/user/register", response_model=User)

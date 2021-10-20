@@ -135,7 +135,10 @@ def batch_download(
         return StreamingResponse(file_obj, media_type="application/text")
 
     return FileResponse(
-        str(path.absolute()), media_type="application/octet-stream", filename=path.name
+        str(path.absolute()),
+        media_type="application/octet-stream",
+        headers={"content-type": "application/octet-stream"},
+        filename=path.name,
     )
 
 

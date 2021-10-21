@@ -24,6 +24,17 @@ from statina.parse.batch import validate_file_path
 
 router = APIRouter(prefix="/v2")
 
+status_options = Literal[
+    "Normal",
+    "False Positive",
+    "Suspected",
+    "Verified",
+    "Probable",
+    "False Negative",
+    "Other",
+    "Failed",
+]
+
 
 @router.get("/samples/", response_model=List[Sample])
 def samples(
@@ -92,16 +103,7 @@ def sample_tris(
 @router.put("/sample/{sample_id}/status_13")
 async def set_sample_status_13(
     sample_id: str,
-    status: Literal[
-        "Normal",
-        "False Positive",
-        "Suspected",
-        "Verified",
-        "Probable",
-        "False Negative",
-        "Other",
-        "Failed",
-    ] = Query(...),
+    status: status_options = Query(...),
     adapter: StatinaAdapter = Depends(get_nipt_adapter),
     current_user: User = Security(get_current_active_user, scopes=["RW"]),
 ):
@@ -118,16 +120,7 @@ async def set_sample_status_13(
 @router.put("/sample/{sample_id}/status_18")
 async def set_sample_status_18(
     sample_id: str,
-    status: Literal[
-        "Normal",
-        "False Positive",
-        "Suspected",
-        "Verified",
-        "Probable",
-        "False Negative",
-        "Other",
-        "Failed",
-    ] = Query(...),
+    status: status_options = Query(...),
     adapter: StatinaAdapter = Depends(get_nipt_adapter),
     current_user: User = Security(get_current_active_user, scopes=["RW"]),
 ):
@@ -144,16 +137,7 @@ async def set_sample_status_18(
 @router.put("/sample/{sample_id}/status_21")
 async def set_sample_status_21(
     sample_id: str,
-    status: Literal[
-        "Normal",
-        "False Positive",
-        "Suspected",
-        "Verified",
-        "Probable",
-        "False Negative",
-        "Other",
-        "Failed",
-    ] = Query(...),
+    status: status_options = Query(...),
     adapter: StatinaAdapter = Depends(get_nipt_adapter),
     current_user: User = Security(get_current_active_user, scopes=["RW"]),
 ):
@@ -170,16 +154,7 @@ async def set_sample_status_21(
 @router.put("/sample/{sample_id}/status_X0")
 async def set_sample_status_x0(
     sample_id: str,
-    status: Literal[
-        "Normal",
-        "False Positive",
-        "Suspected",
-        "Verified",
-        "Probable",
-        "False Negative",
-        "Other",
-        "Failed",
-    ] = Query(...),
+    status: status_options = Query(...),
     adapter: StatinaAdapter = Depends(get_nipt_adapter),
     current_user: User = Security(get_current_active_user, scopes=["RW"]),
 ):
@@ -196,16 +171,7 @@ async def set_sample_status_x0(
 @router.put("/sample/{sample_id}/status_XXY")
 async def set_sample_status_xxy(
     sample_id: str,
-    status: Literal[
-        "Normal",
-        "False Positive",
-        "Suspected",
-        "Verified",
-        "Probable",
-        "False Negative",
-        "Other",
-        "Failed",
-    ] = Query(...),
+    status: status_options = Query(...),
     adapter: StatinaAdapter = Depends(get_nipt_adapter),
     current_user: User = Security(get_current_active_user, scopes=["RW"]),
 ):
@@ -222,16 +188,7 @@ async def set_sample_status_xxy(
 @router.put("/sample/{sample_id}/status_XXX")
 async def set_sample_status_xxx(
     sample_id: str,
-    status: Literal[
-        "Normal",
-        "False Positive",
-        "Suspected",
-        "Verified",
-        "Probable",
-        "False Negative",
-        "Other",
-        "Failed",
-    ] = Query(...),
+    status: status_options = Query(...),
     adapter: StatinaAdapter = Depends(get_nipt_adapter),
     current_user: User = Security(get_current_active_user, scopes=["RW"]),
 ):
@@ -248,16 +205,7 @@ async def set_sample_status_xxx(
 @router.put("/sample/{sample_id}/status_XYY")
 async def set_sample_status_xyy(
     sample_id: str,
-    status: Literal[
-        "Normal",
-        "False Positive",
-        "Suspected",
-        "Verified",
-        "Probable",
-        "False Negative",
-        "Other",
-        "Failed",
-    ] = Query(...),
+    status: status_options = Query(...),
     adapter: StatinaAdapter = Depends(get_nipt_adapter),
     current_user: User = Security(get_current_active_user, scopes=["RW"]),
 ):

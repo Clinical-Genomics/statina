@@ -56,7 +56,11 @@ credentials_exception = HTTPException(
 LOG = logging.getLogger(__name__)
 
 
-async def get_current_user(security_scopes: SecurityScopes, token: str = Depends(oauth2_scheme)):
+async def get_current_user(
+    security_scopes: SecurityScopes,
+    token: str = Depends(oauth2_scheme),
+    adapter: StatinaAdapter = Depends(get_nipt_adapter),
+):
     try:
         payload = jwt.decode(token, settings.secret_key, algorithms=settings.algorithm)
         username: str = payload.get("sub")
@@ -65,7 +69,7 @@ async def get_current_user(security_scopes: SecurityScopes, token: str = Depends
         token_data = TokenData(username=username, scopes=payload.get("scopes", []))
     except JWTError:
         raise credentials_exception
-    user = find_user(username=token_data.username)
+    user = find.user(user_name=username, adapter=adapter)
     if user is None:
         raise credentials_exception
     for scope in security_scopes.scopes:
@@ -106,7 +110,7 @@ async def register_user(
     password: str = Form(...),
     adapter: StatinaAdapter = Depends(get_nipt_adapter),
 ):
-    user = find_user(username=username)
+    user = find.user(user_name=username, adapter=adapter)
     if user:
         return JSONResponse(f"Username {username} already taken!", status_code=409)
     if not secrets.compare_digest(password, password_repeated):

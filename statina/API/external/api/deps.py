@@ -8,6 +8,7 @@ from passlib.context import CryptContext
 
 from statina.adapter.plugin import StatinaAdapter
 from statina.config import get_nipt_adapter, settings
+from statina.constants import SCOPES
 from statina.crud.find import find
 from statina.exeptions import CredentialsError
 from statina.models.database import User
@@ -65,12 +66,7 @@ def find_user(username: str) -> Optional[User]:
 
 def get_user_scopes(username: str) -> list:
     user_obj: Optional[User] = find_user(username=username)
-    if user_obj.role == "admin":
-        return ["R", "RW", "admin"]
-    elif user_obj.role == "RW":
-        return ["R", "RW"]
-    elif user_obj.role == "R":
-        return ["R"]
+    return SCOPES.get(user_obj.role, [])
 
 
 def create_access_token(

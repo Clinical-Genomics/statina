@@ -79,7 +79,14 @@ def sample_tris(
 async def set_sample_status_13(
     sample_id: str,
     status: Literal[
-        "Suspected", "Verified", "Probable", "False Negative", "Other", "Failed"
+        "Normal",
+        "False Positive",
+        "Suspected",
+        "Verified",
+        "Probable",
+        "False Negative",
+        "Other",
+        "Failed",
     ] = Query(...),
     adapter: StatinaAdapter = Depends(get_nipt_adapter),
     current_user: User = Security(get_current_active_user, scopes=["RW"]),
@@ -98,7 +105,14 @@ async def set_sample_status_13(
 async def set_sample_status_18(
     sample_id: str,
     status: Literal[
-        "Suspected", "Verified", "Probable", "False Negative", "Other", "Failed"
+        "Normal",
+        "False Positive",
+        "Suspected",
+        "Verified",
+        "Probable",
+        "False Negative",
+        "Other",
+        "Failed",
     ] = Query(...),
     adapter: StatinaAdapter = Depends(get_nipt_adapter),
     current_user: User = Security(get_current_active_user, scopes=["RW"]),
@@ -117,7 +131,14 @@ async def set_sample_status_18(
 async def set_sample_status_21(
     sample_id: str,
     status: Literal[
-        "Suspected", "Verified", "Probable", "False Negative", "Other", "Failed"
+        "Normal",
+        "False Positive",
+        "Suspected",
+        "Verified",
+        "Probable",
+        "False Negative",
+        "Other",
+        "Failed",
     ] = Query(...),
     adapter: StatinaAdapter = Depends(get_nipt_adapter),
     current_user: User = Security(get_current_active_user, scopes=["RW"]),
@@ -136,7 +157,14 @@ async def set_sample_status_21(
 async def set_sample_status_x0(
     sample_id: str,
     status: Literal[
-        "Suspected", "Verified", "Probable", "False Negative", "Other", "Failed"
+        "Normal",
+        "False Positive",
+        "Suspected",
+        "Verified",
+        "Probable",
+        "False Negative",
+        "Other",
+        "Failed",
     ] = Query(...),
     adapter: StatinaAdapter = Depends(get_nipt_adapter),
     current_user: User = Security(get_current_active_user, scopes=["RW"]),
@@ -155,7 +183,14 @@ async def set_sample_status_x0(
 async def set_sample_status_xxy(
     sample_id: str,
     status: Literal[
-        "Suspected", "Verified", "Probable", "False Negative", "Other", "Failed"
+        "Normal",
+        "False Positive",
+        "Suspected",
+        "Verified",
+        "Probable",
+        "False Negative",
+        "Other",
+        "Failed",
     ] = Query(...),
     adapter: StatinaAdapter = Depends(get_nipt_adapter),
     current_user: User = Security(get_current_active_user, scopes=["RW"]),
@@ -174,7 +209,14 @@ async def set_sample_status_xxy(
 async def set_sample_status_xxx(
     sample_id: str,
     status: Literal[
-        "Suspected", "Verified", "Probable", "False Negative", "Other", "Failed"
+        "Normal",
+        "False Positive",
+        "Suspected",
+        "Verified",
+        "Probable",
+        "False Negative",
+        "Other",
+        "Failed",
     ] = Query(...),
     adapter: StatinaAdapter = Depends(get_nipt_adapter),
     current_user: User = Security(get_current_active_user, scopes=["RW"]),
@@ -193,7 +235,14 @@ async def set_sample_status_xxx(
 async def set_sample_status_xyy(
     sample_id: str,
     status: Literal[
-        "Suspected", "Verified", "Probable", "False Negative", "Other", "Failed"
+        "Normal",
+        "False Positive",
+        "Suspected",
+        "Verified",
+        "Probable",
+        "False Negative",
+        "Other",
+        "Failed",
     ] = Query(...),
     adapter: StatinaAdapter = Depends(get_nipt_adapter),
     current_user: User = Security(get_current_active_user, scopes=["RW"]),
@@ -243,14 +292,13 @@ async def sample_include(
 @router.get("/sample/{sample_id}/download/segmental_calls")
 def sample_segmental_calls_download(
     sample_id: str,
-    file_id: str = Query(...),
     current_user: User = Security(get_current_active_user, scopes=["R"]),
     adapter: StatinaAdapter = Depends(get_nipt_adapter),
 ):
     """View for sample downloads"""
 
     sample: DataBaseSample = find.sample(adapter=adapter, sample_id=sample_id)
-    file_path = sample.dict().get(file_id)
+    file_path = sample.dict().get("segmental_calls")
     if not validate_file_path(file_path):
         # warn file missing!
         JSONResponse(content="File missing on disk", status_code=404)

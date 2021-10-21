@@ -85,3 +85,15 @@ BATCH_KEYS = [
     "Stdev_X",
     "Stdev_Y",
 ]
+
+
+SCOPES = {
+    "unconfirmed": ["unconfirmed"],
+    "inactive": [
+        "unconfirmed",
+        "inactive",
+    ],
+    "R": ["unconfirmed", "inactive", "R"],
+    "RW": ["unconfirmed", "inactive", "R", "RW"],
+    "admin": ["unconfirmed", "inactive", "R", "RW", "admin"],
+}

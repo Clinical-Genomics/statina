@@ -92,7 +92,11 @@ def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends()):
     return {"access_token": access_token, "token_type": "bearer"}
 
 
-@router.post("/user/register", response_model=User)
+@router.post(
+    "/user/register",
+    response_model=User,
+    response_model_exclude={"hashed_password", "verification_hex"},
+)
 async def register_user(
     background_tasks: BackgroundTasks,
     email: EmailStr = Form(...),
@@ -134,7 +138,9 @@ async def register_user(
         LOG.error(e)
         return JSONResponse(f"Could not register user")
 
-    return JSONResponse(content=user.json(exclude={"role", "hashed_password", "verification_hex"}))
+    return JSONResponse(
+        content=jsonable_encoder(user.dict(exclude={"hashed_password", "verification_hex"}))
+    )
 
 
 @router.get("/users/", response_model=List[User])
@@ -218,15 +224,23 @@ async def update_user_role(
     return JSONResponse(content="User updated", status_code=202)
 
 
-@router.get("/user/me/", response_model=User)
-async def read_users_me(current_user: User = Security(get_current_active_user, scopes=["R"])):
-    return current_user
+@router.get(
+    "/user/me/", response_model=User, response_model_exclude={"hashed_password", "verification_hex"}
+)
+async def read_users_me(
+    current_user: User = Security(get_current_active_user, scopes=["unconfirmed"])
+):
+    return JSONResponse(
+        content=jsonable_encoder(
+            current_user.dict(exclude={"hashed_password", "verification_hex"})
+        ),
+        status_code=200,
+    )
 
 
 @router.delete("/user/{username}")
 async def delete_user(
     username: str,
-    background_tasks: BackgroundTasks,
     adapter: StatinaAdapter = Depends(get_nipt_adapter),
     current_user: User = Security(get_current_active_user, scopes=["admin"]),
 ):

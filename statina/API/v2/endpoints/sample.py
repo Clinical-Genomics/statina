@@ -293,7 +293,7 @@ async def sample_include(
     adapter: StatinaAdapter = Depends(get_nipt_adapter),
     current_user: User = Security(get_current_active_user, scopes=["RW"]),
 ):
-    """Update sample comment"""
+    """Include sample in plots"""
 
     sample: DataBaseSample = find.sample(sample_id=sample_id, adapter=adapter)
     sample.include = include

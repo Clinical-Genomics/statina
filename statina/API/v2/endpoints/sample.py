@@ -54,6 +54,8 @@ def sample(
     """Get sample with id"""
 
     sample: DataBaseSample = find.sample(sample_id=sample_id, adapter=adapter)
+    if not sample:
+        return JSONResponse("Not found", status_code=404)
     validated_sample: Sample = Sample(**sample.dict())
 
     return JSONResponse(

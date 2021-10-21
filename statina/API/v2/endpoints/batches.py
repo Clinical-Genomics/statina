@@ -88,9 +88,12 @@ def get_batch(
     adapter: StatinaAdapter = Depends(get_nipt_adapter),
 ):
     """Batch view with table of all samples in the batch."""
+    batch: Batch = find.batch(batch_id=batch_id, adapter=adapter)
+    if not batch:
+        return JSONResponse("Not found", 404)
 
     return JSONResponse(
-        jsonable_encoder(find.batch(batch_id=batch_id, adapter=adapter), by_alias=False),
+        jsonable_encoder(batch, by_alias=False),
         status_code=200,
     )
 

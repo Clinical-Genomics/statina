@@ -22,7 +22,6 @@ from statina.API.external.api.api_v1.templates.email.confirmation import (
     CONFIRMATION_MESSAGE_TEMPLATE,
 )
 from statina.API.external.api.deps import (
-    find_user,
     get_password_hash,
     authenticate_user,
     create_access_token,

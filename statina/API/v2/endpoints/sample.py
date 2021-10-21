@@ -36,9 +36,10 @@ def samples(
     samples: List[DataBaseSample] = find.samples(
         adapter=adapter, page_size=page_size, page_num=page_num
     )
+    validated_samples: List[Sample] = [Sample(**sample_obj.dict()) for sample_obj in samples]
     return JSONResponse(
         content=jsonable_encoder(
-            samples,
+            validated_samples,
             by_alias=False,
         )
     )
@@ -53,10 +54,11 @@ def sample(
     """Get sample with id"""
 
     sample: DataBaseSample = find.sample(sample_id=sample_id, adapter=adapter)
+    validated_sample: Sample = Sample(**sample.dict())
 
     return JSONResponse(
         content=jsonable_encoder(
-            sample,
+            validated_sample,
             by_alias=False,
         )
     )

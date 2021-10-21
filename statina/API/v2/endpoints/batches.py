@@ -104,12 +104,13 @@ def batch_samples(
     adapter: StatinaAdapter = Depends(get_nipt_adapter),
 ):
     """Batch view with table of all samples in the batch."""
-
+    samples = find.batch_samples(
+        batch_id=batch_id, adapter=adapter, page_size=page_size, page_num=page_num
+    )
+    validated_samples: List[Sample] = [Sample(**sample_obj.dict()) for sample_obj in samples]
     return JSONResponse(
         jsonable_encoder(
-            find.batch_samples(
-                batch_id=batch_id, adapter=adapter, page_size=page_size, page_num=page_num
-            ),
+            validated_samples,
             by_alias=False,
         ),
         status_code=200,

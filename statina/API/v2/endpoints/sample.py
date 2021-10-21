@@ -299,7 +299,7 @@ async def sample_include(
     sample.include = include
     update.sample(adapter=adapter, sample=sample)
 
-    return JSONResponse(content="Sample comment updated", status_code=200)
+    return JSONResponse(content="Sample inclusion status updated", status_code=200)
 
 
 @router.get("/sample/{sample_id}/download/segmental_calls")

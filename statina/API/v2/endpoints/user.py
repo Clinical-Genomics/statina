@@ -31,7 +31,6 @@ from statina.config import email_settings, get_nipt_adapter, settings
 from statina.crud import delete, update
 from statina.crud.find import find
 from statina.crud.insert import insert_user
-from statina.exeptions import MissMatchingPasswordError
 from statina.models.database import User
 from statina.models.database.user import inactive_roles
 from statina.models.server.auth import TokenData, Token

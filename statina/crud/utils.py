@@ -5,7 +5,7 @@ from zipfile import ZipFile, ZIP_DEFLATED
 
 
 def paginate(page_size: int, page_num: int) -> Tuple[int, int]:
-    # Calculate number of documents to skip
+    """Calculate number of documents to skip"""
     if not page_size:
         return 0, 0
     if not page_num:

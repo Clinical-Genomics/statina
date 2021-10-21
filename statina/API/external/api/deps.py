@@ -50,9 +50,8 @@ def authenticate_user(username: str, password: str) -> Optional[User]:
     adapter: StatinaAdapter = get_nipt_adapter()
     user: User = find.user(adapter=adapter, user_name=username)
 
-    if user and user.role != "inactive" and verify_password(password, user.hashed_password):
+    if user and verify_password(password, user.hashed_password):
         return user
-    return None
 
 
 def find_user(username: str) -> Optional[User]:

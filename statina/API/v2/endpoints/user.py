@@ -106,6 +106,9 @@ async def register_user(
     password: str = Form(...),
     adapter: StatinaAdapter = Depends(get_nipt_adapter),
 ):
+    user = find_user(username=username)
+    if user:
+        return JSONResponse(f"Username {username} already taken!", status_code=409)
     if not secrets.compare_digest(password, password_repeated):
         return JSONResponse(content="Password mismatch!", status_code=400)
 

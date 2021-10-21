@@ -58,9 +58,7 @@ def find_user(username: str) -> Optional[User]:
     adapter: StatinaAdapter = get_nipt_adapter()
     user: User = find.user(adapter=adapter, user_name=username)
 
-    if user and user.role != "inactive":
-        return user
-    return None
+    return user
 
 
 def get_user_scopes(username: str) -> list:

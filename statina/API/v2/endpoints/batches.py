@@ -48,7 +48,7 @@ def batches(
 ):
     """List of all batches"""
     all_batches: List[Batch] = find.batches(adapter=adapter, page_size=page_size, page_num=page_num)
-    return JSONResponse(jsonable_encoder(all_batches))
+    return JSONResponse(jsonable_encoder(all_batches, by_alias=False))
 
 
 @router.delete("/batch/{batch_id}")
@@ -78,7 +78,7 @@ def load_batch(
     insert_batch(adapter=adapter, batch=batch, batch_files=batch_files)
     insert_samples(adapter=adapter, samples=samples, segmental_calls=batch_files.segmental_calls)
     inserted_batch = find.batch(adapter=adapter, batch_id=batch.batch_id)
-    return JSONResponse(content=jsonable_encoder(inserted_batch), status_code=200)
+    return JSONResponse(content=jsonable_encoder(inserted_batch, by_alias=False), status_code=200)
 
 
 @router.get("/batch/{batch_id}", response_model=Batch)
@@ -90,7 +90,8 @@ def get_batch(
     """Batch view with table of all samples in the batch."""
 
     return JSONResponse(
-        jsonable_encoder(find.batch(batch_id=batch_id, adapter=adapter)), status_code=200
+        jsonable_encoder(find.batch(batch_id=batch_id, adapter=adapter), by_alias=False),
+        status_code=200,
     )
 
 
@@ -108,7 +109,8 @@ def batch_samples(
         jsonable_encoder(
             find.batch_samples(
                 batch_id=batch_id, adapter=adapter, page_size=page_size, page_num=page_num
-            )
+            ),
+            by_alias=False,
         ),
         status_code=200,
     )
@@ -159,7 +161,8 @@ def zscore_plot(
                 ncv_chrom_data={ncv: get_tris_samples(adapter=adapter, chr=ncv, batch_id=batch_id)},
                 normal_data={ncv: get_tris_control_normal(adapter, ncv)},
                 abnormal_data={ncv: get_tris_control_abnormal(adapter, ncv, 0)},
-            )
+            ),
+            by_alias=False,
         ),
     )
 
@@ -207,7 +210,8 @@ def fetal_fraction_XY(
                 cases=cases,
                 max_x=x_max,
                 min_x=x_min,
-            )
+            ),
+            by_alias=False,
         ),
     )
 
@@ -226,7 +230,8 @@ def fetal_fraction(
                     adapter=adapter, batch_id=batch_id, control_samples=True
                 ),
                 cases=get_fetal_fraction.samples(adapter=adapter, batch_id=batch_id),
-            )
+            ),
+            by_alias=False,
         ),
     )
 
@@ -249,7 +254,8 @@ def coverage(
                 x_axis=list(range(1, 23)),
                 scatter_data=scatter_data,
                 box_data=box_data,
-            )
+            ),
+            by_alias=False,
         ),
     )
 

@@ -36,7 +36,12 @@ def samples(
     samples: List[DataBaseSample] = find.samples(
         adapter=adapter, page_size=page_size, page_num=page_num
     )
-    return JSONResponse(content=jsonable_encoder(samples))
+    return JSONResponse(
+        content=jsonable_encoder(
+            samples,
+            by_alias=False,
+        )
+    )
 
 
 @router.get("/sample/{sample_id}", response_model=Sample)
@@ -49,7 +54,12 @@ def sample(
 
     sample: DataBaseSample = find.sample(sample_id=sample_id, adapter=adapter)
 
-    return JSONResponse(content=jsonable_encoder(sample))
+    return JSONResponse(
+        content=jsonable_encoder(
+            sample,
+            by_alias=False,
+        )
+    )
 
 
 @router.get("/sample/{sample_id}/tris")
@@ -70,7 +80,8 @@ def sample_tris(
                 normal_data=normal_data.dict(exclude_none=True, by_alias=True),
                 abnormal_data=abnormal_data,
                 sample_data=sample_data,
-            )
+            ),
+            by_alias=False,
         ),
     )
 

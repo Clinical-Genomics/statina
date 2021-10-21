@@ -51,6 +51,7 @@ def statistics(
                 box_plots=box_plots,
                 scatter_stat=scatter_stat,
                 scatter_plots=scatter_plots,
-            )
+            ),
+            by_alias=False,
         )
     )

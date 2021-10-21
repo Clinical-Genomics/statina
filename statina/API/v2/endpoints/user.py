@@ -139,7 +139,10 @@ async def register_user(
         return JSONResponse(f"Could not register user")
 
     return JSONResponse(
-        content=jsonable_encoder(user.dict(exclude={"hashed_password", "verification_hex"}))
+        content=jsonable_encoder(
+            user.dict(exclude={"hashed_password", "verification_hex"}),
+            by_alias=False,
+        )
     )
 
 
@@ -152,7 +155,12 @@ def users(
 ):
     """Admin view with table of all users."""
     user_list: List[User] = find.users(adapter=adapter, page_size=page_size, page_num=page_num)
-    return JSONResponse(content=jsonable_encoder(user_list))
+    return JSONResponse(
+        content=jsonable_encoder(
+            user_list,
+            by_alias=False,
+        )
+    )
 
 
 @router.patch("/user/{username}/validate")
@@ -232,7 +240,8 @@ async def read_users_me(
 ):
     return JSONResponse(
         content=jsonable_encoder(
-            current_user.dict(exclude={"hashed_password", "verification_hex"})
+            current_user.dict(exclude={"hashed_password", "verification_hex"}),
+            by_alias=False,
         ),
         status_code=200,
     )

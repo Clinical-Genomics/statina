@@ -106,7 +106,7 @@ async def register_user(
     adapter: StatinaAdapter = Depends(get_nipt_adapter),
 ):
     if not secrets.compare_digest(password, password_repeated):
-        raise MissMatchingPasswordError
+        return JSONResponse(content="Password mismatch!", status_code=400)
 
     user = User(
         username=username,

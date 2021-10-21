@@ -74,7 +74,6 @@ def sample_tris(
 ):
     """Sample view with trisomi plot."""
     sample: DataBaseSample = find.sample(sample_id=sample_id, adapter=adapter)
-    batch: Batch = find.batch(batch_id=sample.batch_id, adapter=adapter)
     abnormal_data: Dict[str, ZscoreSamples] = get_abn_for_samp_tris_plot(adapter=adapter)
     normal_data: Zscore131821 = get_normal_for_samp_tris_plot(adapter=adapter)
     sample_data: ZscoreSamples = get_sample_for_samp_tris_plot(sample)

@@ -1,9 +1,9 @@
-from fastapi import APIRouter, Depends, Request
+from fastapi import APIRouter, Depends, Security
 from fastapi.encoders import jsonable_encoder
 from fastapi.responses import JSONResponse
 
 from statina.adapter.plugin import StatinaAdapter
-from statina.API.external.api.deps import get_current_user
+from statina.API.v2.endpoints.user import get_current_active_user
 from statina.config import get_nipt_adapter
 from statina.crud.find.plots.statistics_plot_data import (
     get_last_batches,
@@ -12,13 +12,12 @@ from statina.crud.find.plots.statistics_plot_data import (
 )
 from statina.models.database import User
 
-router = APIRouter()
-user = {}
+router = APIRouter(prefix="/v2")
 
 
 @router.get("/statistics")
 def statistics(
-    request: Request,
+    current_user: User = Security(get_current_active_user, scopes=["R"]),
     adapter: StatinaAdapter = Depends(get_nipt_adapter),
 ):
     """Statistics view."""
@@ -45,15 +44,14 @@ def statistics(
     return JSONResponse(
         content=jsonable_encoder(
             dict(
-                current_user=user,
-                ticks=list(range(0, nr_batches)),
+                ticks=list(range(nr_batches)),
                 nr_batches=nr_batches,
                 batch_ids=batch_ids,
                 box_stat=box_stat,
                 box_plots=box_plots,
                 scatter_stat=scatter_stat,
                 scatter_plots=scatter_plots,
-                page_id="statistics",
-            )
-        ),
+            ),
+            by_alias=False,
+        )
     )

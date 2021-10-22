@@ -7,6 +7,7 @@ from statina.exeptions import CredentialsError
 
 import statina.API.external.api.api_v1.endpoints as external_api_v1
 import statina.API.internal.api.api_v1.endpoints as internal_api_v1
+import statina.API.v2.endpoints as external_api_v2
 
 external_versions = {"v1": external_api_v1}
 internal_versions = {"v1": internal_api_v1}
@@ -20,6 +21,14 @@ def external(version: str) -> FastAPI:
     async def exception_handler(request: Request, exc: CredentialsError) -> Response:
         return RedirectResponse(url="/")
 
+    external_app.add_middleware(
+        CORSMiddleware,
+        allow_origins=["*"],
+        allow_credentials=True,
+        allow_methods=["*"],
+        allow_headers=["*"],
+    )
+
     external_app.include_router(api.login.router, prefix="/login", tags=["login"])
     external_app.include_router(
         api.batches.router,
@@ -31,6 +40,12 @@ def external(version: str) -> FastAPI:
     external_app.include_router(api.update.router, tags=["update"])
     external_app.include_router(api.download.router, tags=["download"])
     external_app.include_router(api.statistics.router, tags=["statistics"])
+
+    external_app.include_router(external_api_v2.base.router, tags=["base_v2"])
+    external_app.include_router(external_api_v2.batches.router, tags=["batches_v2"])
+    external_app.include_router(external_api_v2.sample.router, tags=["sample_v2"])
+    external_app.include_router(external_api_v2.statistics.router, tags=["statistics_v2"])
+    external_app.include_router(external_api_v2.user.router, tags=["user_v2"])
     return external_app
 
 
@@ -45,17 +60,6 @@ def internal(version: str) -> FastAPI:
         allow_headers=["*"],
     )
     internal_app.include_router(api.insert.router, prefix="/insert", tags=["insert"])
-    internal_app.include_router(api.login.router, prefix="/login", tags=["login"])
-    internal_app.include_router(
-        api.batches.router,
-        prefix="/batches",
-        tags=["batches"],
-    )
-    internal_app.include_router(api.index.router, tags=["index"])
-    internal_app.include_router(api.sample.router, tags=["sample"])
-    internal_app.include_router(api.update.router, tags=["update"])
-    internal_app.include_router(api.download.router, tags=["download"])
-    internal_app.include_router(api.statistics.router, tags=["statistics"])
     return internal_app
 
 

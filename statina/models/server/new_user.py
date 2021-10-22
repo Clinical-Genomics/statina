@@ -1,7 +1,6 @@
 from pydantic import BaseModel, EmailStr, validator
 
 from statina.exeptions import MissMatchingPasswordError
-from statina.config import EmailSettings
 
 
 class NewUser(BaseModel):

@@ -8,6 +8,7 @@ from passlib.context import CryptContext
 
 from statina.adapter.plugin import StatinaAdapter
 from statina.config import get_nipt_adapter, settings
+from statina.constants import SCOPES
 from statina.crud.find import find
 from statina.exeptions import CredentialsError
 from statina.models.database import User
@@ -49,22 +50,31 @@ def authenticate_user(username: str, password: str) -> Optional[User]:
     adapter: StatinaAdapter = get_nipt_adapter()
     user: User = find.user(adapter=adapter, user_name=username)
 
-    if not user:
-        return None
-    if user.role == "inactive":
-        return None
-    if not verify_password(password, user.hashed_password):
-        return None
+    if user and verify_password(password, user.hashed_password):
+        return user
+
+
+def find_user(username: str) -> Optional[User]:
+    adapter: StatinaAdapter = get_nipt_adapter()
+    user: User = find.user(adapter=adapter, user_name=username)
+
     return user
 
 
+def get_user_scopes(username: str) -> list:
+    user_obj: Optional[User] = find_user(username=username)
+    return SCOPES.get(user_obj.role, [])
+
+
 def create_access_token(
-    username: str, form_data: OAuth2PasswordRequestForm, expires_delta: Optional[timedelta] = None
+    username: str,
+    form_data: OAuth2PasswordRequestForm,
+    expires_delta: Optional[timedelta] = timedelta(minutes=15),
 ) -> str:
-    to_encode = {"sub": username, "scopes": form_data.scopes}
-    if expires_delta:
-        expire = datetime.utcnow() + expires_delta
-    else:
-        expire = datetime.utcnow() + timedelta(minutes=15)
-    to_encode.update({"exp": expire})
+    expire = datetime.utcnow() + timedelta(minutes=settings.access_token_expire_minutes)
+    to_encode = {
+        "sub": form_data.username,
+        "scopes": get_user_scopes(username=username),
+        "exp": expire,
+    }
     return jwt.encode(to_encode, settings.secret_key, algorithm=settings.algorithm)

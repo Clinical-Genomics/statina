@@ -29,3 +29,7 @@ def delete_batch(adapter: StatinaAdapter, batch_id: str):
 def delete_batches(adapter: StatinaAdapter, batches: Iterable[str]):
     for batch_id in batches:
         delete_batch(adapter=adapter, batch_id=batch_id)
+
+
+def delete_user(adapter: StatinaAdapter, username: str):
+    adapter.user_collection.delete_one({"username": username})

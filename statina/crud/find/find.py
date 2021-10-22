@@ -3,13 +3,14 @@ from typing import Iterable, List, Optional
 from pydantic import parse_obj_as
 
 from statina.adapter import StatinaAdapter
+from statina.crud.utils import paginate
 from statina.models.database import Batch, DataBaseSample, User
 
 
-def users(adapter: StatinaAdapter) -> List[User]:
+def users(adapter: StatinaAdapter, page_size: int = 0, page_num: int = 0) -> List[User]:
     """Return all users from the batch collection"""
-
-    users: Iterable[dict] = adapter.user_collection.find()
+    skip, limit = paginate(page_size=page_size, page_num=page_num)
+    users: Iterable[dict] = adapter.user_collection.find().skip(skip).limit(limit)
     return parse_obj_as(List[User], list(users))
 
 
@@ -28,10 +29,10 @@ def user(
     return User(**raw_user)
 
 
-def samples(adapter: StatinaAdapter) -> List[DataBaseSample]:
+def samples(adapter: StatinaAdapter, page_size: int = 0, page_num: int = 0) -> List[DataBaseSample]:
     """Return all batches from the batch collection"""
-
-    raw_samples: Iterable[dict] = adapter.sample_collection.find()
+    skip, limit = paginate(page_size=page_size, page_num=page_num)
+    raw_samples: Iterable[dict] = adapter.sample_collection.find().skip(skip).limit(limit)
     return parse_obj_as(List[DataBaseSample], list(raw_samples))
 
 
@@ -54,10 +55,10 @@ def batch(adapter: StatinaAdapter, batch_id: str) -> Optional[Batch]:
     return Batch(**raw_batch)
 
 
-def batches(adapter: StatinaAdapter) -> List[Batch]:
+def batches(adapter: StatinaAdapter, page_size: int = 0, page_num: int = 0) -> List[Batch]:
     """Return all batches from the batch collection"""
-
-    raw_batches: Iterable[dict] = adapter.batch_collection.find()
+    skip, limit = paginate(page_size=page_size, page_num=page_num)
+    raw_batches: Iterable[dict] = adapter.batch_collection.find().skip(skip).limit(limit)
     return parse_obj_as(List[Batch], list(raw_batches))
 
 
@@ -73,8 +74,12 @@ def batch_aggregate(adapter: StatinaAdapter, pipe: list) -> List[Batch]:
     return list(adapter.batch_collection.aggregate(pipe))
 
 
-def batch_samples(adapter: StatinaAdapter, batch_id: str) -> List[DataBaseSample]:
+def batch_samples(
+    adapter: StatinaAdapter, batch_id: str, page_size: int = 0, page_num: int = 0
+) -> List[DataBaseSample]:
     """All samples within the batch"""
-
-    raw_samples: Iterable[dict] = adapter.sample_collection.find({"batch_id": batch_id})
+    skip, limit = paginate(page_size=page_size, page_num=page_num)
+    raw_samples: Iterable[dict] = (
+        adapter.sample_collection.find({"batch_id": batch_id}).skip(skip).limit(limit)
+    )
     return parse_obj_as(List[DataBaseSample], list(raw_samples))

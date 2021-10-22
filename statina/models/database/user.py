@@ -1,8 +1,13 @@
 from datetime import datetime
-from typing import Literal
+from typing import Literal, Optional
 import secrets
 
 from pydantic import BaseModel, EmailStr
+
+inactive_roles = [
+    "unconfirmed",
+    "inactive",
+]
 
 
 class User(BaseModel):

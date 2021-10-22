@@ -4,13 +4,13 @@ from typing import List
 
 from fastapi import APIRouter, Depends, Response, status
 
+
 from statina.adapter.plugin import StatinaAdapter
-from statina.API.external.api.deps import get_password_hash
 from statina.config import get_nipt_adapter
 from statina.crud.find import find
-from statina.crud.insert import insert_batch, insert_samples, insert_user
-from statina.models.database import Batch, DataBaseSample, User
-from statina.models.server.load import BatchRequestBody, UserRequestBody
+from statina.crud.insert import insert_batch, insert_samples
+from statina.models.database import Batch, DataBaseSample
+from statina.models.server.load import BatchRequestBody
 from statina.parse.batch import get_batch, get_samples
 
 router = APIRouter()
@@ -37,26 +37,3 @@ def batch(
 
     response.status_code = status.HTTP_200_OK
     return {"message": f"Batch {batch.batch_id} inserted to the database"}
-
-
-@router.post("/user")
-def user(
-    response: Response, user: UserRequestBody, adapter: StatinaAdapter = Depends(get_nipt_adapter)
-):
-    """Function to load user into the database with rest"""
-
-    user_dict = {
-        "email": user.email,
-        "username": user.username,
-        "role": user.role,
-        "hashed_password": get_password_hash(user.password),
-        "added": datetime.now(),
-    }
-
-    if find.user(adapter=adapter, email=user.email):
-        return "user already in database"
-
-    insert_user(adapter=adapter, user=User(**user_dict))
-
-    response.status_code = status.HTTP_200_OK
-    return {"message": f"User {user.email} inserted to the database."}

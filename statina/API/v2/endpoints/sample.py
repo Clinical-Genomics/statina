@@ -17,7 +17,7 @@ from statina.crud.find.plots.zscore_plot_data import (
     get_normal_for_samp_tris_plot,
     get_sample_for_samp_tris_plot,
 )
-from statina.models.database import Batch, DataBaseSample, User
+from statina.models.database import DataBaseSample, User
 from statina.models.server.plots.ncv import Zscore131821, ZscoreSamples
 from statina.models.server.sample import Sample
 from statina.parse.batch import validate_file_path
@@ -25,13 +25,13 @@ from statina.parse.batch import validate_file_path
 router = APIRouter(prefix="/v2")
 
 status_options = Literal[
+    "Verified",
+    "Suspected",
+    "Probable",
+    "Other",
     "Normal",
     "False Positive",
-    "Suspected",
-    "Verified",
-    "Probable",
     "False Negative",
-    "Other",
     "Failed",
 ]
 

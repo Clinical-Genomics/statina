@@ -61,7 +61,7 @@ async def batch_delete(
     return JSONResponse(content=f"Deleted batch {batch_id}", status_code=200)
 
 
-@router.post("/batch/", response_model=Batch)
+@router.post("/batch", response_model=Batch)
 def load_batch(
     batch_files: BatchRequestBody,
     current_user: User = Security(get_current_active_user, scopes=["RW"]),

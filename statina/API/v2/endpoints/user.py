@@ -153,7 +153,7 @@ async def register_user(
     )
 
 
-@router.get("/users/", response_model=List[User])
+@router.get("/users", response_model=List[User])
 def users(
     page_size: Optional[int] = Query(5),
     page_num: Optional[int] = Query(0),
@@ -240,7 +240,7 @@ async def update_user_role(
 
 
 @router.get(
-    "/user/me/", response_model=User, response_model_exclude={"hashed_password", "verification_hex"}
+    "/user/me", response_model=User, response_model_exclude={"hashed_password", "verification_hex"}
 )
 async def read_users_me(
     current_user: User = Security(get_current_active_user, scopes=["unconfirmed"])

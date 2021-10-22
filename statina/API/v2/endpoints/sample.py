@@ -36,7 +36,7 @@ status_options = Literal[
 ]
 
 
-@router.get("/samples/", response_model=List[Sample])
+@router.get("/samples", response_model=List[Sample])
 def samples(
     page_size: Optional[int] = Query(5),
     page_num: Optional[int] = Query(0),

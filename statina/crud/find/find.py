@@ -16,7 +16,7 @@ def users(adapter: StatinaAdapter, page_size: int = 0, page_num: int = 0) -> Lis
 
 def count_users(adapter: StatinaAdapter) -> int:
     """Count all users from the batch collection"""
-    return adapter.user_collection.count_documents()
+    return adapter.user_collection.count_documents(filter={})
 
 
 def user(
@@ -43,7 +43,7 @@ def samples(adapter: StatinaAdapter, page_size: int = 0, page_num: int = 0) -> L
 
 def count_samples(adapter: StatinaAdapter) -> int:
     """Count all samples in sample collection"""
-    return adapter.sample_collection.count_documents()
+    return adapter.sample_collection.count_documents(filter={})
 
 
 def sample(adapter: StatinaAdapter, sample_id: str) -> Optional[DataBaseSample]:
@@ -74,7 +74,7 @@ def batches(adapter: StatinaAdapter, page_size: int = 0, page_num: int = 0) -> L
 
 def count_batches(adapter: StatinaAdapter) -> int:
     """Count all batches from the batch collection"""
-    return adapter.batch_collection.count_documents()
+    return adapter.batch_collection.count_documents(filter={})
 
 
 def sample_aggregate(adapter: StatinaAdapter, pipe: list) -> list:

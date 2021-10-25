@@ -1,4 +1,4 @@
-from typing import Literal, Optional
+from typing import Literal, Optional, List
 
 from pydantic import BaseModel, validator
 
@@ -265,3 +265,8 @@ class Sample(DataBaseSample):
         ):
             return "danger"
         return "default"
+
+
+class PaginatedSampleResponse(BaseModel):
+    document_count: int
+    documents: List[Sample]

@@ -14,6 +14,11 @@ def users(adapter: StatinaAdapter, page_size: int = 0, page_num: int = 0) -> Lis
     return parse_obj_as(List[User], list(users))
 
 
+def count_users(adapter: StatinaAdapter) -> int:
+    """Count all users from the batch collection"""
+    return adapter.user_collection.count_documents()
+
+
 def user(
     adapter: StatinaAdapter, email: Optional[str] = None, user_name: Optional[str] = None
 ) -> Optional[User]:
@@ -30,10 +35,15 @@ def user(
 
 
 def samples(adapter: StatinaAdapter, page_size: int = 0, page_num: int = 0) -> List[DataBaseSample]:
-    """Return all batches from the batch collection"""
+    """Return all samples from the sample collection"""
     skip, limit = paginate(page_size=page_size, page_num=page_num)
     raw_samples: Iterable[dict] = adapter.sample_collection.find().skip(skip).limit(limit)
     return parse_obj_as(List[DataBaseSample], list(raw_samples))
+
+
+def count_samples(adapter: StatinaAdapter) -> int:
+    """Count all samples in sample collection"""
+    return adapter.sample_collection.count_documents()
 
 
 def sample(adapter: StatinaAdapter, sample_id: str) -> Optional[DataBaseSample]:
@@ -62,6 +72,11 @@ def batches(adapter: StatinaAdapter, page_size: int = 0, page_num: int = 0) -> L
     return parse_obj_as(List[Batch], list(raw_batches))
 
 
+def count_batches(adapter: StatinaAdapter) -> int:
+    """Count all batches from the batch collection"""
+    return adapter.batch_collection.count_documents()
+
+
 def sample_aggregate(adapter: StatinaAdapter, pipe: list) -> list:
     """Aggregates a query pipeline on the sample collection"""
 
@@ -83,3 +98,8 @@ def batch_samples(
         adapter.sample_collection.find({"batch_id": batch_id}).skip(skip).limit(limit)
     )
     return parse_obj_as(List[DataBaseSample], list(raw_samples))
+
+
+def count_batch_samples(adapter: StatinaAdapter, batch_id: str) -> int:
+    """Count samples within the batch"""
+    return adapter.sample_collection.count_documents(filter={"batch_id": batch_id})

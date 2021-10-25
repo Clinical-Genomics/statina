@@ -25,6 +25,7 @@ from statina.API.external.api.deps import (
     get_password_hash,
     authenticate_user,
     create_access_token,
+    get_user_scopes,
 )
 from statina.config import email_settings, get_nipt_adapter, settings
 from statina.crud import delete, update
@@ -93,7 +94,17 @@ def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends()):
     if not user:
         raise credentials_exception
     access_token = create_access_token(form_data=form_data, username=user.username)
-    return {"access_token": access_token, "token_type": "bearer"}
+    return JSONResponse(
+        content=jsonable_encoder(
+            {
+                "access_token": access_token,
+                "token_type": "bearer",
+                "username": user.username,
+                "email": user.email,
+                "scopes": get_user_scopes(user.username),
+            }
+        )
+    )
 
 
 @router.post(
@@ -162,11 +173,13 @@ def users(
 ):
     """Admin view with table of all users."""
     user_list: List[User] = find.users(adapter=adapter, page_size=page_size, page_num=page_num)
+    document_count = find.count_users(adapter=adapter)
     return JSONResponse(
         content=jsonable_encoder(
-            user_list,
+            {"document_count": document_count, "documents": user_list},
             by_alias=False,
-        )
+        ),
+        status_code=200,
     )
 
 

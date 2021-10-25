@@ -19,7 +19,7 @@ from statina.crud.find.plots.zscore_plot_data import (
 )
 from statina.models.database import Batch, DataBaseSample, User
 from statina.models.server.plots.ncv import Zscore131821, ZscoreSamples
-from statina.models.server.sample import Sample
+from statina.models.server.sample import Sample, PaginatedSampleResponse
 from statina.parse.batch import validate_file_path
 
 router = APIRouter(prefix="/v2")
@@ -36,7 +36,7 @@ status_options = Literal[
 ]
 
 
-@router.get("/samples", response_model=List[Sample])
+@router.get("/samples", response_model=PaginatedSampleResponse)
 def samples(
     page_size: Optional[int] = Query(5),
     page_num: Optional[int] = Query(0),
@@ -48,9 +48,10 @@ def samples(
         adapter=adapter, page_size=page_size, page_num=page_num
     )
     validated_samples: List[Sample] = [Sample(**sample_obj.dict()) for sample_obj in samples]
+    document_count: int = find.count_samples(adapter=adapter)
     return JSONResponse(
         content=jsonable_encoder(
-            validated_samples,
+            {"document_count": document_count, "documents": validated_samples},
             by_alias=False,
         )
     )

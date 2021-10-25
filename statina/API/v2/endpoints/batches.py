@@ -117,7 +117,7 @@ def batch_samples(
         batch_id=batch_id, adapter=adapter, page_size=page_size, page_num=page_num
     )
     validated_samples: List[Sample] = [Sample(**sample_obj.dict()) for sample_obj in samples]
-    document_count: int = find.count_batch_samples(batch_id=batch_id)
+    document_count: int = find.count_batch_samples(adapter=adapter, batch_id=batch_id)
     return JSONResponse(
         content=jsonable_encoder(
             {"document_count": document_count, "documents": validated_samples},

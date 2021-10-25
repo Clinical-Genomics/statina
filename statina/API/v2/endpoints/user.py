@@ -34,6 +34,7 @@ from statina.crud.insert import insert_user
 from statina.models.database import User
 from statina.models.database.user import inactive_roles
 from statina.models.server.auth import TokenData, Token
+from statina.models.server.new_user import PaginatedUserResponse
 from statina.tools.email import send_email
 
 router = APIRouter(prefix="/v2")
@@ -164,7 +165,7 @@ async def register_user(
     )
 
 
-@router.get("/users", response_model=List[User])
+@router.get("/users", response_model=PaginatedUserResponse)
 def users(
     page_size: Optional[int] = Query(5),
     page_num: Optional[int] = Query(0),

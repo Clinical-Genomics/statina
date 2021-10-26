@@ -116,9 +116,11 @@ async def register_user(
     password: str = Form(...),
     adapter: StatinaAdapter = Depends(get_nipt_adapter),
 ):
-    user = find.user(user_name=username, adapter=adapter)
-    if user:
+
+    if find.user(user_name=username, adapter=adapter):
         return JSONResponse(f"Username {username} already taken!", status_code=409)
+    elif find.user(email=email, adapter=adapter):
+        return JSONResponse(f"Email {email} already in use!", status_code=409)
     if not secrets.compare_digest(password, password_repeated):
         return JSONResponse(content="Password mismatch!", status_code=400)
 
@@ -150,7 +152,7 @@ async def register_user(
         background_tasks.add_task(send_email, email_form)
     except Exception as e:
         LOG.error(e)
-        return JSONResponse(f"Could not register user")
+        return JSONResponse(f"Could not register user", status_code=500)
 
     return JSONResponse(
         content=jsonable_encoder(

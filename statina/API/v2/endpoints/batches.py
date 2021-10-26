@@ -26,6 +26,7 @@ from statina.crud.find.plots.zscore_plot_data import (
 from statina.crud.insert import insert_batch, insert_samples
 from statina.crud.utils import zip_dir
 from statina.models.database import Batch, DataBaseSample, User
+from statina.models.server.batch import PaginatedBatchResponse
 from statina.models.server.load import BatchRequestBody
 from statina.models.server.plots.coverage import CoveragePlotSampleData
 from statina.models.server.plots.fetal_fraction import (
@@ -33,13 +34,13 @@ from statina.models.server.plots.fetal_fraction import (
     FetalFractionSamples,
 )
 from statina.models.server.plots.fetal_fraction_sex import SexChromosomeThresholds
-from statina.models.server.sample import Sample
+from statina.models.server.sample import Sample, PaginatedSampleResponse
 from statina.parse.batch import get_batch, get_samples, validate_file_path
 
 router = APIRouter(prefix="/v2")
 
 
-@router.get("/batches")
+@router.get("/batches", response_model=PaginatedBatchResponse)
 def batches(
     page_size: Optional[int] = Query(5),
     page_num: Optional[int] = Query(0),
@@ -47,8 +48,14 @@ def batches(
     adapter: StatinaAdapter = Depends(get_nipt_adapter),
 ):
     """List of all batches"""
-    all_batches: List[Batch] = find.batches(adapter=adapter, page_size=page_size, page_num=page_num)
-    return JSONResponse(jsonable_encoder(all_batches, by_alias=False))
+    batches: List[Batch] = find.batches(adapter=adapter, page_size=page_size, page_num=page_num)
+    document_count = find.count_batches(adapter=adapter)
+    return JSONResponse(
+        content=jsonable_encoder(
+            PaginatedBatchResponse(document_count=document_count, documents=batches),
+            by_alias=False,
+        )
+    )
 
 
 @router.delete("/batch/{batch_id}")
@@ -98,7 +105,7 @@ def get_batch(
     )
 
 
-@router.get("/batch/{batch_id}/samples", response_model=List[Sample])
+@router.get("/batch/{batch_id}/samples", response_model=PaginatedSampleResponse)
 def batch_samples(
     batch_id: str,
     page_size: Optional[int] = Query(5),
@@ -111,9 +118,10 @@ def batch_samples(
         batch_id=batch_id, adapter=adapter, page_size=page_size, page_num=page_num
     )
     validated_samples: List[Sample] = [Sample(**sample_obj.dict()) for sample_obj in samples]
+    document_count: int = find.count_batch_samples(adapter=adapter, batch_id=batch_id)
     return JSONResponse(
-        jsonable_encoder(
-            validated_samples,
+        content=jsonable_encoder(
+            PaginatedSampleResponse(document_count=document_count, documents=validated_samples),
             by_alias=False,
         ),
         status_code=200,

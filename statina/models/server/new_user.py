@@ -1,6 +1,9 @@
+from typing import List
+
 from pydantic import BaseModel, EmailStr, validator
 
 from statina.exeptions import MissMatchingPasswordError
+from statina.models.database import User
 
 
 class NewUser(BaseModel):
@@ -14,3 +17,8 @@ class NewUser(BaseModel):
         if v != values["password_repeated"]:
             raise MissMatchingPasswordError
         return v
+
+
+class PaginatedUserResponse(BaseModel):
+    document_count: int
+    documents: List[User]

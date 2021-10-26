@@ -53,6 +53,12 @@ credentials_exception = HTTPException(
     headers={"WWW-Authenticate": "Bearer"},
 )
 
+forbidden_access_exception = HTTPException(
+    status_code=status.HTTP_403_FORBIDDEN,
+    detail="Not authorized to access this resource",
+    headers={"WWW-Authenticate": "Bearer"},
+)
+
 
 LOG = logging.getLogger(__name__)
 
@@ -75,7 +81,7 @@ async def get_current_user(
         raise credentials_exception
     for scope in security_scopes.scopes:
         if scope not in token_data.scopes:
-            raise credentials_exception
+            raise forbidden_access_exception
     return user
 
 

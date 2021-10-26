@@ -177,7 +177,7 @@ def users(
     document_count = find.count_users(adapter=adapter)
     return JSONResponse(
         content=jsonable_encoder(
-            {"document_count": document_count, "documents": user_list},
+            PaginatedUserResponse(document_count=document_count, documents=user_list),
             by_alias=False,
         ),
         status_code=200,

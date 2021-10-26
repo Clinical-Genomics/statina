@@ -97,13 +97,13 @@ def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends()):
     access_token = create_access_token(form_data=form_data, username=user.username)
     return JSONResponse(
         content=jsonable_encoder(
-            {
-                "access_token": access_token,
-                "token_type": "bearer",
-                "username": user.username,
-                "email": user.email,
-                "scopes": get_user_scopes(user.username),
-            }
+            Token(
+                access_token=access_token,
+                token_type="bearer",
+                username=user.username,
+                email=user.email,
+                scopes=get_user_scopes(username=user.username),
+            )
         )
     )
 

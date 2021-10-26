@@ -17,7 +17,7 @@ from statina.crud.find.plots.zscore_plot_data import (
     get_normal_for_samp_tris_plot,
     get_sample_for_samp_tris_plot,
 )
-from statina.models.database import Batch, DataBaseSample, User
+from statina.models.database import DataBaseSample, User
 from statina.models.server.plots.ncv import Zscore131821, ZscoreSamples
 from statina.models.server.sample import Sample, PaginatedSampleResponse
 from statina.parse.batch import validate_file_path
@@ -51,7 +51,7 @@ def samples(
     document_count: int = find.count_samples(adapter=adapter)
     return JSONResponse(
         content=jsonable_encoder(
-            {"document_count": document_count, "documents": validated_samples},
+            PaginatedSampleResponse(document_count=document_count, documents=validated_samples),
             by_alias=False,
         )
     )

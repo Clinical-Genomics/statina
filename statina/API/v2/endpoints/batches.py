@@ -48,11 +48,11 @@ def batches(
     adapter: StatinaAdapter = Depends(get_nipt_adapter),
 ):
     """List of all batches"""
-    all_batches: List[Batch] = find.batches(adapter=adapter, page_size=page_size, page_num=page_num)
+    batches: List[Batch] = find.batches(adapter=adapter, page_size=page_size, page_num=page_num)
     document_count = find.count_batches(adapter=adapter)
     return JSONResponse(
         content=jsonable_encoder(
-            {"document_count": document_count, "documents": all_batches},
+            PaginatedBatchResponse(document_count=document_count, documents=batches),
             by_alias=False,
         )
     )
@@ -121,7 +121,7 @@ def batch_samples(
     document_count: int = find.count_batch_samples(adapter=adapter, batch_id=batch_id)
     return JSONResponse(
         content=jsonable_encoder(
-            {"document_count": document_count, "documents": validated_samples},
+            PaginatedSampleResponse(document_count=document_count, documents=validated_samples),
             by_alias=False,
         ),
         status_code=200,

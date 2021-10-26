@@ -1,6 +1,6 @@
 from typing import Optional
 
-from fastapi import status
+from fastapi import status, HTTPException
 
 
 class NIPToolError(Exception):
@@ -49,3 +49,16 @@ class CredentialsError(NIPToolError):
         self.message = message
         self.code = code
         super().__init__(message)
+
+
+credentials_exception = HTTPException(
+    status_code=status.HTTP_401_UNAUTHORIZED,
+    detail="Could not validate credentials",
+    headers={"WWW-Authenticate": "Bearer"},
+)
+
+forbidden_access_exception = HTTPException(
+    status_code=status.HTTP_403_FORBIDDEN,
+    detail="Not authorized to access this resource",
+    headers={"WWW-Authenticate": "Bearer"},
+)

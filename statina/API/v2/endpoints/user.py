@@ -9,7 +9,6 @@ from fastapi.security import OAuth2PasswordBearer, SecurityScopes, OAuth2Passwor
 from jose import JWTError, jwt
 from pydantic import EmailStr
 from sendmail_container import FormDataRequest
-from starlette import status
 from starlette.background import BackgroundTasks
 from starlette.responses import JSONResponse
 
@@ -31,6 +30,7 @@ from statina.config import email_settings, get_nipt_adapter, settings
 from statina.crud import delete, update
 from statina.crud.find import find
 from statina.crud.insert import insert_user
+from statina.exeptions import credentials_exception, forbidden_access_exception
 from statina.models.database import User
 from statina.models.database.user import inactive_roles
 from statina.models.server.auth import TokenData, Token
@@ -46,17 +46,6 @@ oauth2_scheme = OAuth2PasswordBearer(
         "RW": "Read and write access",
         "admin": "Admin permissions",
     },
-)
-credentials_exception = HTTPException(
-    status_code=status.HTTP_401_UNAUTHORIZED,
-    detail="Could not validate credentials",
-    headers={"WWW-Authenticate": "Bearer"},
-)
-
-forbidden_access_exception = HTTPException(
-    status_code=status.HTTP_403_FORBIDDEN,
-    detail="Not authorized to access this resource",
-    headers={"WWW-Authenticate": "Bearer"},
 )
 
 

@@ -72,7 +72,13 @@ def batches(
     skip, limit = paginate(page_size=page_size, page_num=page_num)
     raw_batches: Iterable[dict] = (
         adapter.batch_collection.find(
-            {"$text": {"$search": text}}, {"score": {"$meta": "textScore"}}
+            {
+                "$or": [
+                    {"batch_id": {"$regex": text, "$options": "i"}},
+                    {"comment": {"$regex": text, "$options": "i"}},
+                    {"Flowcell": {"$regex": text, "$options": "i"}},
+                ]
+            }
         )
         .skip(skip)
         .limit(limit)

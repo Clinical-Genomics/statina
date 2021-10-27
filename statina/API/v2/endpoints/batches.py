@@ -52,7 +52,7 @@ def batches(
     batches: List[Batch] = find.batches(
         adapter=adapter, page_size=page_size, page_num=page_num, text=text
     )
-    document_count = find.count_batches(adapter=adapter)
+    document_count = find.count_batches(adapter=adapter, text=text)
     return JSONResponse(
         content=jsonable_encoder(
             PaginatedBatchResponse(document_count=document_count, documents=batches),

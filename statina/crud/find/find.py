@@ -86,9 +86,17 @@ def batches(
     return parse_obj_as(List[Batch], list(raw_batches))
 
 
-def count_batches(adapter: StatinaAdapter) -> int:
+def count_batches(adapter: StatinaAdapter, text: Optional[str] = "") -> int:
     """Count all batches from the batch collection"""
-    return adapter.batch_collection.count_documents(filter={})
+    return adapter.batch_collection.count_documents(
+        filter={
+            "$or": [
+                {"batch_id": {"$regex": text, "$options": "i"}},
+                {"comment": {"$regex": text, "$options": "i"}},
+                {"Flowcell": {"$regex": text, "$options": "i"}},
+            ]
+        }
+    )
 
 
 def sample_aggregate(adapter: StatinaAdapter, pipe: list) -> list:

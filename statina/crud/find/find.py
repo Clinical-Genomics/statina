@@ -74,7 +74,6 @@ def batches(
         adapter.batch_collection.find(
             {"$text": {"$search": text}}, {"score": {"$meta": "textScore"}}
         )
-        .sort("score")
         .skip(skip)
         .limit(limit)
     )

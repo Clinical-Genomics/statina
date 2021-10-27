@@ -71,7 +71,11 @@ def batches(
     """Return all batches from the batch collection"""
     skip, limit = paginate(page_size=page_size, page_num=page_num)
     raw_batches: Iterable[dict] = (
-        adapter.batch_collection.find({"$text": {"$search": text}}).skip(skip).limit(limit)
+        adapter.batch_collection.find(
+            {"$text": {"$search": text}}, {"score": {"$meta": "textScore"}}
+        )
+        .skip(skip)
+        .limit(limit)
     )
     return parse_obj_as(List[Batch], list(raw_batches))
 

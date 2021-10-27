@@ -44,11 +44,14 @@ router = APIRouter(prefix="/v2")
 def batches(
     page_size: Optional[int] = Query(5),
     page_num: Optional[int] = Query(0),
+    text: Optional[str] = Query(...),
     current_user: User = Security(get_current_active_user, scopes=["R"]),
     adapter: StatinaAdapter = Depends(get_nipt_adapter),
 ):
     """List of all batches"""
-    batches: List[Batch] = find.batches(adapter=adapter, page_size=page_size, page_num=page_num)
+    batches: List[Batch] = find.batches(
+        adapter=adapter, page_size=page_size, page_num=page_num, text=text
+    )
     document_count = find.count_batches(adapter=adapter)
     return JSONResponse(
         content=jsonable_encoder(

@@ -65,10 +65,14 @@ def batch(adapter: StatinaAdapter, batch_id: str) -> Optional[Batch]:
     return Batch(**raw_batch)
 
 
-def batches(adapter: StatinaAdapter, page_size: int = 0, page_num: int = 0) -> List[Batch]:
+def batches(
+    adapter: StatinaAdapter, page_size: int = 0, page_num: int = 0, text: Optional[str] = ""
+) -> List[Batch]:
     """Return all batches from the batch collection"""
     skip, limit = paginate(page_size=page_size, page_num=page_num)
-    raw_batches: Iterable[dict] = adapter.batch_collection.find().skip(skip).limit(limit)
+    raw_batches: Iterable[dict] = (
+        adapter.batch_collection.find({"$text": {"$search": text}}).skip(skip).limit(limit)
+    )
     return parse_obj_as(List[Batch], list(raw_batches))
 
 

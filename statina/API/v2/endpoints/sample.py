@@ -69,7 +69,7 @@ def samples(
         text=text,
     )
     validated_samples: List[Sample] = [Sample(**sample_obj.dict()) for sample_obj in samples]
-    document_count: int = find.count_samples(adapter=adapter)
+    document_count: int = find.count_samples(adapter=adapter, text=text)
     return JSONResponse(
         content=jsonable_encoder(
             PaginatedSampleResponse(document_count=document_count, documents=validated_samples),

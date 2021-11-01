@@ -3,21 +3,50 @@ from typing import Iterable, List, Optional, Literal
 from pydantic import parse_obj_as
 
 from statina.adapter import StatinaAdapter
-from statina.constants import sort_table
+from statina.constants import sort_table, SCOPES
 from statina.crud.utils import paginate
 from statina.models.database import Batch, DataBaseSample, User
 
 
-def users(adapter: StatinaAdapter, page_size: int = 0, page_num: int = 0) -> List[User]:
+def users(
+    adapter: StatinaAdapter,
+    page_size: int = 0,
+    page_num: int = 0,
+    text: Optional[str] = "",
+    role: Optional[str] = "",
+) -> List[User]:
     """Return all users from the batch collection"""
     skip, limit = paginate(page_size=page_size, page_num=page_num)
-    users: Iterable[dict] = adapter.user_collection.find().skip(skip).limit(limit)
+    users: Iterable[dict] = (
+        adapter.user_collection.find(
+            {
+                "$and": [
+                    {"role": {"$in": [role or x for x in SCOPES]}},
+                    {
+                        "$or": [
+                            {"username": {"$regex": text, "$options": "i"}},
+                            {"email": {"$regex": text, "$options": "i"}},
+                        ]
+                    },
+                ]
+            }
+        )
+        .skip(skip)
+        .limit(limit)
+    )
     return parse_obj_as(List[User], list(users))
 
 
-def count_users(adapter: StatinaAdapter) -> int:
+def count_users(adapter: StatinaAdapter, text: Optional[str] = "") -> int:
     """Count all users from the batch collection"""
-    return adapter.user_collection.count_documents(filter={})
+    return adapter.user_collection.count_documents(
+        filter={
+            "$or": [
+                {"username": {"$regex": text, "$options": "i"}},
+                {"email": {"$regex": text, "$options": "i"}},
+            ]
+        }
+    )
 
 
 def user(

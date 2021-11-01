@@ -37,13 +37,22 @@ def users(
     return parse_obj_as(List[User], list(users))
 
 
-def count_users(adapter: StatinaAdapter, text: Optional[str] = "") -> int:
+def count_users(
+    adapter: StatinaAdapter,
+    text: Optional[str] = "",
+    role: Optional[str] = "",
+) -> int:
     """Count all users from the batch collection"""
     return adapter.user_collection.count_documents(
         filter={
-            "$or": [
-                {"username": {"$regex": text, "$options": "i"}},
-                {"email": {"$regex": text, "$options": "i"}},
+            "$and": [
+                {"role": {"$in": [role or x for x in SCOPES]}},
+                {
+                    "$or": [
+                        {"username": {"$regex": text, "$options": "i"}},
+                        {"email": {"$regex": text, "$options": "i"}},
+                    ]
+                },
             ]
         }
     )

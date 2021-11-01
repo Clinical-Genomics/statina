@@ -166,7 +166,7 @@ async def register_user(
 def users(
     page_size: Optional[int] = Query(5),
     page_num: Optional[int] = Query(0),
-    role: Literal[None, "admin", "unconfirmed", "inactive", "R", "RW"] = Query(None),
+    role: Literal["", "admin", "unconfirmed", "inactive", "R", "RW"] = Query(""),
     text: Optional[str] = Query(""),
     sort_key: Literal["added", "username", "email"] = Query("added"),
     sort_direction: Literal["ascending", "descending"] = Query("ascending"),

@@ -13,7 +13,7 @@ def users(
     page_size: int = 0,
     page_num: int = 0,
     text: Optional[str] = "",
-    role: Optional[str] = "",
+    role: Literal["", "admin", "unconfirmed", "inactive", "R", "RW"] = "",
     sort_key: Literal["added", "username", "email"] = "added",
     sort_direction: Literal["ascending", "descending"] = "ascending",
 ) -> List[User]:
@@ -43,7 +43,7 @@ def users(
 def count_users(
     adapter: StatinaAdapter,
     text: Optional[str] = "",
-    role: Optional[str] = "",
+    role: Literal["", "admin", "unconfirmed", "inactive", "R", "RW"] = "",
 ) -> int:
     """Count all users from the batch collection"""
     return adapter.user_collection.count_documents(

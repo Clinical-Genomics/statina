@@ -175,7 +175,7 @@ def users(
     user_list: List[User] = find.users(
         adapter=adapter, page_size=page_size, text=text, role=role, page_num=page_num
     )
-    document_count = find.count_users(adapter=adapter)
+    document_count = find.count_users(adapter=adapter, text=text, role=role)
     return JSONResponse(
         content=jsonable_encoder(
             PaginatedUserResponse(document_count=document_count, documents=user_list),

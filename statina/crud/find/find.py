@@ -92,7 +92,7 @@ def samples(
             "FFX",
         ]
     ] = "sample_id",
-    sort_direction: Optional[Literal["ascending", "descending"]] = "ascending",
+    sort_direction: Optional[Literal["ascending", "descending"]] = "descending",
     text: Optional[str] = "",
     page_size: int = 0,
     page_num: int = 0,
@@ -224,7 +224,7 @@ def batch_samples(
             "FFX",
         ]
     ] = "sample_id",
-    sort_direction: Optional[Literal["ascending", "descending"]] = "ascending",
+    sort_direction: Optional[Literal["ascending", "descending"]] = "descending",
     text: Optional[str] = "",
 ) -> List[DataBaseSample]:
     """All samples within the batch"""

@@ -135,7 +135,7 @@ def batch_samples(
             "FFX",
         ]
     ] = Query("sample_id"),
-    sort_direction: Optional[Literal["ascending", "descending"]] = Query("ascending"),
+    sort_direction: Optional[Literal["ascending", "descending"]] = Query("descending"),
     text: Optional[str] = Query(""),
     current_user: User = Security(get_current_active_user, scopes=["R"]),
     adapter: StatinaAdapter = Depends(get_nipt_adapter),

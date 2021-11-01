@@ -14,6 +14,8 @@ def users(
     page_num: int = 0,
     text: Optional[str] = "",
     role: Optional[str] = "",
+    sort_key: Literal["added", "username", "email"] = "added",
+    sort_direction: Literal["ascending", "descending"] = "ascending",
 ) -> List[User]:
     """Return all users from the batch collection"""
     skip, limit = paginate(page_size=page_size, page_num=page_num)
@@ -31,6 +33,7 @@ def users(
                 ]
             }
         )
+        .sort(sort_key, sort_table.get(sort_direction))
         .skip(skip)
         .limit(limit)
     )

@@ -166,14 +166,22 @@ async def register_user(
 def users(
     page_size: Optional[int] = Query(5),
     page_num: Optional[int] = Query(0),
-    role: Optional[Literal[None, "admin", "unconfirmed", "inactive", "R", "RW"]] = Query(None),
+    role: Literal[None, "admin", "unconfirmed", "inactive", "R", "RW"] = Query(None),
     text: Optional[str] = Query(""),
+    sort_key: Literal["added", "username", "email"] = Query("added"),
+    sort_direction: Literal["ascending", "descending"] = Query("ascending"),
     current_user: User = Security(get_current_active_user, scopes=["admin"]),
     adapter: StatinaAdapter = Depends(get_nipt_adapter),
 ):
     """Admin view with table of all users."""
     user_list: List[User] = find.users(
-        adapter=adapter, page_size=page_size, text=text, role=role, page_num=page_num
+        adapter=adapter,
+        page_size=page_size,
+        text=text,
+        role=role,
+        sort_key=sort_key,
+        sort_direction=sort_direction,
+        page_num=page_num,
     )
     document_count = find.count_users(adapter=adapter, text=text, role=role)
     return JSONResponse(

@@ -45,12 +45,21 @@ def batches(
     page_size: Optional[int] = Query(5),
     page_num: Optional[int] = Query(0),
     text: Optional[str] = Query(""),
+    sort_key: Optional[Literal["batch_id", "SequencingDate", "Flowcell", "comment"]] = Query(
+        "SequencingDate"
+    ),
+    sort_direction: Optional[Literal["ascending", "descending"]] = Query("descending"),
     current_user: User = Security(get_current_active_user, scopes=["R"]),
     adapter: StatinaAdapter = Depends(get_nipt_adapter),
 ):
     """List of all batches"""
     batches: List[Batch] = find.batches(
-        adapter=adapter, page_size=page_size, page_num=page_num, text=text
+        adapter=adapter,
+        page_size=page_size,
+        page_num=page_num,
+        text=text,
+        sort_key=sort_key,
+        sort_direction=sort_direction,
     )
     document_count = find.count_batches(adapter=adapter, text=text)
     return JSONResponse(
@@ -113,15 +122,36 @@ def batch_samples(
     batch_id: str,
     page_size: Optional[int] = Query(5),
     page_num: Optional[int] = Query(0),
+    sort_key: Optional[
+        Literal[
+            "sample_id",
+            "Zscore_13",
+            "Zscore_18",
+            "Zscore_21",
+            "Zscore_X",
+            "FF_Formatted",
+            "CNVSegment",
+            "FFY",
+            "FFX",
+        ]
+    ] = Query("sample_id"),
+    sort_direction: Optional[Literal["ascending", "descending"]] = Query("ascending"),
+    text: Optional[str] = Query(...),
     current_user: User = Security(get_current_active_user, scopes=["R"]),
     adapter: StatinaAdapter = Depends(get_nipt_adapter),
 ):
     """Batch view with table of all samples in the batch."""
     samples = find.batch_samples(
-        batch_id=batch_id, adapter=adapter, page_size=page_size, page_num=page_num
+        batch_id=batch_id,
+        adapter=adapter,
+        sort_key=sort_key,
+        sort_direction=sort_direction,
+        text=text,
+        page_size=page_size,
+        page_num=page_num,
     )
     validated_samples: List[Sample] = [Sample(**sample_obj.dict()) for sample_obj in samples]
-    document_count: int = find.count_batch_samples(adapter=adapter, batch_id=batch_id)
+    document_count: int = find.count_batch_samples(adapter=adapter, batch_id=batch_id, text=text)
     return JSONResponse(
         content=jsonable_encoder(
             PaginatedSampleResponse(document_count=document_count, documents=validated_samples),

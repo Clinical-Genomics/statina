@@ -1,8 +1,9 @@
-from typing import Iterable, List, Optional
+from typing import Iterable, List, Optional, Literal
 
 from pydantic import parse_obj_as
 
 from statina.adapter import StatinaAdapter
+from statina.constants import sort_table
 from statina.crud.utils import paginate
 from statina.models.database import Batch, DataBaseSample, User
 
@@ -34,16 +35,61 @@ def user(
     return User(**raw_user)
 
 
-def samples(adapter: StatinaAdapter, page_size: int = 0, page_num: int = 0) -> List[DataBaseSample]:
+def samples(
+    adapter: StatinaAdapter,
+    sort_key: Optional[
+        Literal[
+            "sample_id",
+            "batch_id",
+            "Zscore_13",
+            "Zscore_18",
+            "Zscore_21",
+            "Zscore_X",
+            "FF_Formatted",
+            "CNVSegment",
+            "FFY",
+            "FFX",
+        ]
+    ] = "sample_id",
+    sort_direction: Optional[Literal["ascending", "descending"]] = "ascending",
+    text: Optional[str] = "",
+    page_size: int = 0,
+    page_num: int = 0,
+) -> List[DataBaseSample]:
     """Return all samples from the sample collection"""
     skip, limit = paginate(page_size=page_size, page_num=page_num)
-    raw_samples: Iterable[dict] = adapter.sample_collection.find().skip(skip).limit(limit)
+    raw_samples: Iterable[dict] = (
+        adapter.sample_collection.find(
+            {
+                "$or": [
+                    {"batch_id": {"$regex": text, "$options": "i"}},
+                    {"sample_id": {"$regex": text, "$options": "i"}},
+                    {"comment": {"$regex": text, "$options": "i"}},
+                    {"SampleType": {"$regex": text, "$options": "i"}},
+                    {"QCFlag": {"$regex": text, "$options": "i"}},
+                ]
+            }
+        )
+        .sort(sort_key, sort_table.get(sort_direction))
+        .skip(skip)
+        .limit(limit)
+    )
     return parse_obj_as(List[DataBaseSample], list(raw_samples))
 
 
-def count_samples(adapter: StatinaAdapter) -> int:
+def count_samples(adapter: StatinaAdapter, text: Optional[str] = "") -> int:
     """Count all samples in sample collection"""
-    return adapter.sample_collection.count_documents(filter={})
+    return adapter.sample_collection.count_documents(
+        filter={
+            "$or": [
+                {"batch_id": {"$regex": text, "$options": "i"}},
+                {"sample_id": {"$regex": text, "$options": "i"}},
+                {"comment": {"$regex": text, "$options": "i"}},
+                {"SampleType": {"$regex": text, "$options": "i"}},
+                {"QCFlag": {"$regex": text, "$options": "i"}},
+            ]
+        }
+    )
 
 
 def sample(adapter: StatinaAdapter, sample_id: str) -> Optional[DataBaseSample]:
@@ -66,7 +112,14 @@ def batch(adapter: StatinaAdapter, batch_id: str) -> Optional[Batch]:
 
 
 def batches(
-    adapter: StatinaAdapter, page_size: int = 0, page_num: int = 0, text: Optional[str] = ""
+    adapter: StatinaAdapter,
+    page_size: int = 0,
+    page_num: int = 0,
+    sort_direction: Optional[Literal["ascending", "descending"]] = "descending",
+    sort_key: Optional[
+        Literal["batch_id", "SequencingDate", "Flowcell", "comment"]
+    ] = "SequencingDate",
+    text: Optional[str] = "",
 ) -> List[Batch]:
     """Return all batches from the batch collection"""
     skip, limit = paginate(page_size=page_size, page_num=page_num)
@@ -80,6 +133,7 @@ def batches(
                 ]
             }
         )
+        .sort(sort_key, sort_table.get(sort_direction))
         .skip(skip)
         .limit(limit)
     )
@@ -112,16 +166,65 @@ def batch_aggregate(adapter: StatinaAdapter, pipe: list) -> List[Batch]:
 
 
 def batch_samples(
-    adapter: StatinaAdapter, batch_id: str, page_size: int = 0, page_num: int = 0
+    adapter: StatinaAdapter,
+    batch_id: str,
+    page_size: int = 0,
+    page_num: int = 0,
+    sort_key: Optional[
+        Literal[
+            "sample_id",
+            "Zscore_13",
+            "Zscore_18",
+            "Zscore_21",
+            "Zscore_X",
+            "FF_Formatted",
+            "CNVSegment",
+            "FFY",
+            "FFX",
+        ]
+    ] = "sample_id",
+    sort_direction: Optional[Literal["ascending", "descending"]] = "ascending",
+    text: Optional[str] = "",
 ) -> List[DataBaseSample]:
     """All samples within the batch"""
     skip, limit = paginate(page_size=page_size, page_num=page_num)
     raw_samples: Iterable[dict] = (
-        adapter.sample_collection.find({"batch_id": batch_id}).skip(skip).limit(limit)
+        adapter.sample_collection.find(
+            {
+                "$and": [
+                    {"batch_id": batch_id},
+                    {
+                        "$or": [
+                            {"sample_id": {"$regex": text, "$options": "i"}},
+                            {"comment": {"$regex": text, "$options": "i"}},
+                            {"SampleType": {"$regex": text, "$options": "i"}},
+                            {"QCFlag": {"$regex": text, "$options": "i"}},
+                        ]
+                    },
+                ],
+            }
+        )
+        .sort(sort_key, sort_table.get(sort_direction))
+        .skip(skip)
+        .limit(limit)
     )
     return parse_obj_as(List[DataBaseSample], list(raw_samples))
 
 
-def count_batch_samples(adapter: StatinaAdapter, batch_id: str) -> int:
+def count_batch_samples(adapter: StatinaAdapter, batch_id: str, text: Optional[str] = "") -> int:
     """Count samples within the batch"""
-    return adapter.sample_collection.count_documents(filter={"batch_id": batch_id})
+    return adapter.sample_collection.count_documents(
+        filter={
+            "$and": [
+                {"batch_id": batch_id},
+                {
+                    "$or": [
+                        {"sample_id": {"$regex": text, "$options": "i"}},
+                        {"comment": {"$regex": text, "$options": "i"}},
+                        {"SampleType": {"$regex": text, "$options": "i"}},
+                        {"QCFlag": {"$regex": text, "$options": "i"}},
+                    ]
+                },
+            ],
+        }
+    )

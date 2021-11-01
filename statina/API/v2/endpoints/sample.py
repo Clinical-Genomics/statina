@@ -40,12 +40,33 @@ status_options = Literal[
 def samples(
     page_size: Optional[int] = Query(5),
     page_num: Optional[int] = Query(0),
+    sort_key: Optional[
+        Literal[
+            "sample_id",
+            "batch_id",
+            "Zscore_13",
+            "Zscore_18",
+            "Zscore_21",
+            "Zscore_X",
+            "FF_Formatted",
+            "CNVSegment",
+            "FFY",
+            "FFX",
+        ]
+    ] = Query("sample_id"),
+    sort_direction: Optional[Literal["ascending", "descending"]] = Query("ascending"),
+    text: Optional[str] = Query(...),
     current_user: User = Security(get_current_active_user, scopes=["R"]),
     adapter: StatinaAdapter = Depends(get_nipt_adapter),
 ):
     """Get samples"""
     samples: List[DataBaseSample] = find.samples(
-        adapter=adapter, page_size=page_size, page_num=page_num
+        adapter=adapter,
+        page_size=page_size,
+        page_num=page_num,
+        sort_key=sort_key,
+        sort_direction=sort_direction,
+        text=text,
     )
     validated_samples: List[Sample] = [Sample(**sample_obj.dict()) for sample_obj in samples]
     document_count: int = find.count_samples(adapter=adapter)

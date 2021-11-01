@@ -1,3 +1,5 @@
+import pymongo
+
 SAMPLE_KEYS = [
     "SampleProject",
     "SampleType",
@@ -97,3 +99,6 @@ SCOPES = {
     "RW": ["unconfirmed", "inactive", "R", "RW"],
     "admin": ["unconfirmed", "inactive", "R", "RW", "admin"],
 }
+
+
+sort_table = {"ascending": pymongo.ASCENDING, "descending": pymongo.DESCENDING}

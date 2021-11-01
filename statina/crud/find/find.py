@@ -91,6 +91,7 @@ def samples(
             "FFY",
             "FFX",
             "comment",
+            "QCFlag",
         ]
     ] = "sample_id",
     sort_direction: Optional[Literal["ascending", "descending"]] = "descending",
@@ -224,6 +225,7 @@ def batch_samples(
             "FFY",
             "FFX",
             "comment",
+            "QCFlag",
         ]
     ] = "sample_id",
     sort_direction: Optional[Literal["ascending", "descending"]] = "descending",

@@ -53,6 +53,7 @@ def samples(
             "FFY",
             "FFX",
             "comment",
+            "QCFlag",
         ]
     ] = Query("sample_id"),
     sort_direction: Optional[Literal["ascending", "descending"]] = Query("descending"),

@@ -52,6 +52,7 @@ def samples(
             "CNVSegment",
             "FFY",
             "FFX",
+            "comment",
         ]
     ] = Query("sample_id"),
     sort_direction: Optional[Literal["ascending", "descending"]] = Query("descending"),

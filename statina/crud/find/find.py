@@ -222,6 +222,7 @@ def batch_samples(
             "CNVSegment",
             "FFY",
             "FFX",
+            "comment",
         ]
     ] = "sample_id",
     sort_direction: Optional[Literal["ascending", "descending"]] = "descending",

@@ -47,7 +47,10 @@ def query_samples(
     raw_samples: Iterable[dict] = (
         adapter.sample_collection.find(
             {
-                "$and": [{"batch_id": batch_id}, get_sample_text_query(query_string=query_string)],
+                "$and": [
+                    {"batch_id": batch_id or "$all"},
+                    get_sample_text_query(query_string=query_string),
+                ],
             }
         )
         .sort(sort_key, sort_table.get(sort_direction))

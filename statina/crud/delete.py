@@ -3,8 +3,7 @@ from typing import Iterable
 import logging
 
 from statina.adapter import StatinaAdapter
-from statina.crud.find.find import batch_samples
-
+from statina.crud.find.tables.batch_samples import batch_samples
 
 LOG = logging.getLogger(__name__)
 

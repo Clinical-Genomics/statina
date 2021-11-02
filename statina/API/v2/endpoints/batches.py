@@ -7,6 +7,11 @@ from fastapi.encoders import jsonable_encoder
 from fastapi.responses import FileResponse, JSONResponse, StreamingResponse
 
 import statina.crud.find.plots.fetal_fraction_plot_data as get_fetal_fraction
+import statina.crud.find.tables.batch_samples_table
+
+import statina.crud.find.tables.batch_samples
+import statina.crud.find.tables.batches
+import statina.crud.find.tables.samples
 from statina.adapter import StatinaAdapter
 from statina.API.external.constants import TRISOMI_TRESHOLDS
 from statina.API.v2.endpoints.user import get_current_active_user
@@ -53,7 +58,7 @@ def batches(
     adapter: StatinaAdapter = Depends(get_nipt_adapter),
 ):
     """List of all batches"""
-    batches: List[Batch] = find.batches(
+    batches: List[Batch] = statina.crud.find.tables.batches.batches(
         adapter=adapter,
         page_size=page_size,
         page_num=page_num,
@@ -61,7 +66,7 @@ def batches(
         sort_key=sort_key,
         sort_direction=sort_direction,
     )
-    document_count = find.count_batches(adapter=adapter, text=text)
+    document_count = statina.crud.find.tables.batches.count_batches(adapter=adapter, text=text)
     return JSONResponse(
         content=jsonable_encoder(
             PaginatedBatchResponse(document_count=document_count, documents=batches),
@@ -143,7 +148,7 @@ def batch_samples(
     adapter: StatinaAdapter = Depends(get_nipt_adapter),
 ):
     """Batch view with table of all samples in the batch."""
-    samples = find.batch_samples(
+    samples = statina.crud.find.tables.batch_samples.batch_samples(
         batch_id=batch_id,
         adapter=adapter,
         sort_key=sort_key,
@@ -153,7 +158,7 @@ def batch_samples(
         page_num=page_num,
     )
     validated_samples: List[Sample] = [Sample(**sample_obj.dict()) for sample_obj in samples]
-    document_count: int = find.count_batch_samples(adapter=adapter, batch_id=batch_id, text=text)
+    document_count: int = statina.crud.find.tables.batch_samples.count_batch_samples(adapter=adapter, batch_id=batch_id, text=text)
     return JSONResponse(
         content=jsonable_encoder(
             PaginatedSampleResponse(document_count=document_count, documents=validated_samples),
@@ -290,7 +295,7 @@ def coverage(
     adapter: StatinaAdapter = Depends(get_nipt_adapter),
 ):
     """Batch view with coverage plot"""
-    db_samples: List[DataBaseSample] = find.batch_samples(batch_id=batch_id, adapter=adapter)
+    db_samples: List[DataBaseSample] = statina.crud.find.tables.batch_samples.batch_samples(batch_id=batch_id, adapter=adapter)
     samples: List[Sample] = [Sample(**db_sample.dict()) for db_sample in db_samples]
 
     scatter_data: Dict[str, CoveragePlotSampleData] = get_scatter_data_for_coverage_plot(samples)
@@ -330,7 +335,7 @@ async def include_samples(
     current_user: User = Security(get_current_active_user, scopes=["RW"]),
 ):
     """Update include status and comment for samples in batch"""
-    samples: List[DataBaseSample] = find.batch_samples(adapter=adapter, batch_id=batch_id)
+    samples: List[DataBaseSample] = statina.crud.find.tables.batch_samples.batch_samples(adapter=adapter, batch_id=batch_id)
     for sample in samples:
         sample.include = True
         sample.change_include_date = (

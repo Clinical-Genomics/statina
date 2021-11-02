@@ -7,6 +7,7 @@ from fastapi import APIRouter, Depends, Form, Query, Security
 from fastapi.encoders import jsonable_encoder
 from fastapi.responses import FileResponse, JSONResponse
 
+import statina.crud.find.tables.samples
 from statina.adapter import StatinaAdapter
 from statina.API.v2.endpoints.user import get_current_active_user
 from statina.config import get_nipt_adapter
@@ -62,7 +63,7 @@ def samples(
     adapter: StatinaAdapter = Depends(get_nipt_adapter),
 ):
     """Get samples"""
-    samples: List[DataBaseSample] = find.samples(
+    samples: List[DataBaseSample] = statina.crud.find.tables.samples.samples(
         adapter=adapter,
         page_size=page_size,
         page_num=page_num,
@@ -71,7 +72,7 @@ def samples(
         text=text,
     )
     validated_samples: List[Sample] = [Sample(**sample_obj.dict()) for sample_obj in samples]
-    document_count: int = find.count_samples(adapter=adapter, text=text)
+    document_count: int = statina.crud.find.tables.samples.count_samples(adapter=adapter, text=text)
     return JSONResponse(
         content=jsonable_encoder(
             PaginatedSampleResponse(document_count=document_count, documents=validated_samples),

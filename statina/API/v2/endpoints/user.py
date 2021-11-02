@@ -12,6 +12,7 @@ from sendmail_container import FormDataRequest
 from starlette.background import BackgroundTasks
 from starlette.responses import JSONResponse
 
+import statina.crud.find.tables.users
 from statina.adapter import StatinaAdapter
 from statina.API.external.api.api_v1.templates.email.account_activated import (
     ACTIVATION_MESSAGE_TEMPLATE,
@@ -174,7 +175,7 @@ def users(
     adapter: StatinaAdapter = Depends(get_nipt_adapter),
 ):
     """Admin view with table of all users."""
-    user_list: List[User] = find.users(
+    user_list: List[User] = statina.crud.find.tables.users.users(
         adapter=adapter,
         page_size=page_size,
         text=text,
@@ -183,7 +184,7 @@ def users(
         sort_direction=sort_direction,
         page_num=page_num,
     )
-    document_count = find.count_users(adapter=adapter, text=text, role=role)
+    document_count = statina.crud.find.tables.users.count_users(adapter=adapter, text=text, role=role)
     return JSONResponse(
         content=jsonable_encoder(
             PaginatedUserResponse(document_count=document_count, documents=user_list),

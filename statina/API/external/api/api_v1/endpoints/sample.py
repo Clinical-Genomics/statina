@@ -2,6 +2,7 @@ from typing import Dict, List
 
 from fastapi import APIRouter, Depends, Request
 
+import statina.crud.find.tables.samples
 from statina.adapter import StatinaAdapter
 from statina.API.external.api.deps import get_current_user
 from statina.API.external.constants import CHROM_ABNORM, STATUS_CLASSES, STATUS_COLORS
@@ -26,7 +27,7 @@ def samples(
     user: User = Depends(get_current_user),
 ):
     """Get sample with id"""
-    samples: List[DataBaseSample] = find.samples(adapter=adapter)
+    samples: List[DataBaseSample] = statina.crud.find.tables.samples.samples(adapter=adapter)
     return templates.TemplateResponse(
         "sample/samples.html",
         context=dict(

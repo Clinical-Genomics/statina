@@ -5,6 +5,10 @@ from fastapi.responses import FileResponse, RedirectResponse
 from starlette.requests import Request
 from starlette.responses import StreamingResponse
 
+import statina.crud.find.tables.batch_samples_table
+
+import statina.crud.find.tables.batch_samples
+import statina.crud.find.tables.samples
 from statina.API.external.constants import COLORS
 from statina.adapter.plugin import StatinaAdapter
 from statina.API.external.api.deps import get_current_user
@@ -96,7 +100,7 @@ def report(
 ):
     """Report view, collecting all tables and plots from one batch."""
 
-    samples: List[DataBaseSample] = find.batch_samples(batch_id=batch_id, adapter=adapter)
+    samples: List[DataBaseSample] = statina.crud.find.tables.batch_samples.batch_samples(batch_id=batch_id, adapter=adapter)
     batch: Batch = find.batch(batch_id=batch_id, adapter=adapter)
 
     cases = get_fetal_fraction.samples(adapter=adapter, batch_id=batch_id)

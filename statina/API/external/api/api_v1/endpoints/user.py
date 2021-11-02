@@ -6,6 +6,7 @@ from starlette.background import BackgroundTasks
 from starlette.requests import Request
 from starlette.responses import RedirectResponse
 
+import statina
 from statina.API.external.api.api_v1.endpoints.login import router
 from statina.API.external.api.api_v1.templates.email.confirmation import (
     CONFIRMATION_MESSAGE_TEMPLATE,
@@ -13,7 +14,6 @@ from statina.API.external.api.api_v1.templates.email.confirmation import (
 from statina.API.external.api.deps import get_password_hash, get_current_user
 from statina.adapter import StatinaAdapter
 from statina.config import get_nipt_adapter, templates, email_settings
-from statina.crud.find import find
 from statina.crud.insert import insert_user
 from statina.exeptions import CredentialsError
 from statina.models.database import User
@@ -109,7 +109,7 @@ def users(
     if user.role != "admin":
         raise CredentialsError(message="Only admin users can access the users page")
 
-    user_list: List[User] = find.users(adapter=adapter)
+    user_list: List[User] = statina.crud.find.users.users(adapter=adapter)
     return templates.TemplateResponse(
         "users.html",
         context={
@@ -131,7 +131,7 @@ def users(
     if user.role != "admin":
         CredentialsError(message="Only admin users can access the users page")
 
-    user_list: List[User] = find.users(adapter=adapter)
+    user_list: List[User] = statina.crud.find.users.users(adapter=adapter)
     return templates.TemplateResponse(
         "users.html",
         context={

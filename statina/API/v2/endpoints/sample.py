@@ -1,4 +1,3 @@
-import io
 from datetime import datetime
 from pathlib import Path
 from typing import Dict, List, Literal, Optional
@@ -7,16 +6,19 @@ from fastapi import APIRouter, Depends, Form, Query, Security
 from fastapi.encoders import jsonable_encoder
 from fastapi.responses import FileResponse, JSONResponse
 
+import statina
 from statina.adapter import StatinaAdapter
 from statina.API.v2.endpoints.user import get_current_active_user
 from statina.config import get_nipt_adapter
+from statina.constants import sample_sort_keys, sample_status_options
 from statina.crud import update
-from statina.crud.find import find
 from statina.crud.find.plots.zscore_plot_data import (
     get_abn_for_samp_tris_plot,
     get_normal_for_samp_tris_plot,
     get_sample_for_samp_tris_plot,
 )
+from statina.crud.find.samples import query_samples, count_query_samples
+
 from statina.models.database import DataBaseSample, User
 from statina.models.server.plots.ncv import Zscore131821, ZscoreSamples
 from statina.models.server.sample import Sample, PaginatedSampleResponse
@@ -24,45 +26,19 @@ from statina.parse.batch import validate_file_path
 
 router = APIRouter(prefix="/v2")
 
-status_options = Literal[
-    "Normal",
-    "False Positive",
-    "Suspected",
-    "Verified",
-    "Probable",
-    "False Negative",
-    "Other",
-    "Failed",
-]
-
 
 @router.get("/samples", response_model=PaginatedSampleResponse)
 def samples(
     page_size: Optional[int] = Query(5),
     page_num: Optional[int] = Query(0),
-    sort_key: Optional[
-        Literal[
-            "sample_id",
-            "batch_id",
-            "Zscore_13",
-            "Zscore_18",
-            "Zscore_21",
-            "Zscore_X",
-            "FF_Formatted",
-            "CNVSegment",
-            "FFY",
-            "FFX",
-            "comment",
-            "QCFlag",
-        ]
-    ] = Query("sample_id"),
+    sort_key: Optional[sample_sort_keys] = Query("sample_id"),
     sort_direction: Optional[Literal["ascending", "descending"]] = Query("descending"),
     text: Optional[str] = Query(""),
     current_user: User = Security(get_current_active_user, scopes=["R"]),
     adapter: StatinaAdapter = Depends(get_nipt_adapter),
 ):
     """Get samples"""
-    samples: List[DataBaseSample] = find.samples(
+    samples: List[DataBaseSample] = query_samples(
         adapter=adapter,
         page_size=page_size,
         page_num=page_num,
@@ -71,7 +47,7 @@ def samples(
         text=text,
     )
     validated_samples: List[Sample] = [Sample(**sample_obj.dict()) for sample_obj in samples]
-    document_count: int = find.count_samples(adapter=adapter, text=text)
+    document_count: int = count_query_samples(adapter=adapter, text=text)
     return JSONResponse(
         content=jsonable_encoder(
             PaginatedSampleResponse(document_count=document_count, documents=validated_samples),
@@ -88,7 +64,7 @@ def sample(
 ):
     """Get sample with id"""
 
-    sample: DataBaseSample = find.sample(sample_id=sample_id, adapter=adapter)
+    sample: DataBaseSample = statina.crud.find.samples.sample(sample_id=sample_id, adapter=adapter)
     if not sample:
         return JSONResponse("Not found", status_code=404)
     validated_sample: Sample = Sample(**sample.dict())
@@ -108,7 +84,7 @@ def sample_tris(
     adapter: StatinaAdapter = Depends(get_nipt_adapter),
 ):
     """Sample view with trisomi plot."""
-    sample: DataBaseSample = find.sample(sample_id=sample_id, adapter=adapter)
+    sample: DataBaseSample = statina.crud.find.samples.sample(sample_id=sample_id, adapter=adapter)
     abnormal_data: Dict[str, ZscoreSamples] = get_abn_for_samp_tris_plot(adapter=adapter)
     normal_data: Zscore131821 = get_normal_for_samp_tris_plot(adapter=adapter)
     sample_data: ZscoreSamples = get_sample_for_samp_tris_plot(sample)
@@ -127,13 +103,13 @@ def sample_tris(
 @router.put("/sample/{sample_id}/status_13")
 async def set_sample_status_13(
     sample_id: str,
-    status: status_options = Query(...),
+    status: sample_status_options = Query(...),
     adapter: StatinaAdapter = Depends(get_nipt_adapter),
     current_user: User = Security(get_current_active_user, scopes=["RW"]),
 ):
     """Update the manualy interpreted chromosome abnormality status for a sample."""
 
-    sample: DataBaseSample = find.sample(sample_id=sample_id, adapter=adapter)
+    sample: DataBaseSample = statina.crud.find.samples.sample(sample_id=sample_id, adapter=adapter)
     sample.status_13 = status
     time_stamp: str = datetime.now().strftime("%Y/%m/%d %H:%M:%S")
     sample.status_change_13 = f"{current_user.username} {time_stamp}"
@@ -144,13 +120,13 @@ async def set_sample_status_13(
 @router.put("/sample/{sample_id}/status_18")
 async def set_sample_status_18(
     sample_id: str,
-    status: status_options = Query(...),
+    status: sample_status_options = Query(...),
     adapter: StatinaAdapter = Depends(get_nipt_adapter),
     current_user: User = Security(get_current_active_user, scopes=["RW"]),
 ):
     """Update the manualy interpreted chromosome abnormality status for a sample."""
 
-    sample: DataBaseSample = find.sample(sample_id=sample_id, adapter=adapter)
+    sample: DataBaseSample = statina.crud.find.samples.sample(sample_id=sample_id, adapter=adapter)
     sample.status_18 = status
     time_stamp: str = datetime.now().strftime("%Y/%m/%d %H:%M:%S")
     sample.status_change_18 = f"{current_user.username} {time_stamp}"
@@ -161,13 +137,13 @@ async def set_sample_status_18(
 @router.put("/sample/{sample_id}/status_21")
 async def set_sample_status_21(
     sample_id: str,
-    status: status_options = Query(...),
+    status: sample_status_options = Query(...),
     adapter: StatinaAdapter = Depends(get_nipt_adapter),
     current_user: User = Security(get_current_active_user, scopes=["RW"]),
 ):
     """Update the manualy interpreted chromosome abnormality status for a sample."""
 
-    sample: DataBaseSample = find.sample(sample_id=sample_id, adapter=adapter)
+    sample: DataBaseSample = statina.crud.find.samples.sample(sample_id=sample_id, adapter=adapter)
     sample.status_21 = status
     time_stamp: str = datetime.now().strftime("%Y/%m/%d %H:%M:%S")
     sample.status_change_21 = f"{current_user.username} {time_stamp}"
@@ -178,13 +154,13 @@ async def set_sample_status_21(
 @router.put("/sample/{sample_id}/status_X0")
 async def set_sample_status_x0(
     sample_id: str,
-    status: status_options = Query(...),
+    status: sample_status_options = Query(...),
     adapter: StatinaAdapter = Depends(get_nipt_adapter),
     current_user: User = Security(get_current_active_user, scopes=["RW"]),
 ):
     """Update the manualy interpreted chromosome abnormality status for a sample."""
 
-    sample: DataBaseSample = find.sample(sample_id=sample_id, adapter=adapter)
+    sample: DataBaseSample = statina.crud.find.samples.sample(sample_id=sample_id, adapter=adapter)
     sample.status_X0 = status
     time_stamp: str = datetime.now().strftime("%Y/%m/%d %H:%M:%S")
     sample.status_change_X0 = f"{current_user.username} {time_stamp}"
@@ -195,13 +171,13 @@ async def set_sample_status_x0(
 @router.put("/sample/{sample_id}/status_XXY")
 async def set_sample_status_xxy(
     sample_id: str,
-    status: status_options = Query(...),
+    status: sample_status_options = Query(...),
     adapter: StatinaAdapter = Depends(get_nipt_adapter),
     current_user: User = Security(get_current_active_user, scopes=["RW"]),
 ):
     """Update the manualy interpreted chromosome abnormality status for a sample."""
 
-    sample: DataBaseSample = find.sample(sample_id=sample_id, adapter=adapter)
+    sample: DataBaseSample = statina.crud.find.samples.sample(sample_id=sample_id, adapter=adapter)
     sample.status_XXY = status
     time_stamp: str = datetime.now().strftime("%Y/%m/%d %H:%M:%S")
     sample.status_change_XXY = f"{current_user.username} {time_stamp}"
@@ -212,13 +188,13 @@ async def set_sample_status_xxy(
 @router.put("/sample/{sample_id}/status_XXX")
 async def set_sample_status_xxx(
     sample_id: str,
-    status: status_options = Query(...),
+    status: sample_status_options = Query(...),
     adapter: StatinaAdapter = Depends(get_nipt_adapter),
     current_user: User = Security(get_current_active_user, scopes=["RW"]),
 ):
     """Update the manualy interpreted chromosome abnormality status for a sample."""
 
-    sample: DataBaseSample = find.sample(sample_id=sample_id, adapter=adapter)
+    sample: DataBaseSample = statina.crud.find.samples.sample(sample_id=sample_id, adapter=adapter)
     sample.status_XXX = status
     time_stamp: str = datetime.now().strftime("%Y/%m/%d %H:%M:%S")
     sample.status_change_XXX = f"{current_user.username} {time_stamp}"
@@ -229,13 +205,13 @@ async def set_sample_status_xxx(
 @router.put("/sample/{sample_id}/status_XYY")
 async def set_sample_status_xyy(
     sample_id: str,
-    status: status_options = Query(...),
+    status: sample_status_options = Query(...),
     adapter: StatinaAdapter = Depends(get_nipt_adapter),
     current_user: User = Security(get_current_active_user, scopes=["RW"]),
 ):
     """Update the manualy interpreted chromosome abnormality status for a sample."""
 
-    sample: DataBaseSample = find.sample(sample_id=sample_id, adapter=adapter)
+    sample: DataBaseSample = statina.crud.find.samples.sample(sample_id=sample_id, adapter=adapter)
     sample.status_XYY = status
     time_stamp: str = datetime.now().strftime("%Y/%m/%d %H:%M:%S")
     sample.status_change_XYY = f"{current_user.username} {time_stamp}"
@@ -252,7 +228,7 @@ async def sample_comment(
 ):
     """Update sample comment"""
 
-    sample: DataBaseSample = find.sample(sample_id=sample_id, adapter=adapter)
+    sample: DataBaseSample = statina.crud.find.samples.sample(sample_id=sample_id, adapter=adapter)
     sample.comment = comment
     update.sample(adapter=adapter, sample=sample)
 
@@ -268,7 +244,7 @@ async def sample_include(
 ):
     """Include sample in plots"""
 
-    sample: DataBaseSample = find.sample(sample_id=sample_id, adapter=adapter)
+    sample: DataBaseSample = statina.crud.find.samples.sample(sample_id=sample_id, adapter=adapter)
     sample.include = include
     update.sample(adapter=adapter, sample=sample)
 
@@ -283,7 +259,7 @@ def sample_segmental_calls_download(
 ):
     """View for sample downloads"""
 
-    sample: DataBaseSample = find.sample(adapter=adapter, sample_id=sample_id)
+    sample: DataBaseSample = statina.crud.find.samples.sample(adapter=adapter, sample_id=sample_id)
     file_path = sample.dict().get("segmental_calls")
     if not validate_file_path(file_path):
         # warn file missing!

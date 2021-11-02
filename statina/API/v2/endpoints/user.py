@@ -12,6 +12,7 @@ from sendmail_container import FormDataRequest
 from starlette.background import BackgroundTasks
 from starlette.responses import JSONResponse
 
+import statina.crud.find.users
 from statina.adapter import StatinaAdapter
 from statina.API.external.api.api_v1.templates.email.account_activated import (
     ACTIVATION_MESSAGE_TEMPLATE,
@@ -28,7 +29,6 @@ from statina.API.external.api.deps import (
 )
 from statina.config import email_settings, get_nipt_adapter, settings
 from statina.crud import delete, update
-from statina.crud.find import find
 from statina.crud.insert import insert_user
 from statina.exeptions import credentials_exception, forbidden_access_exception
 from statina.models.database import User
@@ -65,7 +65,7 @@ async def get_current_user(
         token_data = TokenData(username=username, scopes=payload.get("scopes", []))
     except JWTError:
         raise credentials_exception
-    user = find.user(user_name=username, adapter=adapter)
+    user = statina.crud.find.users.user(user_name=username, adapter=adapter)
     if user is None:
         raise credentials_exception
     for scope in security_scopes.scopes:
@@ -117,9 +117,9 @@ async def register_user(
     adapter: StatinaAdapter = Depends(get_nipt_adapter),
 ):
 
-    if find.user(user_name=username, adapter=adapter):
+    if statina.crud.find.users.user(user_name=username, adapter=adapter):
         return JSONResponse(f"Username {username} already taken!", status_code=409)
-    elif find.user(email=email, adapter=adapter):
+    elif statina.crud.find.users.user(email=email, adapter=adapter):
         return JSONResponse(f"Email {email} already in use!", status_code=409)
     if not secrets.compare_digest(password, password_repeated):
         return JSONResponse(content="Password mismatch!", status_code=400)
@@ -174,7 +174,7 @@ def users(
     adapter: StatinaAdapter = Depends(get_nipt_adapter),
 ):
     """Admin view with table of all users."""
-    user_list: List[User] = find.users(
+    user_list: List[User] = statina.crud.find.users.query_users(
         adapter=adapter,
         page_size=page_size,
         text=text,
@@ -183,7 +183,9 @@ def users(
         sort_direction=sort_direction,
         page_num=page_num,
     )
-    document_count = find.count_users(adapter=adapter, text=text, role=role)
+    document_count = statina.crud.find.users.count_query_users(
+        adapter=adapter, text=text, role=role
+    )
     return JSONResponse(
         content=jsonable_encoder(
             PaginatedUserResponse(document_count=document_count, documents=user_list),
@@ -200,7 +202,7 @@ async def validate_user_email(
     verification_hex: str = Query(...),
     adapter: StatinaAdapter = Depends(get_nipt_adapter),
 ):
-    update_user: User = find.user(user_name=username, adapter=adapter)
+    update_user: User = statina.crud.find.users.user(user_name=username, adapter=adapter)
     if not update_user:
         return JSONResponse(content="No such user", status_code=404)
     if update_user.role != "unconfirmed":
@@ -243,7 +245,7 @@ async def update_user_role(
     adapter: StatinaAdapter = Depends(get_nipt_adapter),
     current_user: User = Security(get_current_active_user, scopes=["admin"]),
 ):
-    update_user: User = find.user(user_name=username, adapter=adapter)
+    update_user: User = statina.crud.find.users.user(user_name=username, adapter=adapter)
     old_role = update_user.role
     update_user.role = role
     update.update_user(adapter=adapter, user=update_user)

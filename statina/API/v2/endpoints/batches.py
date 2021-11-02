@@ -6,14 +6,16 @@ from fastapi import APIRouter, Depends, Form, Query, Security, Response
 from fastapi.encoders import jsonable_encoder
 from fastapi.responses import FileResponse, JSONResponse, StreamingResponse
 
+import statina
 import statina.crud.find.plots.fetal_fraction_plot_data as get_fetal_fraction
 from statina.adapter import StatinaAdapter
 from statina.API.external.constants import TRISOMI_TRESHOLDS
 from statina.API.v2.endpoints.user import get_current_active_user
 from statina.config import get_nipt_adapter
+from statina.constants import sample_sort_keys
 from statina.crud import update
 from statina.crud.delete import delete_batch
-from statina.crud.find import find
+from statina.crud.find.batches import query_batches, count_query_batches
 from statina.crud.find.plots.coverage_plot_data import (
     get_box_data_for_coverage_plot,
     get_scatter_data_for_coverage_plot,
@@ -23,6 +25,7 @@ from statina.crud.find.plots.zscore_plot_data import (
     get_tris_control_normal,
     get_tris_samples,
 )
+from statina.crud.find.samples import count_query_batch_samples, query_batch_samples
 from statina.crud.insert import insert_batch, insert_samples
 from statina.crud.utils import zip_dir
 from statina.models.database import Batch, DataBaseSample, User
@@ -53,7 +56,7 @@ def batches(
     adapter: StatinaAdapter = Depends(get_nipt_adapter),
 ):
     """List of all batches"""
-    batches: List[Batch] = find.batches(
+    batches: List[Batch] = query_batches(
         adapter=adapter,
         page_size=page_size,
         page_num=page_num,
@@ -61,7 +64,7 @@ def batches(
         sort_key=sort_key,
         sort_direction=sort_direction,
     )
-    document_count = find.count_batches(adapter=adapter, text=text)
+    document_count = count_query_batches(adapter=adapter, text=text)
     return JSONResponse(
         content=jsonable_encoder(
             PaginatedBatchResponse(document_count=document_count, documents=batches),
@@ -92,11 +95,11 @@ def load_batch(
         return JSONResponse(content="Results file missing", status_code=422)
     samples: List[DataBaseSample] = get_samples(nipt_results)
     batch: Batch = get_batch(nipt_results)
-    if find.batch(adapter=adapter, batch_id=batch.batch_id):
+    if statina.crud.find.batches.batch(adapter=adapter, batch_id=batch.batch_id):
         return JSONResponse(content="Batch already in database!", status_code=422)
     insert_batch(adapter=adapter, batch=batch, batch_files=batch_files)
     insert_samples(adapter=adapter, samples=samples, segmental_calls=batch_files.segmental_calls)
-    inserted_batch = find.batch(adapter=adapter, batch_id=batch.batch_id)
+    inserted_batch = statina.crud.find.batches.batch(adapter=adapter, batch_id=batch.batch_id)
     return JSONResponse(content=jsonable_encoder(inserted_batch, by_alias=False), status_code=200)
 
 
@@ -107,7 +110,7 @@ def get_batch(
     adapter: StatinaAdapter = Depends(get_nipt_adapter),
 ):
     """Batch view with table of all samples in the batch."""
-    batch: Batch = find.batch(batch_id=batch_id, adapter=adapter)
+    batch: Batch = statina.crud.find.batches.batch(batch_id=batch_id, adapter=adapter)
     if not batch:
         return JSONResponse("Not found", 404)
 
@@ -122,28 +125,14 @@ def batch_samples(
     batch_id: str,
     page_size: Optional[int] = Query(5),
     page_num: Optional[int] = Query(0),
-    sort_key: Optional[
-        Literal[
-            "sample_id",
-            "Zscore_13",
-            "Zscore_18",
-            "Zscore_21",
-            "Zscore_X",
-            "FF_Formatted",
-            "CNVSegment",
-            "FFY",
-            "FFX",
-            "comment",
-            "QCFlag",
-        ]
-    ] = Query("sample_id"),
+    sort_key: Optional[sample_sort_keys] = Query("sample_id"),
     sort_direction: Optional[Literal["ascending", "descending"]] = Query("descending"),
     text: Optional[str] = Query(""),
     current_user: User = Security(get_current_active_user, scopes=["R"]),
     adapter: StatinaAdapter = Depends(get_nipt_adapter),
 ):
     """Batch view with table of all samples in the batch."""
-    samples = find.batch_samples(
+    samples = query_batch_samples(
         batch_id=batch_id,
         adapter=adapter,
         sort_key=sort_key,
@@ -153,7 +142,7 @@ def batch_samples(
         page_num=page_num,
     )
     validated_samples: List[Sample] = [Sample(**sample_obj.dict()) for sample_obj in samples]
-    document_count: int = find.count_batch_samples(adapter=adapter, batch_id=batch_id, text=text)
+    document_count: int = count_query_batch_samples(adapter=adapter, batch_id=batch_id, text=text)
     return JSONResponse(
         content=jsonable_encoder(
             PaginatedSampleResponse(document_count=document_count, documents=validated_samples),
@@ -172,7 +161,7 @@ def batch_download(
     adapter: StatinaAdapter = Depends(get_nipt_adapter),
 ):
     """Download files, media type application/text or application/octet-stream"""
-    batch: dict = find.batch(adapter=adapter, batch_id=batch_id).dict()
+    batch: dict = statina.crud.find.batches.batch(adapter=adapter, batch_id=batch_id).dict()
     file_path = batch.get(file_id)
     if not validate_file_path(file_path):
         return JSONResponse(content="File not found", status_code=404)
@@ -290,7 +279,9 @@ def coverage(
     adapter: StatinaAdapter = Depends(get_nipt_adapter),
 ):
     """Batch view with coverage plot"""
-    db_samples: List[DataBaseSample] = find.batch_samples(batch_id=batch_id, adapter=adapter)
+    db_samples: List[DataBaseSample] = statina.crud.find.samples.batch_samples(
+        batch_id=batch_id, adapter=adapter
+    )
     samples: List[Sample] = [Sample(**db_sample.dict()) for db_sample in db_samples]
 
     scatter_data: Dict[str, CoveragePlotSampleData] = get_scatter_data_for_coverage_plot(samples)
@@ -316,7 +307,7 @@ async def batch_update_comment(
 ):
     """Update batch comment"""
 
-    batch: Batch = find.batch(batch_id=batch_id, adapter=adapter)
+    batch: Batch = statina.crud.find.batches.batch(batch_id=batch_id, adapter=adapter)
     batch.comment = comment
     update.update_batch(adapter=adapter, batch=batch)
 
@@ -326,16 +317,19 @@ async def batch_update_comment(
 @router.patch("/batch/{batch_id}/include_samples")
 async def include_samples(
     batch_id: str,
+    include: bool = Query(...),
     adapter: StatinaAdapter = Depends(get_nipt_adapter),
     current_user: User = Security(get_current_active_user, scopes=["RW"]),
 ):
     """Update include status and comment for samples in batch"""
-    samples: List[DataBaseSample] = find.batch_samples(adapter=adapter, batch_id=batch_id)
+    samples: List[DataBaseSample] = statina.crud.find.samples.batch_samples(
+        adapter=adapter, batch_id=batch_id
+    )
     for sample in samples:
-        sample.include = True
+        sample.include = include
         sample.change_include_date = (
             f'{current_user.username} {datetime.now().strftime("%Y/%m/%d %H:%M:%S")}'
         )
         update.sample(adapter=adapter, sample=sample)
 
-    return JSONResponse(content="All samples included in batch plots", status_code=200)
+    return JSONResponse(content="All samples inclusion updated in batch plots", status_code=200)

@@ -7,6 +7,7 @@ from fastapi.responses import RedirectResponse
 from sendmail_container import FormDataRequest
 from starlette.datastructures import FormData
 
+import statina
 from statina.API.external.api.api_v1.templates.email.account_activated import (
     ACTIVATION_MESSAGE_TEMPLATE,
 )
@@ -17,7 +18,6 @@ from statina.API.external.constants import CHROM_ABNORM
 from statina.config import get_nipt_adapter, email_settings
 from statina.crud import update
 from statina.crud.delete import delete_batches
-from statina.crud.find import find
 from statina.models.database import DataBaseSample, User, Batch
 from statina.tools.email import send_email
 
@@ -33,7 +33,7 @@ async def validate_user(
     background_tasks: BackgroundTasks,
     adapter: StatinaAdapter = Depends(get_nipt_adapter),
 ):
-    update_user: User = find.user(user_name=username, adapter=adapter)
+    update_user: User = statina.crud.find.users.user(user_name=username, adapter=adapter)
     response = RedirectResponse("/batches")
     if not update_user:
         response.set_cookie(key="info_type", value="danger")
@@ -81,7 +81,7 @@ async def update_user(
     if user.role != "admin":
         return RedirectResponse(request.headers.get("referer"))
     form = await request.form()
-    update_user: User = find.user(email=form["user_email"], adapter=adapter)
+    update_user: User = statina.crud.find.users.user(email=form["user_email"], adapter=adapter)
     old_role = update_user.role
     new_role = form["role"]
     update_user.role = new_role
@@ -129,7 +129,7 @@ async def set_sample_status(
         return RedirectResponse(request.headers.get("referer"))
 
     sample_id: str = form["sample_id"]
-    sample: dict = find.sample(sample_id=sample_id, adapter=adapter).dict()
+    sample: dict = statina.crud.find.samples.sample(sample_id=sample_id, adapter=adapter).dict()
 
     for abnormality in CHROM_ABNORM:
         new_abnormality_status: str = form[abnormality]
@@ -164,7 +164,7 @@ async def batch_comment(
     if user.role not in ["RW", "admin"]:
         return RedirectResponse(request.headers.get("referer"))
     batch_id: str = form["batch_id"]
-    batch: Batch = find.batch(batch_id=batch_id, adapter=adapter)
+    batch: Batch = statina.crud.find.batches.batch(batch_id=batch_id, adapter=adapter)
     comment: str = form.get("comment")
     if comment != batch.comment:
         batch.comment = comment
@@ -187,7 +187,7 @@ async def sample_comment(
         return RedirectResponse(request.headers.get("referer"))
 
     sample_id: str = form["sample_id"]
-    sample: DataBaseSample = find.sample(sample_id=sample_id, adapter=adapter)
+    sample: DataBaseSample = statina.crud.find.samples.sample(sample_id=sample_id, adapter=adapter)
     comment: str = form.get("comment")
     if comment != sample.comment:
         sample.comment = comment
@@ -224,7 +224,9 @@ def save_samples(samples: Iterable[str], form: FormData, adapter: StatinaAdapter
 
     time_stamp: str = datetime.now().strftime("%Y/%m/%d %H:%M:%S")
     for sample_id in samples:
-        sample: DataBaseSample = find.sample(sample_id=sample_id, adapter=adapter)
+        sample: DataBaseSample = statina.crud.find.samples.sample(
+            sample_id=sample_id, adapter=adapter
+        )
         comment: str = form.get(f"comment_{sample_id}")
         include: bool = form.get(f"include_{sample_id}")
         if comment != sample.comment:
@@ -242,7 +244,9 @@ def include_all_samples(samples: Iterable[str], adapter: StatinaAdapter, user: U
 
     time_stamp: str = datetime.now().strftime("%Y/%m/%d %H:%M:%S")
     for sample_id in samples:
-        sample: DataBaseSample = find.sample(sample_id=sample_id, adapter=adapter)
+        sample: DataBaseSample = statina.crud.find.samples.sample(
+            sample_id=sample_id, adapter=adapter
+        )
         if sample.include:
             continue
         sample.include = True

@@ -8,7 +8,7 @@ from statina.crud.utils import paginate
 from statina.models.database import Batch
 
 
-def get_batches_query(text: str) -> dict:
+def get_batches_text_query(text: str) -> dict:
     return {
         "$or": [
             {"batch_id": {"$regex": text, "$options": "i"}},
@@ -48,7 +48,7 @@ def query_batches(
     """Query batches from the batch collection"""
     skip, limit = paginate(page_size=page_size, page_num=page_num)
     raw_batches: Iterable[dict] = (
-        adapter.batch_collection.find(get_batches_query(text=text))
+        adapter.batch_collection.find(get_batches_text_query(text=text))
         .sort(sort_key, sort_table.get(sort_direction))
         .skip(skip)
         .limit(limit)
@@ -58,7 +58,7 @@ def query_batches(
 
 def count_query_batches(adapter: StatinaAdapter, text: Optional[str] = "") -> int:
     """Count all queried batches from the batch collection"""
-    return adapter.batch_collection.count_documents(filter=get_batches_query(text=text))
+    return adapter.batch_collection.count_documents(filter=get_batches_text_query(text=text))
 
 
 def batch_aggregate(adapter: StatinaAdapter, pipe: list) -> List[Batch]:

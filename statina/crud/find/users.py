@@ -8,6 +8,15 @@ from statina.crud.utils import paginate
 from statina.models.database import User
 
 
+def get_users_text_query(text: str) -> dict:
+    return {
+        "$or": [
+            {"username": {"$regex": text, "$options": "i"}},
+            {"email": {"$regex": text, "$options": "i"}},
+        ]
+    }
+
+
 def users(
     adapter: StatinaAdapter,
 ) -> List[User]:
@@ -32,12 +41,7 @@ def query_users(
             {
                 "$and": [
                     {"role": {"$in": [role or x for x in SCOPES]}},
-                    {
-                        "$or": [
-                            {"username": {"$regex": text, "$options": "i"}},
-                            {"email": {"$regex": text, "$options": "i"}},
-                        ]
-                    },
+                    get_users_text_query(text=text),
                 ]
             }
         )
@@ -58,12 +62,7 @@ def count_query_users(
         filter={
             "$and": [
                 {"role": {"$in": [role or x for x in SCOPES]}},
-                {
-                    "$or": [
-                        {"username": {"$regex": text, "$options": "i"}},
-                        {"email": {"$regex": text, "$options": "i"}},
-                    ]
-                },
+                get_users_text_query(text=text),
             ]
         }
     )

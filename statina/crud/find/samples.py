@@ -31,6 +31,7 @@ def samples(
 
 def query_samples(
     adapter: StatinaAdapter,
+    batch_id: Optional[str] = None,
     sort_key: Optional[sample_sort_keys] = "sample_id",
     sort_direction: Optional[Literal["ascending", "descending"]] = "descending",
     query_string: Optional[str] = "",
@@ -44,7 +45,11 @@ def query_samples(
     """
     skip, limit = paginate(page_size=page_size, page_num=page_num)
     raw_samples: Iterable[dict] = (
-        adapter.sample_collection.find(get_sample_text_query(query_string=query_string))
+        adapter.sample_collection.find(
+            {
+                "$and": [{"batch_id": batch_id}, get_sample_text_query(query_string=query_string)],
+            }
+        )
         .sort(sort_key, sort_table.get(sort_direction))
         .skip(skip)
         .limit(limit)
@@ -52,10 +57,14 @@ def query_samples(
     return parse_obj_as(List[DataBaseSample], list(raw_samples))
 
 
-def count_query_samples(adapter: StatinaAdapter, query_string: Optional[str] = "") -> int:
+def count_query_samples(
+    adapter: StatinaAdapter, batch_id: Optional[str] = None, query_string: Optional[str] = ""
+) -> int:
     """Count all queried samples in sample collection"""
     return adapter.sample_collection.count_documents(
-        filter=get_sample_text_query(query_string=query_string)
+        filter={
+            "$and": [{"batch_id": batch_id}, get_sample_text_query(query_string=query_string)],
+        }
     )
 
 

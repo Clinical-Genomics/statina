@@ -29,6 +29,7 @@ router = APIRouter(prefix="/v2")
 
 @router.get("/samples", response_model=PaginatedSampleResponse)
 def samples(
+    batch_id: Optional[str] = Query(None),
     page_size: Optional[int] = Query(5),
     page_num: Optional[int] = Query(0),
     sort_key: Optional[sample_sort_keys] = Query("sample_id"),
@@ -39,6 +40,7 @@ def samples(
 ):
     """Get samples"""
     samples: List[DataBaseSample] = query_samples(
+        batch_id=batch_id,
         adapter=adapter,
         page_size=page_size,
         page_num=page_num,
@@ -47,7 +49,9 @@ def samples(
         query_string=query_string,
     )
     validated_samples: List[Sample] = [Sample(**sample_obj.dict()) for sample_obj in samples]
-    document_count: int = count_query_samples(adapter=adapter, query_string=query_string)
+    document_count: int = count_query_samples(
+        adapter=adapter, batch_id=batch_id, query_string=query_string
+    )
     return JSONResponse(
         content=jsonable_encoder(
             PaginatedSampleResponse(document_count=document_count, documents=validated_samples),

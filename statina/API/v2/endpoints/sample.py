@@ -33,7 +33,7 @@ def samples(
     page_num: Optional[int] = Query(0),
     sort_key: Optional[sample_sort_keys] = Query("sample_id"),
     sort_direction: Optional[Literal["ascending", "descending"]] = Query("descending"),
-    text: Optional[str] = Query(""),
+    query_string: Optional[str] = Query(""),
     current_user: User = Security(get_current_active_user, scopes=["R"]),
     adapter: StatinaAdapter = Depends(get_nipt_adapter),
 ):
@@ -44,10 +44,10 @@ def samples(
         page_num=page_num,
         sort_key=sort_key,
         sort_direction=sort_direction,
-        text=text,
+        query_string=query_string,
     )
     validated_samples: List[Sample] = [Sample(**sample_obj.dict()) for sample_obj in samples]
-    document_count: int = count_query_samples(adapter=adapter, text=text)
+    document_count: int = count_query_samples(adapter=adapter, query_string=query_string)
     return JSONResponse(
         content=jsonable_encoder(
             PaginatedSampleResponse(document_count=document_count, documents=validated_samples),

@@ -167,7 +167,7 @@ def users(
     page_size: Optional[int] = Query(5),
     page_num: Optional[int] = Query(0),
     role: Literal["", "admin", "unconfirmed", "inactive", "R", "RW"] = Query(""),
-    text: Optional[str] = Query(""),
+    query_string: Optional[str] = Query(""),
     sort_key: Literal["added", "username", "email"] = Query("added"),
     sort_direction: Literal["ascending", "descending"] = Query("ascending"),
     current_user: User = Security(get_current_active_user, scopes=["admin"]),
@@ -177,14 +177,14 @@ def users(
     user_list: List[User] = statina.crud.find.users.query_users(
         adapter=adapter,
         page_size=page_size,
-        text=text,
+        query_string=query_string,
         role=role,
         sort_key=sort_key,
         sort_direction=sort_direction,
         page_num=page_num,
     )
     document_count = statina.crud.find.users.count_query_users(
-        adapter=adapter, text=text, role=role
+        adapter=adapter, query_string=query_string, role=role
     )
     return JSONResponse(
         content=jsonable_encoder(

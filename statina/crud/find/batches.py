@@ -8,12 +8,13 @@ from statina.crud.utils import paginate
 from statina.models.database import Batch
 
 
-def get_batches_text_query(text: str) -> dict:
+def get_batches_text_query(query_string: str) -> dict:
+    """Text search with regex, case insensitive"""
     return {
         "$or": [
-            {"batch_id": {"$regex": text, "$options": "i"}},
-            {"comment": {"$regex": text, "$options": "i"}},
-            {"Flowcell": {"$regex": text, "$options": "i"}},
+            {"batch_id": {"$regex": query_string, "$options": "i"}},
+            {"comment": {"$regex": query_string, "$options": "i"}},
+            {"Flowcell": {"$regex": query_string, "$options": "i"}},
         ]
     }
 
@@ -43,12 +44,16 @@ def query_batches(
     sort_key: Optional[
         Literal["batch_id", "SequencingDate", "Flowcell", "comment"]
     ] = "SequencingDate",
-    text: Optional[str] = "",
+    query_string: Optional[str] = "",
 ) -> List[Batch]:
-    """Query batches from the batch collection"""
+    """
+    Query batches from the batch collection.
+    Pagination can be enabled with <page_size> and <page_num> options.
+    No pagination enabled by default.
+    """
     skip, limit = paginate(page_size=page_size, page_num=page_num)
     raw_batches: Iterable[dict] = (
-        adapter.batch_collection.find(get_batches_text_query(text=text))
+        adapter.batch_collection.find(get_batches_text_query(query_string=query_string))
         .sort(sort_key, sort_table.get(sort_direction))
         .skip(skip)
         .limit(limit)
@@ -56,12 +61,8 @@ def query_batches(
     return parse_obj_as(List[Batch], list(raw_batches))
 
 
-def count_query_batches(adapter: StatinaAdapter, text: Optional[str] = "") -> int:
+def count_query_batches(adapter: StatinaAdapter, query_string: Optional[str] = "") -> int:
     """Count all queried batches from the batch collection"""
-    return adapter.batch_collection.count_documents(filter=get_batches_text_query(text=text))
-
-
-def batch_aggregate(adapter: StatinaAdapter, pipe: list) -> List[Batch]:
-    """Aggregates a query pipeline on the sample collection"""
-
-    return list(adapter.batch_collection.aggregate(pipe))
+    return adapter.batch_collection.count_documents(
+        filter=get_batches_text_query(query_string=query_string)
+    )

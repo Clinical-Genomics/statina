@@ -47,7 +47,7 @@ router = APIRouter(prefix="/v2")
 def batches(
     page_size: Optional[int] = Query(5),
     page_num: Optional[int] = Query(0),
-    text: Optional[str] = Query(""),
+    query_string: Optional[str] = Query(""),
     sort_key: Optional[Literal["batch_id", "SequencingDate", "Flowcell", "comment"]] = Query(
         "SequencingDate"
     ),
@@ -60,11 +60,11 @@ def batches(
         adapter=adapter,
         page_size=page_size,
         page_num=page_num,
-        text=text,
+        query_string=query_string,
         sort_key=sort_key,
         sort_direction=sort_direction,
     )
-    document_count = count_query_batches(adapter=adapter, text=text)
+    document_count = count_query_batches(adapter=adapter, query_string=query_string)
     return JSONResponse(
         content=jsonable_encoder(
             PaginatedBatchResponse(document_count=document_count, documents=batches),
@@ -127,7 +127,7 @@ def batch_samples(
     page_num: Optional[int] = Query(0),
     sort_key: Optional[sample_sort_keys] = Query("sample_id"),
     sort_direction: Optional[Literal["ascending", "descending"]] = Query("descending"),
-    text: Optional[str] = Query(""),
+    query_string: Optional[str] = Query(""),
     current_user: User = Security(get_current_active_user, scopes=["R"]),
     adapter: StatinaAdapter = Depends(get_nipt_adapter),
 ):
@@ -137,12 +137,14 @@ def batch_samples(
         adapter=adapter,
         sort_key=sort_key,
         sort_direction=sort_direction,
-        text=text,
+        query_string=query_string,
         page_size=page_size,
         page_num=page_num,
     )
     validated_samples: List[Sample] = [Sample(**sample_obj.dict()) for sample_obj in samples]
-    document_count: int = count_query_batch_samples(adapter=adapter, batch_id=batch_id, text=text)
+    document_count: int = count_query_batch_samples(
+        adapter=adapter, batch_id=batch_id, query_string=query_string
+    )
     return JSONResponse(
         content=jsonable_encoder(
             PaginatedSampleResponse(document_count=document_count, documents=validated_samples),

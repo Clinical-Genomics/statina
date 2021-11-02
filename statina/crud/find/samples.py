@@ -48,7 +48,7 @@ def query_samples(
         adapter.sample_collection.find(
             {
                 "$and": [
-                    {"batch_id": batch_id or "$all"},
+                    {"batch_id": batch_id or "*"},
                     get_sample_text_query(query_string=query_string),
                 ],
             }
@@ -66,7 +66,10 @@ def count_query_samples(
     """Count all queried samples in sample collection"""
     return adapter.sample_collection.count_documents(
         filter={
-            "$and": [{"batch_id": batch_id}, get_sample_text_query(query_string=query_string)],
+            "$and": [
+                {"batch_id": batch_id or "*"},
+                get_sample_text_query(query_string=query_string),
+            ],
         }
     )
 

@@ -77,7 +77,7 @@ def batch(
 ):
     """Batch view with table of all samples in the batch."""
 
-    samples: List[DataBaseSample] = statina.crud.samples.batch_samples(
+    samples: List[DataBaseSample] = statina.crud.find.samples.batch_samples(
         batch_id=batch_id, adapter=adapter
     )
     return templates.TemplateResponse(
@@ -101,7 +101,7 @@ def batch(
 ):
     """Batch view with table of all samples in the batch."""
 
-    samples: List[DataBaseSample] = statina.crud.samples.batch_samples(
+    samples: List[DataBaseSample] = statina.crud.find.samples.batch_samples(
         batch_id=batch_id, adapter=adapter
     )
     return templates.TemplateResponse(

@@ -4,10 +4,9 @@ from typing import List
 
 from fastapi import APIRouter, Depends, Response, status
 
-
+import statina
 from statina.adapter.plugin import StatinaAdapter
 from statina.config import get_nipt_adapter
-from statina.crud.find import find
 from statina.crud.insert import insert_batch, insert_samples
 from statina.models.database import Batch, DataBaseSample
 from statina.models.server.load import BatchRequestBody
@@ -29,7 +28,7 @@ def batch(
         return {"message": "Results file missing."}
     samples: List[DataBaseSample] = get_samples(nipt_results)
     batch: Batch = get_batch(nipt_results)
-    if find.batch(adapter=adapter, batch_id=batch.batch_id):
+    if statina.crud.find.batches.batch(adapter=adapter, batch_id=batch.batch_id):
         return "batch already in database"
 
     insert_batch(adapter=adapter, batch=batch, batch_files=batch_files)

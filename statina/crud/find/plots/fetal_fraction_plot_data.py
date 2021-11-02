@@ -1,8 +1,8 @@
 from typing import Optional
 
+import statina
 from statina.adapter import StatinaAdapter
 from statina.API.external.constants import CHROM_ABNORM, SEX_CHROM_ABNORM
-from statina.crud.find import find
 from statina.models.server.plots.fetal_fraction import (
     AbNormalityClasses,
     FetalFractionControlAbNormal,
@@ -41,7 +41,9 @@ def samples(
     else:
         match["$match"]["batch_id"] = {"$eq": batch_id}
 
-    relevant_aggregation_data = list(find.sample_aggregate(pipe=[match, group], adapter=adapter))[0]
+    relevant_aggregation_data = list(
+        statina.crud.find.samples.sample_aggregate(pipe=[match, group], adapter=adapter)
+    )[0]
     return FetalFractionSamples(**relevant_aggregation_data)
 
 
@@ -69,7 +71,7 @@ def control_abnormal(adapter: StatinaAdapter) -> FetalFractionControlAbNormal:
             },
         ]
         statuses = {}
-        for status_dict in find.sample_aggregate(pipe=pipe, adapter=adapter):
+        for status_dict in statina.crud.find.samples.sample_aggregate(pipe=pipe, adapter=adapter):
             status: str = status_dict["_id"][f"status_{abn}"]
             statuses[status] = status_dict
 

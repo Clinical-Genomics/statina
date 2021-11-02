@@ -45,7 +45,7 @@ def statistics(
         context=dict(
             request=request,
             current_user=user,
-            ticks=list(range(0, nr_batches)),
+            ticks=list(range(nr_batches)),
             nr_batches=nr_batches,
             batch_ids=batch_ids,
             box_stat=box_stat,

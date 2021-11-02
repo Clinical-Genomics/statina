@@ -2,8 +2,8 @@ from typing import List, Optional
 
 import pymongo
 
+import statina
 from statina.adapter import StatinaAdapter
-from statina.crud.find import find
 
 
 def get_last_batches(adapter, nr_of_batches: int) -> list:
@@ -52,5 +52,5 @@ def get_statistics_for_box_plot(adapter: StatinaAdapter, batches: list, fields: 
 
     pipe = [match, lookup, unwind, group]
     # maybe add a fina sort to the pipe
-    box_plot_data = list(find.sample_aggregate(pipe=pipe, adapter=adapter))
+    box_plot_data = list(statina.crud.find.samples.sample_aggregate(pipe=pipe, adapter=adapter))
     return {batch["_id"]["batch"]: batch for batch in box_plot_data}

@@ -5,11 +5,11 @@ from fastapi.responses import FileResponse, RedirectResponse
 from starlette.requests import Request
 from starlette.responses import StreamingResponse
 
+import statina
 from statina.API.external.constants import COLORS
 from statina.adapter.plugin import StatinaAdapter
 from statina.API.external.api.deps import get_current_user
 from statina.config import get_nipt_adapter, templates
-from statina.crud.find import find
 from statina.crud.find.plots import fetal_fraction_plot_data as get_fetal_fraction
 from statina.models.server.plots.fetal_fraction import (
     FetalFractionSamples,
@@ -49,7 +49,7 @@ def batch_download(
     user: User = Depends(get_current_user),
 ):
     """View for batch downloads"""
-    batch: dict = find.batch(adapter=adapter, batch_id=batch_id).dict()
+    batch: dict = statina.crud.find.batches.batch(adapter=adapter, batch_id=batch_id).dict()
     file_path = batch.get(file_id)
     if not validate_file_path(file_path):
         return RedirectResponse(request.headers.get("referer"))
@@ -74,7 +74,7 @@ def sample_download(
 ):
     """View for sample downloads"""
 
-    sample: DataBaseSample = find.sample(adapter=adapter, sample_id=sample_id)
+    sample: DataBaseSample = statina.crud.find.samples.sample(adapter=adapter, sample_id=sample_id)
     file_path = sample.dict().get(file_id)
     if not validate_file_path(file_path):
         # warn file missing!
@@ -96,8 +96,10 @@ def report(
 ):
     """Report view, collecting all tables and plots from one batch."""
 
-    samples: List[DataBaseSample] = find.batch_samples(batch_id=batch_id, adapter=adapter)
-    batch: Batch = find.batch(batch_id=batch_id, adapter=adapter)
+    samples: List[DataBaseSample] = statina.crud.find.samples.batch_samples(
+        batch_id=batch_id, adapter=adapter
+    )
+    batch: Batch = statina.crud.find.batches.batch(batch_id=batch_id, adapter=adapter)
 
     cases = get_fetal_fraction.samples(adapter=adapter, batch_id=batch_id)
     control: FetalFractionSamples = get_fetal_fraction.samples(
@@ -124,7 +126,7 @@ def report(
         # common
         request=request,
         current_user=user,
-        batch=find.batch(batch_id=batch_id, adapter=adapter),
+        batch=statina.crud.find.batches.batch(batch_id=batch_id, adapter=adapter),
         # Fetal Fraction  XY
         sex_thresholds={
             "XY_fetal_fraction_y": sex_thresholds.XY_fetal_fraction_y(),

@@ -6,10 +6,10 @@ from fastapi.security import OAuth2PasswordRequestForm
 from jose import JWTError, jwt
 from passlib.context import CryptContext
 
+import statina
 from statina.adapter.plugin import StatinaAdapter
 from statina.config import get_nipt_adapter, settings
 from statina.constants import SCOPES
-from statina.crud.find import find
 from statina.exeptions import CredentialsError
 from statina.models.database import User
 
@@ -32,7 +32,7 @@ def get_current_user(
             raise CredentialsError(message="Could not validate credentials")
     except JWTError:
         raise CredentialsError(message="Could not validate credentials")
-    user: User = find.user(adapter=adapter, user_name=username)
+    user: User = statina.crud.find.users.user(adapter=adapter, user_name=username)
     if not user:
         raise CredentialsError(message="User not found in database.")
     return user
@@ -48,7 +48,7 @@ def get_password_hash(password: str) -> str:
 
 def authenticate_user(username: str, password: str) -> Optional[User]:
     adapter: StatinaAdapter = get_nipt_adapter()
-    user: User = find.user(adapter=adapter, user_name=username)
+    user: User = statina.crud.find.users.user(adapter=adapter, user_name=username)
 
     if user and verify_password(password, user.hashed_password):
         return user
@@ -56,7 +56,7 @@ def authenticate_user(username: str, password: str) -> Optional[User]:
 
 def find_user(username: str) -> Optional[User]:
     adapter: StatinaAdapter = get_nipt_adapter()
-    user: User = find.user(adapter=adapter, user_name=username)
+    user: User = statina.crud.find.users.user(adapter=adapter, user_name=username)
 
     return user
 

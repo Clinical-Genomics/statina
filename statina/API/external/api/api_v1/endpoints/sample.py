@@ -2,11 +2,11 @@ from typing import Dict, List
 
 from fastapi import APIRouter, Depends, Request
 
+import statina
 from statina.adapter import StatinaAdapter
 from statina.API.external.api.deps import get_current_user
 from statina.API.external.constants import CHROM_ABNORM, STATUS_CLASSES, STATUS_COLORS
 from statina.config import get_nipt_adapter, templates
-from statina.crud.find import find
 from statina.crud.find.plots.zscore_plot_data import (
     get_abn_for_samp_tris_plot,
     get_normal_for_samp_tris_plot,
@@ -26,7 +26,7 @@ def samples(
     user: User = Depends(get_current_user),
 ):
     """Get sample with id"""
-    samples: List[DataBaseSample] = find.samples(adapter=adapter)
+    samples: List[DataBaseSample] = statina.crud.find.samples.samples(adapter=adapter)
     return templates.TemplateResponse(
         "sample/samples.html",
         context=dict(
@@ -47,8 +47,8 @@ def sample(
 ):
     """Get sample with id"""
 
-    sample: DataBaseSample = find.sample(sample_id=sample_id, adapter=adapter)
-    batch: Batch = find.batch(batch_id=sample.batch_id, adapter=adapter)
+    sample: DataBaseSample = statina.crud.find.samples.sample(sample_id=sample_id, adapter=adapter)
+    batch: Batch = statina.crud.find.batches.batch(batch_id=sample.batch_id, adapter=adapter)
     return templates.TemplateResponse(
         "sample/sample.html",
         context=dict(
@@ -72,8 +72,8 @@ def sample(
 ):
     """Post sample with id"""
 
-    sample: DataBaseSample = find.sample(sample_id=sample_id, adapter=adapter)
-    batch: Batch = find.batch(batch_id=sample.batch_id, adapter=adapter)
+    sample: DataBaseSample = statina.crud.find.samples.sample(sample_id=sample_id, adapter=adapter)
+    batch: Batch = statina.crud.find.batches.batch(batch_id=sample.batch_id, adapter=adapter)
     return templates.TemplateResponse(
         "sample/sample.html",
         context=dict(
@@ -96,8 +96,8 @@ def sample_tris(
     user: User = Depends(get_current_user),
 ):
     """Sample view with trisomi plot."""
-    sample: DataBaseSample = find.sample(sample_id=sample_id, adapter=adapter)
-    batch: Batch = find.batch(batch_id=sample.batch_id, adapter=adapter)
+    sample: DataBaseSample = statina.crud.find.samples.sample(sample_id=sample_id, adapter=adapter)
+    batch: Batch = statina.crud.find.batches.batch(batch_id=sample.batch_id, adapter=adapter)
     abnormal_data: Dict[str, ZscoreSamples] = get_abn_for_samp_tris_plot(adapter=adapter)
     normal_data: Zscore131821 = get_normal_for_samp_tris_plot(adapter=adapter)
     sample_data: ZscoreSamples = get_sample_for_samp_tris_plot(sample)
@@ -125,8 +125,8 @@ def sample_tris(
     user: User = Depends(get_current_user),
 ):
     """Sample view with trisomi plot."""
-    sample: DataBaseSample = find.sample(sample_id=sample_id, adapter=adapter)
-    batch: Batch = find.batch(batch_id=sample.batch_id, adapter=adapter)
+    sample: DataBaseSample = statina.crud.find.samples.sample(sample_id=sample_id, adapter=adapter)
+    batch: Batch = statina.crud.find.batches.batch(batch_id=sample.batch_id, adapter=adapter)
     abnormal_data: Dict[str, ZscoreSamples] = get_abn_for_samp_tris_plot(adapter=adapter)
     normal_data: Zscore131821 = get_normal_for_samp_tris_plot(adapter=adapter)
     sample_data: ZscoreSamples = get_sample_for_samp_tris_plot(sample)

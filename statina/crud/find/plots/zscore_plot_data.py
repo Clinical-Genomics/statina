@@ -1,8 +1,8 @@
 from copy import deepcopy
 from typing import Dict, Optional
 
+import statina
 from statina.adapter import StatinaAdapter
-from statina.crud.find import find
 from statina.models.database import DataBaseSample
 from statina.models.server.plots.ncv import Zscore131821, ZscoreSamples
 
@@ -29,7 +29,7 @@ def get_tris_control_abnormal(adapter: StatinaAdapter, chr, x_axis) -> Dict[str,
         },
     ]
 
-    for status_dict in find.sample_aggregate(pipe=pipe, adapter=adapter):
+    for status_dict in statina.crud.find.samples.sample_aggregate(pipe=pipe, adapter=adapter):
         status = status_dict["_id"][f"status_{chr}"]
         plot_data[status] = ZscoreSamples(
             ncv_values=[value for value in status_dict.get("ncv_values")],
@@ -79,9 +79,9 @@ def get_tris_control_normal(
             }
         },
     ]
-    if not list(find.sample_aggregate(pipe=pipe, adapter=adapter)):
+    if not list(statina.crud.find.samples.sample_aggregate(pipe=pipe, adapter=adapter)):
         return {}
-    data = find.sample_aggregate(pipe=pipe, adapter=adapter)[0]
+    data = statina.crud.find.samples.sample_aggregate(pipe=pipe, adapter=adapter)[0]
     if x_axis:
         data["x_axis"] = [x_axis] * data.get("count")
 
@@ -131,10 +131,10 @@ def get_tris_samples(adapter: StatinaAdapter, chr, batch_id: str) -> ZscoreSampl
         },
     ]
 
-    if not list(find.sample_aggregate(pipe=pipe, adapter=adapter)):
+    if not list(statina.crud.find.samples.sample_aggregate(pipe=pipe, adapter=adapter)):
         return {}
 
-    data = list(find.sample_aggregate(pipe=pipe, adapter=adapter))[0]
+    data = list(statina.crud.find.samples.sample_aggregate(pipe=pipe, adapter=adapter))[0]
     data["x_axis"] = list(range(1, data.get("count") + 1))
 
     return ZscoreSamples(**data)

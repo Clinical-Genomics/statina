@@ -1,3 +1,5 @@
+from typing import Literal
+
 STATUS_CLASSES = {
     "Suspected": "warning",
     "False Positive": "success",
@@ -7,6 +9,17 @@ STATUS_CLASSES = {
     "Other": "warning",
     "Failed": "danger",
 }
+
+LITERAL_STATUS_CLASSES = Literal[
+    "Suspected",
+    "False Positive",
+    "Verified",
+    "Probable",
+    "False Negative",
+    "Other",
+    "Failed",
+    "Normal",
+]
 
 CHROM_ABNORM = ["13", "18", "21", "X0", "XXX", "XXY", "XYY"]
 TRIS_CHROM_ABNORM = ["13", "18", "21"]

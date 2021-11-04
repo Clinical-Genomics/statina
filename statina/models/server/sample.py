@@ -1,8 +1,9 @@
 from typing import Literal, Optional, List
 
-from pydantic import BaseModel, validator
+from pydantic import BaseModel, validator, Field
 
 from statina.API.external.constants import (
+    LITERAL_STATUS_CLASSES,
     SEX_CHROM_ABNORM,
     TRIS_CHROM_ABNORM,
     TRISOMI_TRESHOLDS,
@@ -10,6 +11,21 @@ from statina.API.external.constants import (
 )
 from statina.models.database import DataBaseSample
 from statina.models.server.plots.fetal_fraction_sex import x_get_y
+
+
+class Status(BaseModel):
+    status: LITERAL_STATUS_CLASSES
+    edited: str
+
+
+class Statuses(BaseModel):
+    status13: Status
+    status18: Status
+    status21: Status
+    statusX0: Status
+    statusXXX: Status
+    statusXXY: Status
+    statusXYY: Status
 
 
 class SampleWarning(BaseModel):
@@ -28,7 +44,8 @@ class SampleWarning(BaseModel):
 class Sample(DataBaseSample):
     warnings: Optional[SampleWarning]
     text_warning: Optional[str]
-    status: Optional[str]
+    status_string: Optional[str]
+    status: Optional[Statuses]
     sex: Optional[Literal["XX", "XY"]]
 
     @validator("Zscore_13")
@@ -59,8 +76,8 @@ class Sample(DataBaseSample):
     def round_ffy(cls, v):
         return round(v, 2)
 
-    @validator("status", always=True)
-    def set_status(cls, v, values: dict) -> str:
+    @validator("status_string", always=True)
+    def set_status_string(cls, v, values: dict) -> str:
 
         status_list = []
         for key in TRIS_CHROM_ABNORM + SEX_CHROM_ABNORM:
@@ -68,6 +85,19 @@ class Sample(DataBaseSample):
             if status and status != "Normal":
                 status_list.append(" ".join([status, key]))
         return ", ".join(status_list)
+
+    @validator("status", always=True)
+    def set_status(cls, v, values: dict) -> Statuses:
+
+        statuses_dict = {
+            f"status{key}": Status(
+                status=values.get(f"status_{key}"),
+                edited=values.get(f"status_change_{key}"),
+            )
+            for key in TRIS_CHROM_ABNORM + SEX_CHROM_ABNORM
+        }
+
+        return Statuses(**statuses_dict)
 
     @validator("warnings", always=True)
     def set_warnings(cls, v, values: dict) -> SampleWarning:
@@ -270,3 +300,20 @@ class Sample(DataBaseSample):
 class PaginatedSampleResponse(BaseModel):
     document_count: int
     documents: List[Sample]
+
+
+class SampleView(BaseModel):
+    status: Statuses
+    sample_id: str
+    sample_type: str = Field(..., alias="SampleType")
+    sex: str
+    text_warning: str
+    non_excluded_sites: str = Field(..., alias="NonExcludedSites")
+    include: bool
+    comment: str
+    qc_flag: str = Field(..., alias="QCFlag")
+    batch_id: str
+    sequencing_date: str
+
+    class Config:
+        allow_population_by_field_name = True

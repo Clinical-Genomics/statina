@@ -12,16 +12,12 @@ from statina.API.v2.endpoints.user import get_current_active_user
 from statina.config import get_nipt_adapter
 from statina.constants import sample_sort_keys, sample_status_options
 from statina.crud import update
-from statina.crud.find.plots.zscore_plot_data import (
-    get_abn_for_samp_tris_plot,
-    get_normal_for_samp_tris_plot,
-    get_sample_for_samp_tris_plot,
-)
-from statina.crud.find.samples import query_samples, count_query_samples
-
-from statina.models.database import DataBaseSample, User
+from statina.crud.find import samples as find_samples
+from statina.crud.find import batches as find_batches
+from statina.crud.find.plots import zscore_plot_data
+from statina.models.database import DataBaseSample, User, Batch
 from statina.models.server.plots.ncv import Zscore131821, ZscoreSamples
-from statina.models.server.sample import Sample, PaginatedSampleResponse
+from statina.models.server.sample import Sample, PaginatedSampleResponse, SampleView
 from statina.parse.batch import validate_file_path
 
 router = APIRouter(prefix="/v2")
@@ -39,7 +35,7 @@ def samples(
     adapter: StatinaAdapter = Depends(get_nipt_adapter),
 ):
     """Get samples"""
-    samples: List[DataBaseSample] = query_samples(
+    samples: List[DataBaseSample] = find_samples.query_samples(
         batch_id=batch_id,
         adapter=adapter,
         page_size=page_size,
@@ -49,7 +45,7 @@ def samples(
         query_string=query_string,
     )
     validated_samples: List[Sample] = [Sample(**sample_obj.dict()) for sample_obj in samples]
-    document_count: int = count_query_samples(
+    document_count: int = find_samples.count_query_samples(
         adapter=adapter, batch_id=batch_id, query_string=query_string
     )
     return JSONResponse(
@@ -60,7 +56,7 @@ def samples(
     )
 
 
-@router.get("/sample/{sample_id}", response_model=Sample)
+@router.get("/sample/{sample_id}", response_model=SampleView)
 def sample(
     sample_id: str,
     current_user: User = Security(get_current_active_user, scopes=["R"]),
@@ -68,14 +64,22 @@ def sample(
 ):
     """Get sample with id"""
 
-    sample: DataBaseSample = statina.crud.find.samples.sample(sample_id=sample_id, adapter=adapter)
+    sample: DataBaseSample = find_samples.sample(sample_id=sample_id, adapter=adapter)
+    batch: Batch = find_batches.batch(batch_id=sample.batch_id, adapter=adapter)
+
     if not sample:
         return JSONResponse("Not found", status_code=404)
+
     validated_sample: Sample = Sample(**sample.dict())
+    sample_view_data = SampleView(
+        batch_id=batch.batch_id,
+        sequencing_date=batch.SequencingDate,
+        **validated_sample.dict(exclude_none=True),
+    )
 
     return JSONResponse(
         content=jsonable_encoder(
-            validated_sample,
+            sample_view_data,
             by_alias=False,
         )
     )
@@ -88,10 +92,12 @@ def sample_tris(
     adapter: StatinaAdapter = Depends(get_nipt_adapter),
 ):
     """Sample view with trisomi plot."""
-    sample: DataBaseSample = statina.crud.find.samples.sample(sample_id=sample_id, adapter=adapter)
-    abnormal_data: Dict[str, ZscoreSamples] = get_abn_for_samp_tris_plot(adapter=adapter)
-    normal_data: Zscore131821 = get_normal_for_samp_tris_plot(adapter=adapter)
-    sample_data: ZscoreSamples = get_sample_for_samp_tris_plot(sample)
+    sample: DataBaseSample = find_samples.sample(sample_id=sample_id, adapter=adapter)
+    abnormal_data: Dict[str, ZscoreSamples] = zscore_plot_data.get_abn_for_samp_tris_plot(
+        adapter=adapter
+    )
+    normal_data: Zscore131821 = zscore_plot_data.get_normal_for_samp_tris_plot(adapter=adapter)
+    sample_data: ZscoreSamples = zscore_plot_data.get_sample_for_samp_tris_plot(sample)
     return JSONResponse(
         content=jsonable_encoder(
             dict(
@@ -113,7 +119,7 @@ async def set_sample_status_13(
 ):
     """Update the manualy interpreted chromosome abnormality status for a sample."""
 
-    sample: DataBaseSample = statina.crud.find.samples.sample(sample_id=sample_id, adapter=adapter)
+    sample: DataBaseSample = find_samples.sample(sample_id=sample_id, adapter=adapter)
     sample.status_13 = status
     time_stamp: str = datetime.now().strftime("%Y/%m/%d %H:%M:%S")
     sample.status_change_13 = f"{current_user.username} {time_stamp}"
@@ -130,7 +136,7 @@ async def set_sample_status_18(
 ):
     """Update the manualy interpreted chromosome abnormality status for a sample."""
 
-    sample: DataBaseSample = statina.crud.find.samples.sample(sample_id=sample_id, adapter=adapter)
+    sample: DataBaseSample = find_samples.sample(sample_id=sample_id, adapter=adapter)
     sample.status_18 = status
     time_stamp: str = datetime.now().strftime("%Y/%m/%d %H:%M:%S")
     sample.status_change_18 = f"{current_user.username} {time_stamp}"
@@ -147,7 +153,7 @@ async def set_sample_status_21(
 ):
     """Update the manualy interpreted chromosome abnormality status for a sample."""
 
-    sample: DataBaseSample = statina.crud.find.samples.sample(sample_id=sample_id, adapter=adapter)
+    sample: DataBaseSample = find_samples.sample(sample_id=sample_id, adapter=adapter)
     sample.status_21 = status
     time_stamp: str = datetime.now().strftime("%Y/%m/%d %H:%M:%S")
     sample.status_change_21 = f"{current_user.username} {time_stamp}"
@@ -164,7 +170,7 @@ async def set_sample_status_x0(
 ):
     """Update the manualy interpreted chromosome abnormality status for a sample."""
 
-    sample: DataBaseSample = statina.crud.find.samples.sample(sample_id=sample_id, adapter=adapter)
+    sample: DataBaseSample = find_samples.sample(sample_id=sample_id, adapter=adapter)
     sample.status_X0 = status
     time_stamp: str = datetime.now().strftime("%Y/%m/%d %H:%M:%S")
     sample.status_change_X0 = f"{current_user.username} {time_stamp}"
@@ -181,7 +187,7 @@ async def set_sample_status_xxy(
 ):
     """Update the manualy interpreted chromosome abnormality status for a sample."""
 
-    sample: DataBaseSample = statina.crud.find.samples.sample(sample_id=sample_id, adapter=adapter)
+    sample: DataBaseSample = find_samples.sample(sample_id=sample_id, adapter=adapter)
     sample.status_XXY = status
     time_stamp: str = datetime.now().strftime("%Y/%m/%d %H:%M:%S")
     sample.status_change_XXY = f"{current_user.username} {time_stamp}"
@@ -198,7 +204,7 @@ async def set_sample_status_xxx(
 ):
     """Update the manualy interpreted chromosome abnormality status for a sample."""
 
-    sample: DataBaseSample = statina.crud.find.samples.sample(sample_id=sample_id, adapter=adapter)
+    sample: DataBaseSample = find_samples.sample(sample_id=sample_id, adapter=adapter)
     sample.status_XXX = status
     time_stamp: str = datetime.now().strftime("%Y/%m/%d %H:%M:%S")
     sample.status_change_XXX = f"{current_user.username} {time_stamp}"
@@ -215,7 +221,7 @@ async def set_sample_status_xyy(
 ):
     """Update the manualy interpreted chromosome abnormality status for a sample."""
 
-    sample: DataBaseSample = statina.crud.find.samples.sample(sample_id=sample_id, adapter=adapter)
+    sample: DataBaseSample = find_samples.sample(sample_id=sample_id, adapter=adapter)
     sample.status_XYY = status
     time_stamp: str = datetime.now().strftime("%Y/%m/%d %H:%M:%S")
     sample.status_change_XYY = f"{current_user.username} {time_stamp}"
@@ -232,7 +238,7 @@ async def sample_comment(
 ):
     """Update sample comment"""
 
-    sample: DataBaseSample = statina.crud.find.samples.sample(sample_id=sample_id, adapter=adapter)
+    sample: DataBaseSample = find_samples.sample(sample_id=sample_id, adapter=adapter)
     sample.comment = comment
     update.sample(adapter=adapter, sample=sample)
 
@@ -248,7 +254,7 @@ async def sample_include(
 ):
     """Include sample in plots"""
 
-    sample: DataBaseSample = statina.crud.find.samples.sample(sample_id=sample_id, adapter=adapter)
+    sample: DataBaseSample = find_samples.sample(sample_id=sample_id, adapter=adapter)
     sample.include = include
     update.sample(adapter=adapter, sample=sample)
 
@@ -263,7 +269,7 @@ def sample_segmental_calls_download(
 ):
     """View for sample downloads"""
 
-    sample: DataBaseSample = statina.crud.find.samples.sample(adapter=adapter, sample_id=sample_id)
+    sample: DataBaseSample = find_samples.sample(adapter=adapter, sample_id=sample_id)
     file_path = sample.dict().get("segmental_calls")
     if not validate_file_path(file_path):
         # warn file missing!

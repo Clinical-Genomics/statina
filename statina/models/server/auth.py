@@ -9,6 +9,7 @@ class Token(BaseModel):
     username: str
     email: str
     scopes: Optional[List]
+    role: str
 
 
 class TokenData(BaseModel):

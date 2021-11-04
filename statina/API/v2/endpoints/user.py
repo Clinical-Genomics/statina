@@ -98,6 +98,7 @@ def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends()):
                 username=user.username,
                 email=user.email,
                 scopes=get_user_scopes(username=user.username),
+                role=user.role,
             )
         )
     )

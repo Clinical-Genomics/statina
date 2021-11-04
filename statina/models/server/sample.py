@@ -19,13 +19,13 @@ class Status(BaseModel):
 
 
 class Statuses(BaseModel):
-    status13: Status
-    status18: Status
-    status21: Status
-    statusX0: Status
-    statusXXX: Status
-    statusXXY: Status
-    statusXYY: Status
+    status_13: Status
+    status_18: Status
+    status_21: Status
+    status_x0: Status
+    status_xxx: Status
+    status_xxy: Status
+    status_xyy: Status
 
 
 class SampleWarning(BaseModel):
@@ -90,7 +90,7 @@ class Sample(DataBaseSample):
     def set_status(cls, v, values: dict) -> Statuses:
 
         statuses_dict = {
-            f"status{key}": Status(
+            f"status_{key.lower()}": Status(
                 status=values.get(f"status_{key}"),
                 edited=values.get(f"status_change_{key}"),
             )

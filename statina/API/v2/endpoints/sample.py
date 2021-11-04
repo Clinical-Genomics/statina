@@ -110,7 +110,7 @@ def sample_tris(
     )
 
 
-@router.put("/sample/{sample_id}/status_13")
+@router.put("/sample/{sample_id}/status/13")
 async def set_sample_status_13(
     sample_id: str,
     status: sample_status_options = Query(...),
@@ -127,7 +127,7 @@ async def set_sample_status_13(
     return JSONResponse(content="Sample field updated", status_code=200)
 
 
-@router.put("/sample/{sample_id}/status_18")
+@router.put("/sample/{sample_id}/status/18")
 async def set_sample_status_18(
     sample_id: str,
     status: sample_status_options = Query(...),
@@ -144,7 +144,7 @@ async def set_sample_status_18(
     return JSONResponse(content="Sample field updated", status_code=200)
 
 
-@router.put("/sample/{sample_id}/status_21")
+@router.put("/sample/{sample_id}/status/21")
 async def set_sample_status_21(
     sample_id: str,
     status: sample_status_options = Query(...),
@@ -161,7 +161,7 @@ async def set_sample_status_21(
     return JSONResponse(content="Sample field updated", status_code=200)
 
 
-@router.put("/sample/{sample_id}/status_X0")
+@router.put("/sample/{sample_id}/status/X0")
 async def set_sample_status_x0(
     sample_id: str,
     status: sample_status_options = Query(...),
@@ -178,7 +178,7 @@ async def set_sample_status_x0(
     return JSONResponse(content="Sample field updated", status_code=200)
 
 
-@router.put("/sample/{sample_id}/status_XXY")
+@router.put("/sample/{sample_id}/status/XXY")
 async def set_sample_status_xxy(
     sample_id: str,
     status: sample_status_options = Query(...),
@@ -195,7 +195,7 @@ async def set_sample_status_xxy(
     return JSONResponse(content="Sample field updated", status_code=200)
 
 
-@router.put("/sample/{sample_id}/status_XXX")
+@router.put("/sample/{sample_id}/status/XXX")
 async def set_sample_status_xxx(
     sample_id: str,
     status: sample_status_options = Query(...),
@@ -212,7 +212,7 @@ async def set_sample_status_xxx(
     return JSONResponse(content="Sample field updated", status_code=200)
 
 
-@router.put("/sample/{sample_id}/status_XYY")
+@router.put("/sample/{sample_id}/status/XYY")
 async def set_sample_status_xyy(
     sample_id: str,
     status: sample_status_options = Query(...),

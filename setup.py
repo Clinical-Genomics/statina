@@ -13,7 +13,7 @@ with open("README.md", "r") as fh:
 
 setup(
     name="statina",
-    version="1.7.2",
+    version="1.7.3",
     description="NIPT data storage and visualisation",
     long_description=long_description,
     long_description_content_type="text/markdown",

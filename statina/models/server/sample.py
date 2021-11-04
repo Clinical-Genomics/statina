@@ -19,13 +19,16 @@ class Status(BaseModel):
 
 
 class Statuses(BaseModel):
-    status_13: Status
-    status_18: Status
-    status_21: Status
-    status_x0: Status
-    status_xxx: Status
-    status_xxy: Status
-    status_xyy: Status
+    status_13: Status = Field(..., alias="13")
+    status_18: Status = Field(..., alias="18")
+    status_21: Status = Field(..., alias="21")
+    status_x0: Status = Field(..., alias="X0")
+    status_xxx: Status = Field(..., alias="XXX")
+    status_xxy: Status = Field(..., alias="XXY")
+    status_xyy: Status = Field(..., alias="XYY")
+
+    class Config:
+        allow_population_by_field_name = True
 
 
 class SampleWarning(BaseModel):

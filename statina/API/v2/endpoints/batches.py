@@ -2,7 +2,7 @@ from datetime import datetime
 from pathlib import Path
 from typing import Dict, List, Literal, Optional
 
-from fastapi import APIRouter, Depends, Form, Query, Security, Response
+from fastapi import APIRouter, Depends, Form, Query, Security
 from fastapi.encoders import jsonable_encoder
 from fastapi.responses import FileResponse, JSONResponse, StreamingResponse
 
@@ -12,7 +12,6 @@ from statina.adapter import StatinaAdapter
 from statina.API.external.constants import TRISOMI_TRESHOLDS
 from statina.API.v2.endpoints.user import get_current_active_user
 from statina.config import get_nipt_adapter
-from statina.constants import sample_sort_keys
 from statina.crud import update
 from statina.crud.delete import delete_batch
 from statina.crud.find.batches import query_batches, count_query_batches
@@ -29,6 +28,7 @@ from statina.crud.find.samples import count_query_batch_samples, query_batch_sam
 from statina.crud.insert import insert_batch, insert_samples
 from statina.crud.utils import zip_dir
 from statina.models.database import Batch, DataBaseSample, User
+from statina.models.query_models import BatchesQuery, BatchSamplesQuery
 from statina.models.server.batch import PaginatedBatchResponse
 from statina.models.server.load import BatchRequestBody
 from statina.models.server.plots.coverage import CoveragePlotSampleData
@@ -45,26 +45,13 @@ router = APIRouter(prefix="/v2")
 
 @router.get("/batches", response_model=PaginatedBatchResponse)
 def batches(
-    page_size: Optional[int] = Query(5),
-    page_num: Optional[int] = Query(0),
-    query_string: Optional[str] = Query(""),
-    sort_key: Optional[Literal["batch_id", "SequencingDate", "Flowcell", "comment"]] = Query(
-        "SequencingDate"
-    ),
-    sort_direction: Optional[Literal["ascending", "descending"]] = Query("descending"),
-    current_user: User = Security(get_current_active_user, scopes=["R"]),
+    batch_query: BatchesQuery,
     adapter: StatinaAdapter = Depends(get_nipt_adapter),
+    current_user: User = Security(get_current_active_user, scopes=["R"]),
 ):
     """List of all batches"""
-    batches: List[Batch] = query_batches(
-        adapter=adapter,
-        page_size=page_size,
-        page_num=page_num,
-        query_string=query_string,
-        sort_key=sort_key,
-        sort_direction=sort_direction,
-    )
-    document_count = count_query_batches(adapter=adapter, query_string=query_string)
+    batches: List[Batch] = query_batches(**batch_query.dict(), adapter=adapter)
+    document_count = count_query_batches(adapter=adapter, query_string=batch_query.query_string)
     return JSONResponse(
         content=jsonable_encoder(
             PaginatedBatchResponse(document_count=document_count, documents=batches),
@@ -122,29 +109,21 @@ def get_batch(
 
 @router.get("/batch/{batch_id}/samples", response_model=PaginatedSampleResponse)
 def batch_samples(
-    batch_id: str,
-    page_size: Optional[int] = Query(5),
-    page_num: Optional[int] = Query(0),
-    sort_key: Optional[sample_sort_keys] = Query("sample_id"),
-    sort_direction: Optional[Literal["ascending", "descending"]] = Query("descending"),
-    query_string: Optional[str] = Query(""),
+    sample_query: BatchSamplesQuery,
     current_user: User = Security(get_current_active_user, scopes=["R"]),
     adapter: StatinaAdapter = Depends(get_nipt_adapter),
 ):
     """Batch view with table of all samples in the batch."""
+
     samples = query_batch_samples(
-        batch_id=batch_id,
+        **sample_query.dict(),
         adapter=adapter,
-        sort_key=sort_key,
-        sort_direction=sort_direction,
-        query_string=query_string,
-        page_size=page_size,
-        page_num=page_num,
     )
     validated_samples: List[Sample] = [Sample(**sample_obj.dict()) for sample_obj in samples]
     document_count: int = count_query_batch_samples(
-        adapter=adapter, batch_id=batch_id, query_string=query_string
+        adapter=adapter, batch_id=sample_query.batch_id, query_string=sample_query.query_string
     )
+
     return JSONResponse(
         content=jsonable_encoder(
             PaginatedSampleResponse(document_count=document_count, documents=validated_samples),

@@ -100,12 +100,14 @@ def sample_tris(
     adapter: StatinaAdapter = Depends(get_nipt_adapter),
 ):
     """Sample view with trisomi plot."""
+
     database_sample: DataBaseSample = find_samples.sample(sample_id=sample_id, adapter=adapter)
     abnormal_data: Dict[str, ZscoreSamples] = zscore_plot_data.get_abn_for_samp_tris_plot(
         adapter=adapter
     )
     normal_data: Zscore131821 = zscore_plot_data.get_normal_for_samp_tris_plot(adapter=adapter)
     sample_data: ZscoreSamples = zscore_plot_data.get_sample_for_samp_tris_plot(database_sample)
+
     return JSONResponse(
         content=jsonable_encoder(
             dict(

@@ -6,7 +6,6 @@ from fastapi import APIRouter, Depends, Form, Query, Security
 from fastapi.encoders import jsonable_encoder
 from fastapi.responses import FileResponse, JSONResponse
 
-import statina
 from statina.adapter import StatinaAdapter
 from statina.API.v2.endpoints.user import get_current_active_user
 from statina.config import get_nipt_adapter
@@ -17,7 +16,13 @@ from statina.crud.find import batches as find_batches
 from statina.crud.find.plots import zscore_plot_data
 from statina.models.database import DataBaseSample, User, Batch
 from statina.models.server.plots.ncv import Zscore131821, ZscoreSamples
-from statina.models.server.sample import Sample, PaginatedSampleResponse, SampleView
+from statina.models.server.sample import (
+    Sample,
+    PaginatedSampleResponse,
+    SampleValidator,
+)
+from pydantic import parse_obj_as
+
 from statina.parse.batch import validate_file_path
 
 router = APIRouter(prefix="/v2")
@@ -35,7 +40,7 @@ def samples(
     adapter: StatinaAdapter = Depends(get_nipt_adapter),
 ):
     """Get samples"""
-    samples: List[DataBaseSample] = find_samples.query_samples(
+    database_samples: List[DataBaseSample] = find_samples.query_samples(
         batch_id=batch_id,
         adapter=adapter,
         page_size=page_size,
@@ -44,19 +49,23 @@ def samples(
         sort_direction=sort_direction,
         query_string=query_string,
     )
-    validated_samples: List[Sample] = [Sample(**sample_obj.dict()) for sample_obj in samples]
+    validated_samples: List[SampleValidator] = [
+        SampleValidator(**sample.dict()) for sample in database_samples
+    ]
+    samples: List[Sample] = [Sample(**sample.dict()) for sample in validated_samples]
+
     document_count: int = find_samples.count_query_samples(
         adapter=adapter, batch_id=batch_id, query_string=query_string
     )
     return JSONResponse(
         content=jsonable_encoder(
-            PaginatedSampleResponse(document_count=document_count, documents=validated_samples),
+            PaginatedSampleResponse(document_count=document_count, documents=samples),
             by_alias=False,
         )
     )
 
 
-@router.get("/sample/{sample_id}", response_model=SampleView)
+@router.get("/sample/{sample_id}", response_model=Sample)
 def sample(
     sample_id: str,
     current_user: User = Security(get_current_active_user, scopes=["R"]),
@@ -64,15 +73,14 @@ def sample(
 ):
     """Get sample with id"""
 
-    sample: DataBaseSample = find_samples.sample(sample_id=sample_id, adapter=adapter)
-    batch: Batch = find_batches.batch(batch_id=sample.batch_id, adapter=adapter)
+    database_sample: DataBaseSample = find_samples.sample(sample_id=sample_id, adapter=adapter)
+    batch: Batch = find_batches.batch(batch_id=database_sample.batch_id, adapter=adapter)
 
-    if not sample:
+    if not database_sample:
         return JSONResponse("Not found", status_code=404)
 
-    validated_sample: Sample = Sample(**sample.dict())
-    sample_view_data = SampleView(
-        batch_id=batch.batch_id,
+    validated_sample = SampleValidator(**database_sample.dict())
+    sample_view_data = Sample(
         sequencing_date=batch.SequencingDate,
         **validated_sample.dict(exclude_none=True),
     )
@@ -92,12 +100,12 @@ def sample_tris(
     adapter: StatinaAdapter = Depends(get_nipt_adapter),
 ):
     """Sample view with trisomi plot."""
-    sample: DataBaseSample = find_samples.sample(sample_id=sample_id, adapter=adapter)
+    database_sample: DataBaseSample = find_samples.sample(sample_id=sample_id, adapter=adapter)
     abnormal_data: Dict[str, ZscoreSamples] = zscore_plot_data.get_abn_for_samp_tris_plot(
         adapter=adapter
     )
     normal_data: Zscore131821 = zscore_plot_data.get_normal_for_samp_tris_plot(adapter=adapter)
-    sample_data: ZscoreSamples = zscore_plot_data.get_sample_for_samp_tris_plot(sample)
+    sample_data: ZscoreSamples = zscore_plot_data.get_sample_for_samp_tris_plot(database_sample)
     return JSONResponse(
         content=jsonable_encoder(
             dict(

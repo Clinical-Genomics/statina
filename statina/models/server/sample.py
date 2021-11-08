@@ -18,6 +18,11 @@ class Status(BaseModel):
     edited: str
 
 
+class Include(BaseModel):
+    include: bool
+    edited: str
+
+
 class Statuses(BaseModel):
     status_13: Status = Field(..., alias="13")
     status_18: Status = Field(..., alias="18")
@@ -44,11 +49,12 @@ class SampleWarning(BaseModel):
     XYY: Literal["danger", "default", "warning"]
 
 
-class Sample(DataBaseSample):
+class SampleValidator(DataBaseSample):
     warnings: Optional[SampleWarning]
     text_warning: Optional[str]
     status_string: Optional[str]
     status: Optional[Statuses]
+    included: Optional[Include]
     sex: Optional[Literal["XX", "XY"]]
 
     @validator("Zscore_13")
@@ -152,6 +158,10 @@ class Sample(DataBaseSample):
 
         fetal_fraction_y = values.get("FFY")
         return "XY" if fetal_fraction_y >= FF_TRESHOLDS["fetal_fraction_y_min"] else "XX"
+
+    @validator("included", always=True)
+    def set_include(cls, v, values: dict) -> Optional[Include]:
+        return Include(include=values["include"], edited=values["change_include_date"])
 
     @classmethod
     def get_tris_warning(cls, z_score: float, fetal_fraction: float) -> str:
@@ -300,23 +310,31 @@ class Sample(DataBaseSample):
         return "default"
 
 
-class PaginatedSampleResponse(BaseModel):
-    document_count: int
-    documents: List[Sample]
-
-
-class SampleView(BaseModel):
+class Sample(BaseModel):
     status: Statuses
-    sample_id: str
     sample_type: str = Field(..., alias="SampleType")
-    sex: str
+    sex: Optional[str]
+    batch_id: str
+    sequencing_date: Optional[str]
     text_warning: str
-    non_excluded_sites: str = Field(..., alias="NonExcludedSites")
-    include: bool
+    warnings: Optional[SampleWarning]
+    included: Include
     comment: str
     qc_flag: str = Field(..., alias="QCFlag")
-    batch_id: str
-    sequencing_date: str
+    sample_id: str
+    z_score_13: str = Field(..., alias="Zscore_13")
+    z_score_18: str = Field(..., alias="Zscore_13")
+    z_score_21: str = Field(..., alias="Zscore_13")
+    z_score_X: str = Field(..., alias="Zscore_13")
+    fetal_fraction_pre_face: str = Field(..., alias="FF_Formatted")
+    fetal_fraction_y: str = Field(..., alias="FFY")
+    fetal_fraction_x: str = Field(..., alias="FFX")
+    cnv_segment: str = Field(..., alias="SampleType")
 
     class Config:
         allow_population_by_field_name = True
+
+
+class PaginatedSampleResponse(BaseModel):
+    document_count: int
+    documents: List[Sample]

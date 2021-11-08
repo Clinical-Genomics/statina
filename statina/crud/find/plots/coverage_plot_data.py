@@ -9,7 +9,8 @@ def get_scatter_data_for_coverage_plot(
     samples: List[Sample],
 ) -> Dict["str", CoveragePlotSampleData]:
     """Coverage Ratio data for Coverage Plot.
-    Only adding samples with a zscore warning"""
+    Only adding samples with a zscore war
+    ning"""
 
     data = {}
     for sample in samples:

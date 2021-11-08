@@ -14,7 +14,7 @@ from statina.crud.find.plots.zscore_plot_data import (
 )
 from statina.models.database import Batch, DataBaseSample, User
 from statina.models.server.plots.ncv import Zscore131821, ZscoreSamples
-from statina.models.server.sample import Sample
+from statina.models.server.sample import Sample, SampleValidator
 
 router = APIRouter()
 
@@ -32,7 +32,7 @@ def samples(
         context=dict(
             request=request,
             current_user=user,
-            sample_info=[Sample(**sample.dict()) for sample in samples],
+            sample_info=[SampleValidator(**sample.dict()) for sample in samples],
             page_id="samples",
         ),
     )
@@ -55,7 +55,7 @@ def sample(
             request=request,
             current_user=user,
             chrom_abnorm=CHROM_ABNORM,
-            sample=Sample(**sample.dict()),
+            sample=SampleValidator(**sample.dict()),
             status_classes=STATUS_CLASSES,
             batch=batch,
             page_id="sample",
@@ -80,7 +80,7 @@ def sample(
             request=request,
             current_user=user,
             chrom_abnorm=CHROM_ABNORM,
-            sample=Sample(**sample.dict()),
+            sample=SampleValidator(**sample.dict()),
             status_classes=STATUS_CLASSES,
             batch=batch,
             page_id="sample",
@@ -109,7 +109,7 @@ def sample_tris(
             normal_data=normal_data.dict(exclude_none=True, by_alias=True),
             abnormal_data=abnormal_data,
             sample_data=sample_data,
-            sample=Sample(**sample.dict()),
+            sample=SampleValidator(**sample.dict()),
             batch=batch,
             status_colors=STATUS_COLORS,
             page_id="sample_tris",
@@ -138,7 +138,7 @@ def sample_tris(
             normal_data=normal_data,
             abnormal_data=abnormal_data,
             sample_data=sample_data,
-            sample=Sample(**sample.dict()),
+            sample=SampleValidator(**sample.dict()),
             batch=batch,
             status_colors=STATUS_COLORS,
             page_id="sample_tris",

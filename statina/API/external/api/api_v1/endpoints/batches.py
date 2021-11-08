@@ -24,7 +24,7 @@ from statina.models.server.plots.fetal_fraction import (
     FetalFractionSamples,
 )
 from statina.models.server.plots.fetal_fraction_sex import SexChromosomeThresholds
-from statina.models.server.sample import Sample
+from statina.models.server.sample import Sample, SampleValidator
 
 router = APIRouter()
 
@@ -104,12 +104,15 @@ def batch(
     samples: List[DataBaseSample] = statina.crud.find.samples.batch_samples(
         batch_id=batch_id, adapter=adapter
     )
+    validated_samples: List[SampleValidator] = [
+        SampleValidator(**sample_obj.dict()) for sample_obj in samples
+    ]
     return templates.TemplateResponse(
         "batch/tabs/table.html",
         context={
             "request": request,
             "batch": statina.crud.find.batches.batch(batch_id=batch_id, adapter=adapter),
-            "sample_info": [Sample(**sample.dict()) for sample in samples],
+            "sample_info": validated_samples,
             "page_id": "batches",
             "current_user": user,
         },
@@ -236,7 +239,9 @@ def coverage(
     db_samples: List[DataBaseSample] = statina.crud.find.samples.batch_samples(
         batch_id=batch_id, adapter=adapter
     )
-    samples: List[Sample] = [Sample(**db_sample.dict()) for db_sample in db_samples]
+    samples: List[SampleValidator] = [
+        SampleValidator(**db_sample.dict()) for db_sample in db_samples
+    ]
 
     scatter_data: Dict[str, CoveragePlotSampleData] = get_scatter_data_for_coverage_plot(samples)
     box_data: Dict[int, List[float]] = get_box_data_for_coverage_plot(samples)

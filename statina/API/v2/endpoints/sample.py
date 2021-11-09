@@ -14,7 +14,7 @@ from statina.crud import update
 from statina.crud.find import samples as find_samples
 from statina.crud.find import batches as find_batches
 from statina.crud.find.plots import zscore_plot_data
-from statina.models.database import DataBaseSample, User, Batch
+from statina.models.database import DataBaseSample, User, DatabaseBatch
 from statina.models.query_params import SamplesQuery
 from statina.models.server.plots.ncv import Zscore131821, ZscoreSamples
 from statina.models.server.sample import (
@@ -63,7 +63,7 @@ def sample(
     """Get sample with id"""
 
     database_sample: DataBaseSample = find_samples.sample(sample_id=sample_id, adapter=adapter)
-    batch: Batch = find_batches.batch(batch_id=database_sample.batch_id, adapter=adapter)
+    batch: DatabaseBatch = find_batches.batch(batch_id=database_sample.batch_id, adapter=adapter)
 
     if not database_sample:
         return JSONResponse("Not found", status_code=404)

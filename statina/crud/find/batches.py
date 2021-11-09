@@ -5,7 +5,7 @@ from pydantic import parse_obj_as
 from statina.adapter import StatinaAdapter
 from statina.constants import sort_table
 from statina.crud.utils import paginate
-from statina.models.database import Batch
+from statina.models.database import DatabaseBatch
 
 
 def get_batches_text_query(query_string: str) -> dict:
@@ -19,21 +19,21 @@ def get_batches_text_query(query_string: str) -> dict:
     }
 
 
-def batch(adapter: StatinaAdapter, batch_id: str) -> Optional[Batch]:
+def batch(adapter: StatinaAdapter, batch_id: str) -> Optional[DatabaseBatch]:
     """Find one batch from the batch collection"""
 
     raw_batch: dict = adapter.batch_collection.find_one({"batch_id": batch_id})
     if not raw_batch:
         return None
-    return Batch(**raw_batch)
+    return DatabaseBatch(**raw_batch)
 
 
 def batches(
     adapter: StatinaAdapter,
-) -> List[Batch]:
+) -> List[DatabaseBatch]:
     """Return all batches from the batch collection"""
     raw_batches: Iterable[dict] = adapter.batch_collection.find()
-    return parse_obj_as(List[Batch], list(raw_batches))
+    return parse_obj_as(List[DatabaseBatch], list(raw_batches))
 
 
 def query_batches(
@@ -45,7 +45,7 @@ def query_batches(
         Literal["batch_id", "SequencingDate", "Flowcell", "comment"]
     ] = "SequencingDate",
     query_string: Optional[str] = "",
-) -> List[Batch]:
+) -> List[DatabaseBatch]:
     """
     Query batches from the batch collection.
     Pagination can be enabled with <page_size> and <page_num> options.
@@ -58,7 +58,7 @@ def query_batches(
         .skip(skip)
         .limit(limit)
     )
-    return parse_obj_as(List[Batch], list(raw_batches))
+    return parse_obj_as(List[DatabaseBatch], list(raw_batches))
 
 
 def count_query_batches(adapter: StatinaAdapter, query_string: Optional[str] = "") -> int:

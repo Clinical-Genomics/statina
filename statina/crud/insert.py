@@ -5,14 +5,16 @@ from pymongo.results import InsertManyResult, InsertOneResult
 
 from statina.adapter import StatinaAdapter
 from statina.exeptions import InsertError
-from statina.models.database import Batch, DataBaseSample, User
+from statina.models.database import DatabaseBatch, DataBaseSample, User
 from statina.models.server.load import BatchRequestBody
 from statina.parse.batch import parse_segmental_calls
 
 LOG = logging.getLogger(__name__)
 
 
-def insert_batch(adapter: StatinaAdapter, batch: Batch, batch_files: BatchRequestBody) -> str:
+def insert_batch(
+    adapter: StatinaAdapter, batch: DatabaseBatch, batch_files: BatchRequestBody
+) -> str:
     """Load a batch into the database"""
 
     batch_dict = batch.dict(exclude_none=True)

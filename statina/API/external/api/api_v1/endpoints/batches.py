@@ -17,7 +17,7 @@ from statina.crud.find.plots.zscore_plot_data import (
     get_tris_control_normal,
     get_tris_samples,
 )
-from statina.models.database import Batch, DataBaseSample, User
+from statina.models.database import DatabaseBatch, DataBaseSample, User
 from statina.models.server.plots.coverage import CoveragePlotSampleData
 from statina.models.server.plots.fetal_fraction import (
     FetalFractionControlAbNormal,
@@ -37,7 +37,7 @@ def batches(
 ):
     """List of all batches"""
 
-    all_batches: List[Batch] = statina.crud.find.batches.batches(adapter=adapter)
+    all_batches: List[DatabaseBatch] = statina.crud.find.batches.batches(adapter=adapter)
     return templates.TemplateResponse(
         "batches.html",
         context={
@@ -56,7 +56,7 @@ def batches(
     user: User = Depends(get_current_user),
 ):
     """List of all batches"""
-    all_batches: List[Batch] = statina.crud.find.batches.batches(adapter=adapter)
+    all_batches: List[DatabaseBatch] = statina.crud.find.batches.batches(adapter=adapter)
     return templates.TemplateResponse(
         "batches.html",
         context={
@@ -126,7 +126,7 @@ def Zscore(
 ):
     """Batch view with with Zscore plot"""
 
-    batch: Batch = statina.crud.find.batches.batch(batch_id=batch_id, adapter=adapter)
+    batch: DatabaseBatch = statina.crud.find.batches.batch(batch_id=batch_id, adapter=adapter)
 
     return templates.TemplateResponse(
         "batch/tabs/Zscore.html",
@@ -153,7 +153,7 @@ def fetal_fraction_XY(
 ):
     """Batch view with fetal fraction (X against Y) plot"""
 
-    batch: Batch = statina.crud.find.batches.batch(batch_id=batch_id, adapter=adapter)
+    batch: DatabaseBatch = statina.crud.find.batches.batch(batch_id=batch_id, adapter=adapter)
 
     cases = get_fetal_fraction.samples(adapter=adapter, batch_id=batch_id)
     control: FetalFractionSamples = get_fetal_fraction.samples(
@@ -207,7 +207,7 @@ def fetal_fraction(
     user: User = Depends(get_current_user),
 ):
     """Batch view with fetal fraction plot"""
-    batch: Batch = statina.crud.find.batches.batch(batch_id=batch_id, adapter=adapter)
+    batch: DatabaseBatch = statina.crud.find.batches.batch(batch_id=batch_id, adapter=adapter)
     return templates.TemplateResponse(
         "batch/tabs/FF.html",
         context=dict(
@@ -232,7 +232,7 @@ def coverage(
     user: User = Depends(get_current_user),
 ):
     """Batch view with coverage plot"""
-    batch: Batch = statina.crud.find.batches.batch(batch_id=batch_id, adapter=adapter)
+    batch: DatabaseBatch = statina.crud.find.batches.batch(batch_id=batch_id, adapter=adapter)
     db_samples: List[DataBaseSample] = statina.crud.find.samples.batch_samples(
         batch_id=batch_id, adapter=adapter
     )

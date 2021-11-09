@@ -12,7 +12,7 @@ from statina.crud.find.plots.zscore_plot_data import (
     get_normal_for_samp_tris_plot,
     get_sample_for_samp_tris_plot,
 )
-from statina.models.database import Batch, DataBaseSample, User
+from statina.models.database import DatabaseBatch, DataBaseSample, User
 from statina.models.server.plots.ncv import Zscore131821, ZscoreSamples
 from statina.models.server.sample import SampleValidator
 
@@ -48,7 +48,9 @@ def sample(
     """Get sample with id"""
 
     sample: DataBaseSample = statina.crud.find.samples.sample(sample_id=sample_id, adapter=adapter)
-    batch: Batch = statina.crud.find.batches.batch(batch_id=sample.batch_id, adapter=adapter)
+    batch: DatabaseBatch = statina.crud.find.batches.batch(
+        batch_id=sample.batch_id, adapter=adapter
+    )
     return templates.TemplateResponse(
         "sample/sample.html",
         context=dict(
@@ -73,7 +75,9 @@ def sample(
     """Post sample with id"""
 
     sample: DataBaseSample = statina.crud.find.samples.sample(sample_id=sample_id, adapter=adapter)
-    batch: Batch = statina.crud.find.batches.batch(batch_id=sample.batch_id, adapter=adapter)
+    batch: DatabaseBatch = statina.crud.find.batches.batch(
+        batch_id=sample.batch_id, adapter=adapter
+    )
     return templates.TemplateResponse(
         "sample/sample.html",
         context=dict(
@@ -97,7 +101,9 @@ def sample_tris(
 ):
     """Sample view with trisomi plot."""
     sample: DataBaseSample = statina.crud.find.samples.sample(sample_id=sample_id, adapter=adapter)
-    batch: Batch = statina.crud.find.batches.batch(batch_id=sample.batch_id, adapter=adapter)
+    batch: DatabaseBatch = statina.crud.find.batches.batch(
+        batch_id=sample.batch_id, adapter=adapter
+    )
     abnormal_data: Dict[str, ZscoreSamples] = get_abn_for_samp_tris_plot(adapter=adapter)
     normal_data: Zscore131821 = get_normal_for_samp_tris_plot(adapter=adapter)
     sample_data: ZscoreSamples = get_sample_for_samp_tris_plot(sample)
@@ -126,7 +132,9 @@ def sample_tris(
 ):
     """Sample view with trisomi plot."""
     sample: DataBaseSample = statina.crud.find.samples.sample(sample_id=sample_id, adapter=adapter)
-    batch: Batch = statina.crud.find.batches.batch(batch_id=sample.batch_id, adapter=adapter)
+    batch: DatabaseBatch = statina.crud.find.batches.batch(
+        batch_id=sample.batch_id, adapter=adapter
+    )
     abnormal_data: Dict[str, ZscoreSamples] = get_abn_for_samp_tris_plot(adapter=adapter)
     normal_data: Zscore131821 = get_normal_for_samp_tris_plot(adapter=adapter)
     sample_data: ZscoreSamples = get_sample_for_samp_tris_plot(sample)

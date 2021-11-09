@@ -1,6 +1,6 @@
 import logging
 from statina.adapter import StatinaAdapter
-from statina.models.database import DataBaseSample, User, Batch
+from statina.models.database import DataBaseSample, User, DatabaseBatch
 
 LOG = logging.getLogger(__name__)
 
@@ -14,7 +14,7 @@ def sample(adapter: StatinaAdapter, sample: DataBaseSample) -> None:
     adapter.sample_collection.update_one({"sample_id": sample_id}, {"$set": sample_dict})
 
 
-def update_batch(adapter: StatinaAdapter, batch: Batch) -> None:
+def update_batch(adapter: StatinaAdapter, batch: DatabaseBatch) -> None:
     """Update a batch object in the database"""
     batch_dict: dict = batch.dict(exclude_none=True)
     batch_id = batch.batch_id

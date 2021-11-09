@@ -10,17 +10,6 @@ STATUS_CLASSES = {
     "Failed": "danger",
 }
 
-LITERAL_STATUS_CLASSES = Literal[
-    "Suspected",
-    "False Positive",
-    "Verified",
-    "Probable",
-    "False Negative",
-    "Other",
-    "Failed",
-    "Normal",
-]
-
 CHROM_ABNORM = ["13", "18", "21", "X0", "XXX", "XXY", "XYY"]
 TRIS_CHROM_ABNORM = ["13", "18", "21"]
 SEX_CHROM_ABNORM = ["X0", "XXX", "XXY", "XYY"]

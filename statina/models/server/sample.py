@@ -3,18 +3,18 @@ from typing import Literal, Optional, List
 from pydantic import BaseModel, validator, Field
 
 from statina.API.external.constants import (
-    LITERAL_STATUS_CLASSES,
     SEX_CHROM_ABNORM,
     TRIS_CHROM_ABNORM,
     TRISOMI_TRESHOLDS,
     FF_TRESHOLDS,
 )
+from statina.constants import sample_status_options
 from statina.models.database import DataBaseSample
 from statina.models.server.plots.fetal_fraction_sex import x_get_y
 
 
 class Status(BaseModel):
-    status: LITERAL_STATUS_CLASSES
+    status: sample_status_options
     edited: str
 
 

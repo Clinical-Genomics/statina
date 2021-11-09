@@ -59,7 +59,7 @@ def batches(
     return JSONResponse(
         content=jsonable_encoder(
             PaginatedBatchResponse(document_count=document_count, documents=batch_documents),
-            by_alias=False,
+            by_alias=True,
         )
     )
 
@@ -110,7 +110,7 @@ def get_batch(
     validated_batch = BatchValidator(**database_batch.dict())
     batch_view_data = Batch(**validated_batch.dict())
     return JSONResponse(
-        jsonable_encoder(batch_view_data, by_alias=False),
+        jsonable_encoder(batch_view_data, by_alias=True),
         status_code=200,
     )
 

@@ -12,6 +12,9 @@ class Median(BaseModel):
     median_x: Optional[float] = Field(..., alias="x")
     median_y: Optional[float] = Field(..., alias="y")
 
+    class Config:
+        allow_population_by_field_name = True
+
 
 class Stdev(BaseModel):
     stdev_13: Optional[float] = Field(..., alias="13")
@@ -19,6 +22,9 @@ class Stdev(BaseModel):
     stdev_21: Optional[float] = Field(..., alias="21")
     stdev_x: Optional[float] = Field(..., alias="x")
     stdev_y: Optional[float] = Field(..., alias="y")
+
+    class Config:
+        allow_population_by_field_name = True
 
 
 class BatchValidator(DatabaseBatch):

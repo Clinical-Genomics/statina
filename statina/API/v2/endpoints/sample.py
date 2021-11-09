@@ -160,7 +160,7 @@ async def set_sample_status_21(
     return JSONResponse(content="Sample field updated", status_code=200)
 
 
-@router.put("/sample/{sample_id}/status/X0")
+@router.put("/sample/{sample_id}/status/x0")
 async def set_sample_status_x0(
     sample_id: str,
     status: sample_status_options = Query(...),
@@ -177,7 +177,7 @@ async def set_sample_status_x0(
     return JSONResponse(content="Sample field updated", status_code=200)
 
 
-@router.put("/sample/{sample_id}/status/XXY")
+@router.put("/sample/{sample_id}/status/xxy")
 async def set_sample_status_xxy(
     sample_id: str,
     status: sample_status_options = Query(...),
@@ -194,7 +194,7 @@ async def set_sample_status_xxy(
     return JSONResponse(content="Sample field updated", status_code=200)
 
 
-@router.put("/sample/{sample_id}/status/XXX")
+@router.put("/sample/{sample_id}/status/xxx")
 async def set_sample_status_xxx(
     sample_id: str,
     status: sample_status_options = Query(...),
@@ -211,7 +211,7 @@ async def set_sample_status_xxx(
     return JSONResponse(content="Sample field updated", status_code=200)
 
 
-@router.put("/sample/{sample_id}/status/XYY")
+@router.put("/sample/{sample_id}/status/xyy")
 async def set_sample_status_xyy(
     sample_id: str,
     status: sample_status_options = Query(...),

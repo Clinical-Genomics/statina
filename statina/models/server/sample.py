@@ -19,16 +19,16 @@ class Status(BaseModel):
 
 
 class ZScore(BaseModel):
-    z_score_13: str
-    z_score_18: str
-    z_score_21: str
-    z_score_x: str
+    z_score_13: str = Field(..., alias="13")
+    z_score_18: str = Field(..., alias="18")
+    z_score_21: str = Field(..., alias="21")
+    z_score_x: str = Field(..., alias="x")
 
 
 class FetalFraction(BaseModel):
-    fetal_fraction_x: str
-    fetal_fraction_y: str
-    fetal_fraction_pf: str
+    x: str
+    y: str
+    pre_face: str
 
 
 class Include(BaseModel):
@@ -37,13 +37,13 @@ class Include(BaseModel):
 
 
 class Statuses(BaseModel):
-    status_13: Status
-    status_18: Status
-    status_21: Status
-    status_x0: Status
-    status_xxx: Status
-    status_xxy: Status
-    status_xyy: Status
+    status_13: Status = Field(..., alias="13")
+    status_18: Status = Field(..., alias="18")
+    status_21: Status = Field(..., alias="21")
+    status_x0: Status = Field(..., alias="x0")
+    status_xxx: Status = Field(..., alias="xxx")
+    status_xxy: Status = Field(..., alias="xxy")
+    status_xyy: Status = Field(..., alias="xyy")
 
     class Config:
         allow_population_by_field_name = True
@@ -71,6 +71,9 @@ class SampleValidator(DataBaseSample):
     z_score: Optional[ZScore]
     included: Optional[Include]
     sex: Optional[Literal["XX", "XY"]]
+    sample_type: str = Field(..., alias="SampleType")
+    qc_flag: str = Field(..., alias="QCFlag")
+    cnv_segment: Optional[str] = Field(..., alias="CNVSegment")
 
     @validator("fetal_fraction", always=True)
     def set_fetal_fraction(cls, v, values: dict) -> FetalFraction:
@@ -320,11 +323,14 @@ class SampleValidator(DataBaseSample):
             return "danger"
         return "default"
 
+    class Config:
+        allow_population_by_field_name = True
+
 
 class Sample(BaseModel):
-    sample_type: str = Field(..., alias="SampleType")
-    qc_flag: str = Field(..., alias="QCFlag")
-    cnv_segment: Optional[str] = Field(..., alias="CNVSegment")
+    sample_type: str
+    qc_flag: str
+    cnv_segment: Optional[str]
     comment: str
     sample_id: str
     batch_id: str

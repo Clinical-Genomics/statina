@@ -24,7 +24,7 @@ from statina.models.server.plots.fetal_fraction import (
     FetalFractionSamples,
 )
 from statina.models.server.plots.fetal_fraction_sex import SexChromosomeThresholds
-from statina.models.server.sample import Sample, SampleValidator
+from statina.models.server.sample import SampleValidator
 
 router = APIRouter()
 
@@ -85,7 +85,7 @@ def batch(
         context={
             "request": request,
             "batch": statina.crud.find.batches.batches(batch_id=batch_id, adapter=adapter),
-            "sample_info": [Sample(**sample.dict()) for sample in samples],
+            "sample_info": [SampleValidator(**sample.dict()) for sample in samples],
             "page_id": "batches",
             "current_user": user,
         },
@@ -104,15 +104,12 @@ def batch(
     samples: List[DataBaseSample] = statina.crud.find.samples.batch_samples(
         batch_id=batch_id, adapter=adapter
     )
-    validated_samples: List[SampleValidator] = [
-        SampleValidator(**sample_obj.dict()) for sample_obj in samples
-    ]
     return templates.TemplateResponse(
         "batch/tabs/table.html",
         context={
             "request": request,
             "batch": statina.crud.find.batches.batch(batch_id=batch_id, adapter=adapter),
-            "sample_info": validated_samples,
+            "sample_info": [SampleValidator(**sample_obj.dict()) for sample_obj in samples],
             "page_id": "batches",
             "current_user": user,
         },

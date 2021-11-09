@@ -48,8 +48,7 @@ def samples(
     )
     return JSONResponse(
         content=jsonable_encoder(
-            PaginatedSampleResponse(document_count=document_count, documents=samples),
-            by_alias=False,
+            PaginatedSampleResponse(document_count=document_count, documents=samples), by_alias=True
         )
     )
 
@@ -77,7 +76,7 @@ def sample(
     return JSONResponse(
         content=jsonable_encoder(
             sample_view_data,
-            by_alias=False,
+            by_alias=True,
         )
     )
 

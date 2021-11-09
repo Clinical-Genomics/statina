@@ -94,7 +94,7 @@ def load_batch(
     return JSONResponse(content=jsonable_encoder(inserted_batch, by_alias=False), status_code=200)
 
 
-@router.get("/batch/{batch_id}", response_model=DatabaseBatch)
+@router.get("/batch/{batch_id}", response_model=Batch)
 def get_batch(
     batch_id: str,
     current_user: User = Security(get_current_active_user, scopes=["R"]),

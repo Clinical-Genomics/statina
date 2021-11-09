@@ -4,7 +4,7 @@ from typing import List
 import pytest
 from pydantic import ValidationError
 
-from statina.models.database import Batch, DataBaseSample
+from statina.models.database import DatabaseBatch, DataBaseSample
 from statina.parse.batch import get_batch, get_samples, parse_csv, parse_segmental_calls
 
 
@@ -84,10 +84,10 @@ def test_get_batch(valid_csv: Path):
     # GIVEN a valid csv file
 
     # WHEN running get_samples
-    results: Batch = get_batch(valid_csv)
+    results: DatabaseBatch = get_batch(valid_csv)
 
     # THEN assert that the objects are samples
-    assert isinstance(results, Batch)
+    assert isinstance(results, DatabaseBatch)
 
 
 def test_get_batch_with_missing_sample_project_in_csv(csv_with_missing_sample_project):

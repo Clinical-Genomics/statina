@@ -45,7 +45,7 @@ router = APIRouter(prefix="/v2")
 
 @router.get("/batches", response_model=PaginatedBatchResponse)
 def batches(
-    batch_query: BatchesQuery,
+    batch_query: BatchesQuery = Depends(BatchesQuery),
     adapter: StatinaAdapter = Depends(get_nipt_adapter),
     current_user: User = Security(get_current_active_user, scopes=["R"]),
 ):
@@ -109,7 +109,7 @@ def get_batch(
 
 @router.get("/batch/{batch_id}/samples", response_model=PaginatedSampleResponse)
 def batch_samples(
-    sample_query: BatchSamplesQuery,
+    sample_query: BatchSamplesQuery = Depends(BatchSamplesQuery),
     current_user: User = Security(get_current_active_user, scopes=["R"]),
     adapter: StatinaAdapter = Depends(get_nipt_adapter),
 ):

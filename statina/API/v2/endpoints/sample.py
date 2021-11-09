@@ -1,6 +1,6 @@
 from datetime import datetime
 from pathlib import Path
-from typing import Dict, List, Literal, Optional
+from typing import Dict, List, Optional
 
 from fastapi import APIRouter, Depends, Form, Query, Security
 from fastapi.encoders import jsonable_encoder
@@ -9,19 +9,19 @@ from fastapi.responses import FileResponse, JSONResponse
 from statina.adapter import StatinaAdapter
 from statina.API.v2.endpoints.user import get_current_active_user
 from statina.config import get_nipt_adapter
-from statina.constants import sample_sort_keys, sample_status_options
+from statina.constants import sample_status_options
 from statina.crud import update
 from statina.crud.find import samples as find_samples
 from statina.crud.find import batches as find_batches
 from statina.crud.find.plots import zscore_plot_data
 from statina.models.database import DataBaseSample, User, Batch
+from statina.models.query_models import SamplesQuery
 from statina.models.server.plots.ncv import Zscore131821, ZscoreSamples
 from statina.models.server.sample import (
     Sample,
     PaginatedSampleResponse,
     SampleValidator,
 )
-from pydantic import parse_obj_as
 
 from statina.parse.batch import validate_file_path
 
@@ -30,24 +30,13 @@ router = APIRouter(prefix="/v2")
 
 @router.get("/samples", response_model=PaginatedSampleResponse)
 def samples(
-    batch_id: Optional[str] = Query(None),
-    page_size: Optional[int] = Query(5),
-    page_num: Optional[int] = Query(0),
-    sort_key: Optional[sample_sort_keys] = Query("sample_id"),
-    sort_direction: Optional[Literal["ascending", "descending"]] = Query("descending"),
-    query_string: Optional[str] = Query(""),
+    sample_query: SamplesQuery = Depends(SamplesQuery),
     current_user: User = Security(get_current_active_user, scopes=["R"]),
     adapter: StatinaAdapter = Depends(get_nipt_adapter),
 ):
     """Get samples"""
     database_samples: List[DataBaseSample] = find_samples.query_samples(
-        batch_id=batch_id,
-        adapter=adapter,
-        page_size=page_size,
-        page_num=page_num,
-        sort_key=sort_key,
-        sort_direction=sort_direction,
-        query_string=query_string,
+        **sample_query.dict(), adapter=adapter
     )
     validated_samples: List[SampleValidator] = [
         SampleValidator(**sample.dict()) for sample in database_samples
@@ -55,7 +44,7 @@ def samples(
     samples: List[Sample] = [Sample(**sample.dict()) for sample in validated_samples]
 
     document_count: int = find_samples.count_query_samples(
-        adapter=adapter, batch_id=batch_id, query_string=query_string
+        adapter=adapter, batch_id=sample_query.batch_id, query_string=sample_query.query_string
     )
     return JSONResponse(
         content=jsonable_encoder(

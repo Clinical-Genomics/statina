@@ -21,7 +21,7 @@ from zipfile import ZIP_DEFLATED, ZipFile
 import io
 from os import PathLike
 from typing import Union, List
-from statina.models.database import DataBaseSample, User, Batch
+from statina.models.database import DataBaseSample, User, DatabaseBatch
 from statina.parse.batch import validate_file_path
 
 router = APIRouter()
@@ -99,7 +99,7 @@ def report(
     samples: List[DataBaseSample] = statina.crud.find.samples.batch_samples(
         batch_id=batch_id, adapter=adapter
     )
-    batch: Batch = statina.crud.find.batches.batch(batch_id=batch_id, adapter=adapter)
+    batch: DatabaseBatch = statina.crud.find.batches.batch(batch_id=batch_id, adapter=adapter)
 
     cases = get_fetal_fraction.samples(adapter=adapter, batch_id=batch_id)
     control: FetalFractionSamples = get_fetal_fraction.samples(

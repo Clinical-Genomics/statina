@@ -17,14 +17,14 @@ from statina.crud.find.plots.zscore_plot_data import (
     get_tris_control_normal,
     get_tris_samples,
 )
-from statina.models.database import Batch, DataBaseSample, User
+from statina.models.database import DatabaseBatch, DataBaseSample, User
 from statina.models.server.plots.coverage import CoveragePlotSampleData
 from statina.models.server.plots.fetal_fraction import (
     FetalFractionControlAbNormal,
     FetalFractionSamples,
 )
 from statina.models.server.plots.fetal_fraction_sex import SexChromosomeThresholds
-from statina.models.server.sample import Sample
+from statina.models.server.sample import SampleValidator
 
 router = APIRouter()
 
@@ -37,7 +37,7 @@ def batches(
 ):
     """List of all batches"""
 
-    all_batches: List[Batch] = statina.crud.find.batches.batches(adapter=adapter)
+    all_batches: List[DatabaseBatch] = statina.crud.find.batches.batches(adapter=adapter)
     return templates.TemplateResponse(
         "batches.html",
         context={
@@ -56,7 +56,7 @@ def batches(
     user: User = Depends(get_current_user),
 ):
     """List of all batches"""
-    all_batches: List[Batch] = statina.crud.find.batches.batches(adapter=adapter)
+    all_batches: List[DatabaseBatch] = statina.crud.find.batches.batches(adapter=adapter)
     return templates.TemplateResponse(
         "batches.html",
         context={
@@ -84,8 +84,8 @@ def batch(
         "batch/tabs/table.html",
         context={
             "request": request,
-            "batch": statina.crud.find.batches.batches(batch_id=batch_id, adapter=adapter),
-            "sample_info": [Sample(**sample.dict()) for sample in samples],
+            "batch": statina.crud.find.batches.batch(batch_id=batch_id, adapter=adapter),
+            "sample_info": [SampleValidator(**sample_obj.dict()) for sample_obj in samples],
             "page_id": "batches",
             "current_user": user,
         },
@@ -109,7 +109,7 @@ def batch(
         context={
             "request": request,
             "batch": statina.crud.find.batches.batch(batch_id=batch_id, adapter=adapter),
-            "sample_info": [Sample(**sample.dict()) for sample in samples],
+            "sample_info": [SampleValidator(**sample_obj.dict()) for sample_obj in samples],
             "page_id": "batches",
             "current_user": user,
         },
@@ -126,7 +126,7 @@ def Zscore(
 ):
     """Batch view with with Zscore plot"""
 
-    batch: Batch = statina.crud.find.batches.batch(batch_id=batch_id, adapter=adapter)
+    batch: DatabaseBatch = statina.crud.find.batches.batch(batch_id=batch_id, adapter=adapter)
 
     return templates.TemplateResponse(
         "batch/tabs/Zscore.html",
@@ -153,7 +153,7 @@ def fetal_fraction_XY(
 ):
     """Batch view with fetal fraction (X against Y) plot"""
 
-    batch: Batch = statina.crud.find.batches.batch(batch_id=batch_id, adapter=adapter)
+    batch: DatabaseBatch = statina.crud.find.batches.batch(batch_id=batch_id, adapter=adapter)
 
     cases = get_fetal_fraction.samples(adapter=adapter, batch_id=batch_id)
     control: FetalFractionSamples = get_fetal_fraction.samples(
@@ -207,7 +207,7 @@ def fetal_fraction(
     user: User = Depends(get_current_user),
 ):
     """Batch view with fetal fraction plot"""
-    batch: Batch = statina.crud.find.batches.batch(batch_id=batch_id, adapter=adapter)
+    batch: DatabaseBatch = statina.crud.find.batches.batch(batch_id=batch_id, adapter=adapter)
     return templates.TemplateResponse(
         "batch/tabs/FF.html",
         context=dict(
@@ -232,11 +232,13 @@ def coverage(
     user: User = Depends(get_current_user),
 ):
     """Batch view with coverage plot"""
-    batch: Batch = statina.crud.find.batches.batch(batch_id=batch_id, adapter=adapter)
+    batch: DatabaseBatch = statina.crud.find.batches.batch(batch_id=batch_id, adapter=adapter)
     db_samples: List[DataBaseSample] = statina.crud.find.samples.batch_samples(
         batch_id=batch_id, adapter=adapter
     )
-    samples: List[Sample] = [Sample(**db_sample.dict()) for db_sample in db_samples]
+    samples: List[SampleValidator] = [
+        SampleValidator(**db_sample.dict()) for db_sample in db_samples
+    ]
 
     scatter_data: Dict[str, CoveragePlotSampleData] = get_scatter_data_for_coverage_plot(samples)
     box_data: Dict[int, List[float]] = get_box_data_for_coverage_plot(samples)

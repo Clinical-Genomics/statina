@@ -9,7 +9,7 @@ from statina.adapter import StatinaAdapter
 from statina.config import settings
 from statina.crud import find, insert
 from statina.exeptions import InsertError
-from statina.models.database import Batch, DataBaseSample
+from statina.models.database import DatabaseBatch, DataBaseSample
 from statina.models.server.load import BatchRequestBody, UserRequestBody
 from statina.parse.batch import get_batch, get_samples
 
@@ -41,7 +41,7 @@ def load_batch(
     adapter: StatinaAdapter = context["adapter"]
     nipt_results = Path(str(result_file))
     samples: List[DataBaseSample] = get_samples(nipt_results)
-    batch: Batch = get_batch(nipt_results)
+    batch: DatabaseBatch = get_batch(nipt_results)
     if find.batch(adapter=adapter, batch_id=batch.batch_id):
         return "batch already in database"
     insert.insert_batch(adapter=adapter, batch=batch, batch_files=batch_files)

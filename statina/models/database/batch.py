@@ -3,7 +3,7 @@ from typing import Optional
 from pydantic import BaseModel, Field
 
 
-class Batch(BaseModel):
+class DatabaseBatch(BaseModel):
     batch_id: str = Field(..., alias="SampleProject")
     result_file: Optional[str]
     multiqc_report: Optional[str]

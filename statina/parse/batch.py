@@ -5,7 +5,7 @@ from typing import Dict, List, Optional
 
 from pydantic import parse_obj_as
 
-from statina.models.database import Batch, DataBaseSample
+from statina.models.database import DatabaseBatch, DataBaseSample
 
 LOG = logging.getLogger(__name__)
 
@@ -59,9 +59,9 @@ def get_samples(nipt_results_path: Path) -> List[DataBaseSample]:
     return parse_obj_as(List[DataBaseSample], parse_csv(nipt_results_path))
 
 
-def get_batch(nipt_results_path: Path) -> Batch:
+def get_batch(nipt_results_path: Path) -> DatabaseBatch:
     """Parse NIPT result file and create a batch object from the first sample information"""
 
     sample_data: List[dict] = parse_csv(nipt_results_path)
 
-    return Batch.parse_obj(sample_data[0])
+    return DatabaseBatch.parse_obj(sample_data[0])

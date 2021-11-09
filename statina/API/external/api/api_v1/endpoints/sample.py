@@ -12,9 +12,9 @@ from statina.crud.find.plots.zscore_plot_data import (
     get_normal_for_samp_tris_plot,
     get_sample_for_samp_tris_plot,
 )
-from statina.models.database import Batch, DataBaseSample, User
+from statina.models.database import DatabaseBatch, DataBaseSample, User
 from statina.models.server.plots.ncv import Zscore131821, ZscoreSamples
-from statina.models.server.sample import Sample
+from statina.models.server.sample import SampleValidator
 
 router = APIRouter()
 
@@ -32,7 +32,7 @@ def samples(
         context=dict(
             request=request,
             current_user=user,
-            sample_info=[Sample(**sample.dict()) for sample in samples],
+            sample_info=[SampleValidator(**sample.dict()) for sample in samples],
             page_id="samples",
         ),
     )
@@ -48,14 +48,16 @@ def sample(
     """Get sample with id"""
 
     sample: DataBaseSample = statina.crud.find.samples.sample(sample_id=sample_id, adapter=adapter)
-    batch: Batch = statina.crud.find.batches.batch(batch_id=sample.batch_id, adapter=adapter)
+    batch: DatabaseBatch = statina.crud.find.batches.batch(
+        batch_id=sample.batch_id, adapter=adapter
+    )
     return templates.TemplateResponse(
         "sample/sample.html",
         context=dict(
             request=request,
             current_user=user,
             chrom_abnorm=CHROM_ABNORM,
-            sample=Sample(**sample.dict()),
+            sample=SampleValidator(**sample.dict()),
             status_classes=STATUS_CLASSES,
             batch=batch,
             page_id="sample",
@@ -73,14 +75,16 @@ def sample(
     """Post sample with id"""
 
     sample: DataBaseSample = statina.crud.find.samples.sample(sample_id=sample_id, adapter=adapter)
-    batch: Batch = statina.crud.find.batches.batch(batch_id=sample.batch_id, adapter=adapter)
+    batch: DatabaseBatch = statina.crud.find.batches.batch(
+        batch_id=sample.batch_id, adapter=adapter
+    )
     return templates.TemplateResponse(
         "sample/sample.html",
         context=dict(
             request=request,
             current_user=user,
             chrom_abnorm=CHROM_ABNORM,
-            sample=Sample(**sample.dict()),
+            sample=SampleValidator(**sample.dict()),
             status_classes=STATUS_CLASSES,
             batch=batch,
             page_id="sample",
@@ -97,7 +101,9 @@ def sample_tris(
 ):
     """Sample view with trisomi plot."""
     sample: DataBaseSample = statina.crud.find.samples.sample(sample_id=sample_id, adapter=adapter)
-    batch: Batch = statina.crud.find.batches.batch(batch_id=sample.batch_id, adapter=adapter)
+    batch: DatabaseBatch = statina.crud.find.batches.batch(
+        batch_id=sample.batch_id, adapter=adapter
+    )
     abnormal_data: Dict[str, ZscoreSamples] = get_abn_for_samp_tris_plot(adapter=adapter)
     normal_data: Zscore131821 = get_normal_for_samp_tris_plot(adapter=adapter)
     sample_data: ZscoreSamples = get_sample_for_samp_tris_plot(sample)
@@ -109,7 +115,7 @@ def sample_tris(
             normal_data=normal_data.dict(exclude_none=True, by_alias=True),
             abnormal_data=abnormal_data,
             sample_data=sample_data,
-            sample=Sample(**sample.dict()),
+            sample=SampleValidator(**sample.dict()),
             batch=batch,
             status_colors=STATUS_COLORS,
             page_id="sample_tris",
@@ -126,7 +132,9 @@ def sample_tris(
 ):
     """Sample view with trisomi plot."""
     sample: DataBaseSample = statina.crud.find.samples.sample(sample_id=sample_id, adapter=adapter)
-    batch: Batch = statina.crud.find.batches.batch(batch_id=sample.batch_id, adapter=adapter)
+    batch: DatabaseBatch = statina.crud.find.batches.batch(
+        batch_id=sample.batch_id, adapter=adapter
+    )
     abnormal_data: Dict[str, ZscoreSamples] = get_abn_for_samp_tris_plot(adapter=adapter)
     normal_data: Zscore131821 = get_normal_for_samp_tris_plot(adapter=adapter)
     sample_data: ZscoreSamples = get_sample_for_samp_tris_plot(sample)
@@ -138,7 +146,7 @@ def sample_tris(
             normal_data=normal_data,
             abnormal_data=abnormal_data,
             sample_data=sample_data,
-            sample=Sample(**sample.dict()),
+            sample=SampleValidator(**sample.dict()),
             batch=batch,
             status_colors=STATUS_COLORS,
             page_id="sample_tris",

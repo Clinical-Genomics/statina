@@ -9,15 +9,16 @@ def get_scatter_data_for_coverage_plot(
     samples: List[Sample],
 ) -> Dict["str", CoveragePlotSampleData]:
     """Coverage Ratio data for Coverage Plot.
-    Only adding samples with a zscore warning"""
+    Only adding samples with a zscore war
+    ning"""
 
     data = {}
     for sample in samples:
         sample_warnings: SampleWarning = sample.warnings
         zscore_warnings = [
-            sample_warnings.Zscore_13,
-            sample_warnings.Zscore_18,
-            sample_warnings.Zscore_21,
+            sample_warnings.z_score_13,
+            sample_warnings.z_score_18,
+            sample_warnings.z_score_21,
         ]
         if set(zscore_warnings) == {"default"}:
             continue

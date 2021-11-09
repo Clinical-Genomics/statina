@@ -18,7 +18,7 @@ from statina.API.external.constants import CHROM_ABNORM
 from statina.config import get_nipt_adapter, email_settings
 from statina.crud import update
 from statina.crud.delete import delete_batches
-from statina.models.database import DataBaseSample, User, Batch
+from statina.models.database import DataBaseSample, User, DatabaseBatch
 from statina.tools.email import send_email
 
 router = APIRouter()
@@ -164,7 +164,7 @@ async def batch_comment(
     if user.role not in ["RW", "admin"]:
         return RedirectResponse(request.headers.get("referer"))
     batch_id: str = form["batch_id"]
-    batch: Batch = statina.crud.find.batches.batch(batch_id=batch_id, adapter=adapter)
+    batch: DatabaseBatch = statina.crud.find.batches.batch(batch_id=batch_id, adapter=adapter)
     comment: str = form.get("comment")
     if comment != batch.comment:
         batch.comment = comment

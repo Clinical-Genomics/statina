@@ -18,19 +18,32 @@ class Status(BaseModel):
     edited: str
 
 
+class ZScore(BaseModel):
+    z_score_13: str
+    z_score_18: str
+    z_score_21: str
+    z_score_x: str
+
+
+class FetalFraction(BaseModel):
+    fetal_fraction_x: str
+    fetal_fraction_y: str
+    fetal_fraction_pf: str
+
+
 class Include(BaseModel):
     include: bool
     edited: str
 
 
 class Statuses(BaseModel):
-    status_13: Status = Field(..., alias="13")
-    status_18: Status = Field(..., alias="18")
-    status_21: Status = Field(..., alias="21")
-    status_x0: Status = Field(..., alias="X0")
-    status_xxx: Status = Field(..., alias="XXX")
-    status_xxy: Status = Field(..., alias="XXY")
-    status_xyy: Status = Field(..., alias="XYY")
+    status_13: Status
+    status_18: Status
+    status_21: Status
+    status_x0: Status
+    status_xxx: Status
+    status_xxy: Status
+    status_xyy: Status
 
     class Config:
         allow_population_by_field_name = True
@@ -54,36 +67,29 @@ class SampleValidator(DataBaseSample):
     text_warning: Optional[str]
     status_string: Optional[str]
     status: Optional[Statuses]
+    fetal_fraction: Optional[FetalFraction]
+    z_score: Optional[ZScore]
     included: Optional[Include]
     sex: Optional[Literal["XX", "XY"]]
 
-    @validator("Zscore_13")
-    def round_zscore_13(cls, v):
-        return round(v, 2)
+    @validator("fetal_fraction", always=True)
+    def set_fetal_fraction(cls, v, values: dict) -> FetalFraction:
 
-    @validator("Zscore_18")
-    def round_zscore_18(cls, v):
-        return round(v, 2)
+        return FetalFraction(
+            fetal_fraction_x=round(values["FFX"], 2),
+            fetal_fraction_y=round(values["FFY"], 2),
+            fetal_fraction_pf=round(values["FF_Formatted"], 2),
+        )
 
-    @validator("Zscore_21")
-    def round_zscore_21(cls, v):
-        return round(v, 2)
+    @validator("z_score", always=True)
+    def set_z_score(cls, v, values: dict) -> ZScore:
 
-    @validator("Zscore_X")
-    def round_zscore_x(cls, v):
-        return round(v, 2)
-
-    @validator("FF_Formatted")
-    def round_ff(cls, v):
-        return round(v, 2)
-
-    @validator("FFX")
-    def round_ffx(cls, v):
-        return round(v, 2)
-
-    @validator("FFY")
-    def round_ffy(cls, v):
-        return round(v, 2)
+        return ZScore(
+            z_score_13=round(values["Zscore_13"], 2),
+            z_score_18=round(values["Zscore_18"], 2),
+            z_score_21=round(values["Zscore_21"], 2),
+            z_score_x=round(values["Zscore_X"], 2),
+        )
 
     @validator("status_string", always=True)
     def set_status_string(cls, v, values: dict) -> str:
@@ -311,25 +317,20 @@ class SampleValidator(DataBaseSample):
 
 
 class Sample(BaseModel):
-    status: Statuses
     sample_type: str = Field(..., alias="SampleType")
-    sex: Optional[str]
-    batch_id: str
-    sequencing_date: Optional[str]
-    text_warning: str
-    warnings: Optional[SampleWarning]
-    included: Include
-    comment: str
     qc_flag: str = Field(..., alias="QCFlag")
+    cnv_segment: str = Field(..., alias="CNVSegment")
+    comment: str
     sample_id: str
-    z_score_13: str = Field(..., alias="Zscore_13")
-    z_score_18: str = Field(..., alias="Zscore_18")
-    z_score_21: str = Field(..., alias="Zscore_21")
-    z_score_X: str = Field(..., alias="Zscore_X")
-    fetal_fraction_pre_face: str = Field(..., alias="FF_Formatted")
-    fetal_fraction_y: str = Field(..., alias="FFY")
-    fetal_fraction_x: str = Field(..., alias="FFX")
-    cnv_segment: str = Field(..., alias="SampleType")
+    batch_id: str
+    text_warning: str
+    sex: Optional[str]
+    sequencing_date: Optional[str]
+    status: Statuses
+    warnings: SampleWarning
+    included: Include
+    z_score: ZScore
+    fetal_fraction: FetalFraction
 
     class Config:
         allow_population_by_field_name = True

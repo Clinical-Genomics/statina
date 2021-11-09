@@ -50,16 +50,16 @@ class Statuses(BaseModel):
 
 
 class SampleWarning(BaseModel):
-    FF_Formatted: Literal["danger", "default", "warning"]
-    Zscore_13: Literal["danger", "default", "warning"]
-    Zscore_18: Literal["danger", "default", "warning"]
-    Zscore_21: Literal["danger", "default", "warning"]
-    FFY: Literal["danger", "default", "warning"]
-    X0: Literal["danger", "default", "warning"]
-    XXX: Literal["danger", "default", "warning"]
+    featl_fraction_pf: Literal["danger", "default", "warning"]
+    featl_fraction_y: Literal["danger", "default", "warning"]
+    z_score_13: Literal["danger", "default", "warning"]
+    z_score_18: Literal["danger", "default", "warning"]
+    z_score_21: Literal["danger", "default", "warning"]
+    x0: Literal["danger", "default", "warning"]
+    xxx: Literal["danger", "default", "warning"]
     other: Literal["danger", "default", "warning"]
-    XXY: Literal["danger", "default", "warning"]
-    XYY: Literal["danger", "default", "warning"]
+    xxy: Literal["danger", "default", "warning"]
+    xyy: Literal["danger", "default", "warning"]
 
 
 class SampleValidator(DataBaseSample):
@@ -122,31 +122,36 @@ class SampleValidator(DataBaseSample):
         fetal_fraction_pf = values.get("FF_Formatted")
         fetal_fraction_y = values.get("FFY")
         fetal_fraction_x = values.get("FFX")
-        sample_warnings["FF_Formatted"]: str = cls.get_ff_preface_warning(
+        sample_warnings["fetal_fraction_pf"]: str = cls.get_ff_preface_warning(
             fetal_fraction_pf=fetal_fraction_pf, fetal_fraction_y=fetal_fraction_y
         )
         sample_warnings["other"]: str = cls.get_other_warning(
             fetal_fraction_y=fetal_fraction_y, fetal_fraction_x=fetal_fraction_x
         )
-        sample_warnings["FFY"]: str = cls.get_ff_y_warning(fetal_fraction_y=fetal_fraction_y)
-        sample_warnings["X0"]: str = cls.get_x0_warning(
+        sample_warnings["fetal_fraction_y"]: str = cls.get_ff_y_warning(
+            fetal_fraction_y=fetal_fraction_y
+        )
+        sample_warnings["x0"]: str = cls.get_x0_warning(
             fetal_fraction_y=fetal_fraction_y, fetal_fraction_x=fetal_fraction_x
         )
-        sample_warnings["XXX"]: str = cls.get_XXX_warning(
+        sample_warnings["xxx"]: str = cls.get_XXX_warning(
             fetal_fraction_y=fetal_fraction_y, fetal_fraction_x=fetal_fraction_x
         )
-        sample_warnings["XYY"]: str = cls.get_XYY_warning(
+        sample_warnings["xyy"]: str = cls.get_XYY_warning(
             fetal_fraction_y=fetal_fraction_y, fetal_fraction_x=fetal_fraction_x
         )
-        sample_warnings["XXY"]: str = cls.get_XXY_warning(
+        sample_warnings["xxy"]: str = cls.get_XXY_warning(
             fetal_fraction_y=fetal_fraction_y, fetal_fraction_x=fetal_fraction_x
         )
-
-        for key in ["Zscore_13", "Zscore_18", "Zscore_21"]:
-            z_score = values.get(key)
-            sample_warnings[key]: str = cls.get_tris_warning(
-                z_score=z_score, fetal_fraction=fetal_fraction_pf
-            )
+        sample_warnings["z_score_13"]: str = cls.get_tris_warning(
+            z_score=values.get("Zscore_13"), fetal_fraction=fetal_fraction_pf
+        )
+        sample_warnings["z_score_18"]: str = cls.get_tris_warning(
+            z_score=values.get("Zscore_18"), fetal_fraction=fetal_fraction_pf
+        )
+        sample_warnings["z_score_21"]: str = cls.get_tris_warning(
+            z_score=values.get("Zscore_21"), fetal_fraction=fetal_fraction_pf
+        )
         return SampleWarning(**sample_warnings)
 
     @validator("text_warning", always=True)
@@ -319,7 +324,7 @@ class SampleValidator(DataBaseSample):
 class Sample(BaseModel):
     sample_type: str = Field(..., alias="SampleType")
     qc_flag: str = Field(..., alias="QCFlag")
-    cnv_segment: str = Field(..., alias="CNVSegment")
+    cnv_segment: Optional[str] = Field(..., alias="CNVSegment")
     comment: str
     sample_id: str
     batch_id: str

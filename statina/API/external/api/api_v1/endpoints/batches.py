@@ -84,7 +84,7 @@ def batch(
         "batch/tabs/table.html",
         context={
             "request": request,
-            "batch": statina.crud.find.batches.batches(batch_id=batch_id, adapter=adapter),
+            "batch": statina.crud.find.batches.batch(batch_id=batch_id, adapter=adapter),
             "sample_info": [SampleValidator(**sample.dict()) for sample in samples],
             "page_id": "batches",
             "current_user": user,

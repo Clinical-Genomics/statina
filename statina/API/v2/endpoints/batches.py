@@ -28,7 +28,7 @@ from statina.crud.find.samples import count_query_batch_samples, query_batch_sam
 from statina.crud.insert import insert_batch, insert_samples
 from statina.crud.utils import zip_dir
 from statina.models.database import Batch, DataBaseSample, User
-from statina.models.query_models import BatchesQuery, BatchSamplesQuery
+from statina.models.query_params import BatchesQuery, BatchSamplesQuery
 from statina.models.server.batch import PaginatedBatchResponse
 from statina.models.server.load import BatchRequestBody
 from statina.models.server.plots.coverage import CoveragePlotSampleData

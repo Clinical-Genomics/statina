@@ -1,6 +1,5 @@
 from typing import Optional, Literal
 
-from fastapi import Query
 from pydantic import BaseModel
 
 from statina.constants import sample_sort_keys

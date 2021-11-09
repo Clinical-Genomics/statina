@@ -138,8 +138,7 @@ def batch_samples(
 
     return JSONResponse(
         content=jsonable_encoder(
-            PaginatedSampleResponse(document_count=document_count, documents=samples),
-            by_alias=True,
+            PaginatedSampleResponse(document_count=document_count, documents=samples), by_alias=True
         ),
         status_code=200,
     )

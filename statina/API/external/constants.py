@@ -1,5 +1,3 @@
-from typing import Literal
-
 STATUS_CLASSES = {
     "Suspected": "warning",
     "False Positive": "success",

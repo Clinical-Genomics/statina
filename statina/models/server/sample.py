@@ -323,9 +323,9 @@ class Sample(BaseModel):
     qc_flag: str = Field(..., alias="QCFlag")
     sample_id: str
     z_score_13: str = Field(..., alias="Zscore_13")
-    z_score_18: str = Field(..., alias="Zscore_13")
-    z_score_21: str = Field(..., alias="Zscore_13")
-    z_score_X: str = Field(..., alias="Zscore_13")
+    z_score_18: str = Field(..., alias="Zscore_18")
+    z_score_21: str = Field(..., alias="Zscore_21")
+    z_score_X: str = Field(..., alias="Zscore_X")
     fetal_fraction_pre_face: str = Field(..., alias="FF_Formatted")
     fetal_fraction_y: str = Field(..., alias="FFY")
     fetal_fraction_x: str = Field(..., alias="FFX")

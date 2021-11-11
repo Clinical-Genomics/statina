@@ -118,7 +118,7 @@
     {% for batch_id in scatter_stat %}
         var batch = {
             y: [{{ scatter_stat[batch_id][plot_name] }}],
-            x: [{{ loop.index }}],
+            x: [{{ loop.index - 1}}],
             type: 'scatter',
             mode: 'markers',
             showlegend: false,

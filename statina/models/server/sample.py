@@ -48,8 +48,8 @@ class FetalFraction(BaseModel):
 
 
 class Include(BaseModel):
-    include: bool
-    edited: str
+    include: Optional[bool] = False
+    edited: Optional[str] = ""
 
 
 class Statuses(BaseModel):

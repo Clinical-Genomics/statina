@@ -58,9 +58,9 @@
                                             <td width="3%" class = "{{ sample.warnings.z_score_18}}">{{ sample.Zscore_18|round(2) }}</td>
                                             <td width="3%" class = "{{ sample.warnings.z_score_21}}">{{ sample.Zscore_21|round(2) }}</td>
                                             <td width="3%" class = "{{ sample.warnings.z_score_X}}">{{ sample.Zscore_X|round(2) }}</td>
-                                            <td width="3%" class = "{{sample.warnings.fetal_fraction_preface}}">{{sample.FF_Formatted}}</td>
+                                            <td width="3%" class = "{{sample.warnings.fetal_fraction_preface}}">{{sample.FF_Formatted|round(2)}}</td>
                                             <td width="3%" class = "default">{{sample.FFX}}</td>
-                                            <td width="3%" class =  "{{sample.warnings.fetal_fraction_y}}">{{sample.FFY}}</td>
+                                            <td width="3%" class =  "{{sample.warnings.fetal_fraction_y}}">{{sample.FFY|round(2)}}</td>
                                             <td width="3%" class = "default">{{sample.sex}}</td>
                                             <td width="3%" class = "default">{{sample.CNVSegment}}</td>
                                             <td width="3%"><p> <small>{{ sample.text_warning }}</small></p></td>

@@ -80,6 +80,7 @@ def batch(
     samples: List[DataBaseSample] = statina.crud.find.samples.batch_samples(
         batch_id=batch_id, adapter=adapter
     )
+
     return templates.TemplateResponse(
         "batch/tabs/table.html",
         context={
@@ -104,6 +105,8 @@ def batch(
     samples: List[DataBaseSample] = statina.crud.find.samples.batch_samples(
         batch_id=batch_id, adapter=adapter
     )
+    u = [SampleValidator(**sample_obj.dict()) for sample_obj in samples]
+    print(u[0].warnings)
     return templates.TemplateResponse(
         "batch/tabs/table.html",
         context={

@@ -11,12 +11,13 @@ from statina.adapter.plugin import StatinaAdapter
 from statina.API.external.api.deps import get_current_user
 from statina.config import get_nipt_adapter, templates
 from statina.crud.find.plots import fetal_fraction_plot_data as get_fetal_fraction
+from statina.models.server.batch import BatchValidator
 from statina.models.server.plots.fetal_fraction import (
     FetalFractionSamples,
     FetalFractionControlAbNormal,
 )
 from statina.models.server.plots.fetal_fraction_sex import SexChromosomeThresholds
-from statina.models.server.sample import Sample
+from statina.models.server.sample import Sample, SampleValidator
 from zipfile import ZIP_DEFLATED, ZipFile
 import io
 from os import PathLike
@@ -99,8 +100,9 @@ def report(
     samples: List[DataBaseSample] = statina.crud.find.samples.batch_samples(
         batch_id=batch_id, adapter=adapter
     )
-    batch: DatabaseBatch = statina.crud.find.batches.batch(batch_id=batch_id, adapter=adapter)
-
+    validated_samples: List[SampleValidator] = [
+        SampleValidator(**sample_obj.dict()) for sample_obj in samples
+    ]
     cases = get_fetal_fraction.samples(adapter=adapter, batch_id=batch_id)
     control: FetalFractionSamples = get_fetal_fraction.samples(
         batch_id=batch_id, adapter=adapter, control_samples=True
@@ -118,6 +120,10 @@ def report(
 
     x_max = max(control.FFX + cases.FFX) + 1
     x_min = min(control.FFX + cases.FFX) - 1
+    database_batch: DatabaseBatch = statina.crud.find.batches.batch(
+        batch_id=batch_id, adapter=adapter
+    )
+    validated_batch = BatchValidator(**database_batch.dict())
 
     sex_thresholds = SexChromosomeThresholds(x_min=x_min, x_max=x_max)
 
@@ -126,7 +132,7 @@ def report(
         # common
         request=request,
         current_user=user,
-        batch=statina.crud.find.batches.batch(batch_id=batch_id, adapter=adapter),
+        batch=validated_batch,
         # Fetal Fraction  XY
         sex_thresholds={
             "XY_fetal_fraction_y": sex_thresholds.XY_fetal_fraction_y(),
@@ -143,7 +149,7 @@ def report(
         max_x=x_max,
         min_x=x_min,
         # table
-        sample_info=[Sample(**sample.dict()) for sample in samples],
+        sample_info=validated_samples,
     )
 
     in_mem_file = io.StringIO()

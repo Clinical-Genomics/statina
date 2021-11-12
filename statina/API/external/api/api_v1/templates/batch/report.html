@@ -30,13 +30,13 @@
                                 <input type=text name="samples" value="{{ sample.sample_id }}" hidden>
                                 <tr>
                                     <td width="20%">{{ sample.sample_id }}</td>
-                                    <td width="4%" class="{{ sample.warnings.Zscore_13 }}">{{ sample.Zscore_13 }}</td>
-                                    <td width="4%" class="{{ sample.warnings.Zscore_18 }}">{{ sample.Zscore_18 }}</td>
-                                    <td width="4%" class="{{ sample.warnings.Zscore_21 }}">{{ sample.Zscore_21 }}</td>
+                                    <td width="4%" class="{{ sample.warnings.z_score_13 }}">{{ sample.Zscore_13 }}</td>
+                                    <td width="4%" class="{{ sample.warnings.z_score_18 }}">{{ sample.Zscore_18 }}</td>
+                                    <td width="4%" class="{{ sample.warnings.z_score_21 }}">{{ sample.Zscore_21 }}</td>
                                     <td width="4%"
-                                        class="{{ sample.warnings.FF_Formatted }}">{{ sample.FF_Formatted }}</td>
+                                        class="{{ sample.warnings.fetal_fraction_preface }}">{{ sample.FF_Formatted }}</td>
                                     <td width="4%" class="default">{{ sample.FFX }}</td>
-                                    <td width="4%" class="{{ sample.warnings.FFY }}">{{ sample.FFY }}</td>
+                                    <td width="4%" class="{{ sample.warnings.fetal_fraction_y }}">{{ sample.FFY }}</td>
                                     <td width="3%" class = "default">{{sample.sex}}</td>
                                     <td width="3%"><p><small>{{ sample.text_warning }}</small></p></td>
                                     <td width="18%">{{ sample.comment }}</td>

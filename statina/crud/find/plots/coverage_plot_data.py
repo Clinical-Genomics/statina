@@ -2,11 +2,11 @@ from typing import Dict, List
 
 from statina.models.database import DataBaseSample
 from statina.models.server.plots.coverage import CoveragePlotSampleData
-from statina.models.server.sample import Sample, SampleWarning
+from statina.models.server.sample import SampleValidator, SampleWarning
 
 
 def get_scatter_data_for_coverage_plot(
-    samples: List[Sample],
+    samples: List[SampleValidator],
 ) -> Dict["str", CoveragePlotSampleData]:
     """Coverage Ratio data for Coverage Plot.
     Only adding samples with a zscore war

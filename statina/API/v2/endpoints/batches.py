@@ -274,10 +274,14 @@ def coverage(
     db_samples: List[DataBaseSample] = statina.crud.find.samples.batch_samples(
         batch_id=batch_id, adapter=adapter
     )
-    samples: List[Sample] = [Sample(**db_sample.dict()) for db_sample in db_samples]
+    validated_samples: List[SampleValidator] = [
+        SampleValidator(**db_sample.dict()) for db_sample in db_samples
+    ]
 
-    scatter_data: Dict[str, CoveragePlotSampleData] = get_scatter_data_for_coverage_plot(samples)
-    box_data: Dict[int, List[float]] = get_box_data_for_coverage_plot(samples)
+    scatter_data: Dict[str, CoveragePlotSampleData] = get_scatter_data_for_coverage_plot(
+        validated_samples
+    )
+    box_data: Dict[int, List[float]] = get_box_data_for_coverage_plot(validated_samples)
     return JSONResponse(
         content=jsonable_encoder(
             dict(

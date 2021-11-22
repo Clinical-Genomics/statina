@@ -167,7 +167,7 @@ def batch_download(
     return FileResponse(
         str(path.absolute()),
         media_type="application/octet-stream",
-        filename=path.name,
+        filename=f"{batch_id}_{path.name}",
     )
 
 

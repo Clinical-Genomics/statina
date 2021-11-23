@@ -162,12 +162,12 @@ def batch_download(
         file_obj = zip_dir(source_dir=file_path)
         response = StreamingResponse(file_obj, media_type="application/octet-stream")
         response.headers["Content-Disposition"] = f"attachment; filename={batch_id}_{file_id}.zip"
-
-    response = FileResponse(
-        str(path.absolute()),
-        media_type="application/octet-stream",
-        filename=f"{batch_id}_{file_id}{path.suffix}",
-    )
+    else:
+        response = FileResponse(
+            str(path.absolute()),
+            media_type="application/octet-stream",
+            filename=f"{batch_id}_{file_id}{path.suffix}",
+        )
     response.headers["Access-Control-Expose-Headers"] = "Content-Disposition"
     return response
 

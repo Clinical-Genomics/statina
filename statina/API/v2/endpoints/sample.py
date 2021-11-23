@@ -274,6 +274,8 @@ def sample_segmental_calls_download(
         JSONResponse(content="File missing on disk", status_code=404)
 
     file = Path(file_path)
-    return FileResponse(
+    response = FileResponse(
         str(file.absolute()), media_type="application/octet-stream", filename=file.name
     )
+    response.headers["Access-Control-Expose-Headers"] = "Content-Disposition"
+    return response

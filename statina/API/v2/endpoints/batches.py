@@ -161,14 +161,15 @@ def batch_download(
     if path.is_dir():
         file_obj = zip_dir(source_dir=file_path)
         response = StreamingResponse(file_obj, media_type="application/octet-stream")
-        response.headers["Content-Disposition"] = f"attachment; filename={batch_id}_{file_id}.zip"
-        return response
-
-    return FileResponse(
-        str(path.absolute()),
-        media_type="application/octet-stream",
-        filename=f"{batch_id}_{file_id}{path.suffix}",
-    )
+        response.headers["Content-Disposition"] = f'attachment; filename="{batch_id}_{file_id}.zip"'
+    else:
+        response = FileResponse(
+            str(path.absolute()),
+            media_type="application/octet-stream",
+            filename=f"{batch_id}_{file_id}{path.suffix}",
+        )
+    response.headers["Access-Control-Expose-Headers"] = "Content-Disposition"
+    return response
 
 
 @router.get("/batch/{batch_id}/zscore_plot")

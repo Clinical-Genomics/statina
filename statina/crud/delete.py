@@ -25,7 +25,6 @@ def delete_batch_samples(adapter: StatinaAdapter, batch_id: str):
 
 
 def delete_batch(adapter: StatinaAdapter, batch_id: str):
-    samples = batch_samples(adapter=adapter, batch_id=batch_id)
     delete_batch_samples(adapter=adapter, batch_id=batch_id)
     delete_batch_document(adapter=adapter, batch_id=batch_id)
 
@@ -37,3 +36,4 @@ def delete_batches(adapter: StatinaAdapter, batches: Iterable[str]):
 
 def delete_user(adapter: StatinaAdapter, username: str):
     adapter.user_collection.delete_one({"username": username})
+    LOG.info(f"Deleting user {username}")

@@ -65,12 +65,12 @@ def batches(
 
 
 @router.delete("/batch/{batch_id}")
-async def batch_delete(
+def batch_delete(
     batch_id: str,
     adapter: StatinaAdapter = Depends(get_nipt_adapter),
     current_user: User = Security(get_current_active_user, scopes=["admin"]),
 ):
-    await delete_batch(adapter=adapter, batch_id=batch_id)
+    delete_batch(adapter=adapter, batch_id=batch_id)
     return JSONResponse(content=f"Deleted batch {batch_id}", status_code=200)
 
 

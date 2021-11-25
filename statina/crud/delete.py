@@ -19,10 +19,14 @@ def delete_sample_document(adapter: StatinaAdapter, sample_id: str):
     LOG.info(f"Deleting sample {sample_id}")
 
 
+def delete_batch_samples(adapter: StatinaAdapter, batch_id: str):
+    adapter.sample_collection.delete_many({"batch_id": batch_id})
+    LOG.info(f"Deleting all samples in {batch_id}")
+
+
 def delete_batch(adapter: StatinaAdapter, batch_id: str):
     samples = batch_samples(adapter=adapter, batch_id=batch_id)
-    for sample in samples:
-        delete_sample_document(adapter=adapter, sample_id=sample.sample_id)
+    delete_batch_samples(adapter=adapter, batch_id=batch_id)
     delete_batch_document(adapter=adapter, batch_id=batch_id)
 
 

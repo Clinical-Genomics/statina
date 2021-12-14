@@ -8,7 +8,7 @@ from statina.constants import sample_sort_keys
 class ListQuery(BaseModel):
     page_size: Optional[int] = 5
     page_num: Optional[int] = 0
-    sort_direction: Optional[Literal["ascending", "descending"]] = "descending"
+    sort_direction: Optional[Literal["ascend", "descend"]] = "descend"
     query_string: Optional[str] = ""
     sort_key: Optional[sample_sort_keys] = ""
 

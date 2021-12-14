@@ -33,7 +33,7 @@ def query_users(
     query_string: Optional[str] = "",
     role: Literal["", "admin", "unconfirmed", "inactive", "R", "RW"] = "",
     sort_key: Literal["added", "username", "email"] = "added",
-    sort_direction: Literal["ascending", "descending"] = "ascending",
+    sort_direction: Literal["ascend", "descend"] = "ascend",
 ) -> List[User]:
     """
     Query users from the user collection.

@@ -170,7 +170,7 @@ def users(
     role: Literal["", "admin", "unconfirmed", "inactive", "R", "RW"] = Query(""),
     query_string: Optional[str] = Query(""),
     sort_key: Literal["added", "username", "email"] = Query("added"),
-    sort_direction: Literal["ascending", "descending"] = Query("ascending"),
+    sort_direction: Literal["ascend", "descend"] = Query("ascend"),
     current_user: User = Security(get_current_active_user, scopes=["admin"]),
     adapter: StatinaAdapter = Depends(get_nipt_adapter),
 ):

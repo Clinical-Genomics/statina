@@ -40,7 +40,7 @@ def query_batches(
     adapter: StatinaAdapter,
     page_size: int = 0,
     page_num: int = 0,
-    sort_direction: Optional[Literal["ascending", "descending"]] = "descending",
+    sort_direction: Optional[Literal["ascend", "descend"]] = "descend",
     sort_key: Optional[
         Literal["batch_id", "SequencingDate", "Flowcell", "comment"]
     ] = "SequencingDate",

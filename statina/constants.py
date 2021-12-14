@@ -14,7 +14,7 @@ SCOPES = {
 }
 
 
-sort_table = {"ascending": pymongo.ASCENDING, "descending": pymongo.DESCENDING}
+sort_table = {"ascend": pymongo.ASCENDING, "descend": pymongo.DESCENDING}
 sample_status_options = Literal[
     "Normal",
     "False Positive",

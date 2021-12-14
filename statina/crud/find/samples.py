@@ -33,7 +33,7 @@ def query_samples(
     adapter: StatinaAdapter,
     batch_id: Optional[str] = None,
     sort_key: Optional[sample_sort_keys] = "sample_id",
-    sort_direction: Optional[Literal["ascending", "descending"]] = "descending",
+    sort_direction: Optional[Literal["ascend", "descend"]] = "descend",
     query_string: Optional[str] = "",
     page_size: int = 0,
     page_num: int = 0,
@@ -105,7 +105,7 @@ def query_batch_samples(
     page_size: int = 0,
     page_num: int = 0,
     sort_key: Optional[sample_sort_keys] = "sample_id",
-    sort_direction: Optional[Literal["ascending", "descending"]] = "descending",
+    sort_direction: Optional[Literal["ascend", "descend"]] = "descend",
     query_string: Optional[str] = "",
 ) -> List[DataBaseSample]:
     """

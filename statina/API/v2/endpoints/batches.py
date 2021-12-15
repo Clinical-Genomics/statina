@@ -159,7 +159,7 @@ def batch_download(
 
     path = Path(file_path)
     if path.is_dir():
-        file_obj = zip_dir(source_dir=file_path)
+        file_obj = zip_dir(source_dir=path.parent)
         response = StreamingResponse(file_obj, media_type="application/octet-stream")
         response.headers["Content-Disposition"] = f'attachment; filename="{batch_id}_{file_id}.zip"'
     else:

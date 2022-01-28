@@ -1,3 +1,5 @@
+from typing import Optional
+
 from fastapi import APIRouter, Depends, Security
 from fastapi.encoders import jsonable_encoder
 from fastapi.responses import JSONResponse
@@ -17,12 +19,12 @@ router = APIRouter(prefix="/v2")
 
 @router.get("/statistics")
 def statistics(
+    nr_batches: Optional[int] = 20,
     current_user: User = Security(get_current_active_user, scopes=["R"]),
     adapter: StatinaAdapter = Depends(get_nipt_adapter),
 ):
     """Statistics view."""
 
-    nr_batches = 20
     scatter_plots = ["Stdev_13", "Stdev_18", "Stdev_21"]
     box_plots = [
         "Chr13_Ratio",

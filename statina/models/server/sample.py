@@ -14,16 +14,16 @@ from statina.models.server.plots.fetal_fraction_sex import x_get_y
 
 
 class SampleWarning(BaseModel):
-    fetal_fraction_preface: Literal["danger", "default", "warning"]
-    fetal_fraction_y: Literal["danger", "default", "warning"]
-    z_score_13: Literal["danger", "default", "warning"]
-    z_score_18: Literal["danger", "default", "warning"]
-    z_score_21: Literal["danger", "default", "warning"]
-    x0: Literal["danger", "default", "warning"]
-    xxx: Literal["danger", "default", "warning"]
-    other: Literal["danger", "default", "warning"]
-    xxy: Literal["danger", "default", "warning"]
-    xyy: Literal["danger", "default", "warning"]
+    fetal_fraction_preface: Literal["red", "default", "gold"]
+    fetal_fraction_y: Literal["red", "default", "gold"]
+    z_score_13: Literal["red", "default", "gold"]
+    z_score_18: Literal["red", "default", "gold"]
+    z_score_21: Literal["red", "default", "gold"]
+    x0: Literal["red", "default", "gold"]
+    xxx: Literal["red", "default", "gold"]
+    other: Literal["red", "default", "gold"]
+    xxy: Literal["red", "default", "gold"]
+    xyy: Literal["red", "default", "gold"]
 
 
 class Status(BaseModel):
@@ -172,7 +172,7 @@ class SampleValidator(DataBaseSample):
         if not values.get("warnings"):
             return ""
         text_warnings = [
-            abn for abn, warning in values["warnings"].dict().items() if warning == "danger"
+            abn for abn, warning in values["warnings"].dict().items() if warning == "red"
         ]
         return ", ".join(text_warnings)
 
@@ -203,19 +203,19 @@ class SampleValidator(DataBaseSample):
             if fetal_fraction_pf >= preface_threshold and (
                 z_score >= hard_max or z_score <= hard_min
             ):
-                return "danger"
+                return "red"
             elif fetal_fraction_pf < preface_threshold and (
                 z_score >= soft_max or z_score <= hard_min
             ):
-                return "warning"
+                return "gold"
         elif fetal_fraction_y >= fetal_fraction_y_threshold and (
             z_score >= hard_max or z_score <= hard_min
         ):
-            return "danger"
+            return "red"
         elif fetal_fraction_y < fetal_fraction_y_threshold and (
             z_score >= soft_max or z_score <= hard_min
         ):
-            return "warning"
+            return "gold"
         return "default"
 
     @classmethod
@@ -226,7 +226,7 @@ class SampleValidator(DataBaseSample):
             return "default"
 
         if fetal_fraction_y < FF_TRESHOLDS["fetal_fraction_y_max"] and fetal_fraction_y != 0:
-            return "danger"
+            return "red"
 
         return "default"
 
@@ -244,7 +244,7 @@ class SampleValidator(DataBaseSample):
             return "default"
 
         if fetal_fraction_y < y_treshold and fetal_fraction_x > x_treshold:
-            return "danger"
+            return "red"
 
         return "default"
 
@@ -262,7 +262,7 @@ class SampleValidator(DataBaseSample):
             return "default"
 
         if fetal_fraction_y < y_treshold and fetal_fraction_x < x_treshold:
-            return "danger"
+            return "red"
 
         return "default"
 
@@ -273,7 +273,7 @@ class SampleValidator(DataBaseSample):
         if not isinstance(fetal_fraction_pf, (float, int)):
             return "default"
         if fetal_fraction_pf < FF_TRESHOLDS["fetal_fraction_preface"]:
-            return "danger"
+            return "red"
         return "default"
 
     @classmethod
@@ -291,7 +291,7 @@ class SampleValidator(DataBaseSample):
             return "default"
 
         if y_treshold < fetal_fraction_y <= x_get_y(x=fetal_fraction_x, k=k_lower, m=m_lower):
-            return "danger"
+            return "red"
 
         return "default"
 
@@ -312,7 +312,7 @@ class SampleValidator(DataBaseSample):
         if fetal_fraction_y > x_get_y(x=fetal_fraction_x, k=k_upper, m=m_upper) and (
             fetal_fraction_x <= x_threshold
         ):
-            return "danger"
+            return "red"
         return "default"
 
     @classmethod
@@ -332,7 +332,7 @@ class SampleValidator(DataBaseSample):
         if fetal_fraction_y > x_get_y(x=fetal_fraction_x, k=k_upper, m=m_upper) and (
             fetal_fraction_x > x_treshold
         ):
-            return "danger"
+            return "red"
         return "default"
 
     class Config:

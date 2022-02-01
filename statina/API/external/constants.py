@@ -1,11 +1,11 @@
 STATUS_CLASSES = {
-    "Suspected": "warning",
+    "Suspected": "gold",
     "False Positive": "success",
-    "Verified": "danger",
-    "Probable": "warning",
-    "False Negative": "danger",
-    "Other": "warning",
-    "Failed": "danger",
+    "Verified": "red",
+    "Probable": "gold",
+    "False Negative": "red",
+    "Other": "gold",
+    "Failed": "red",
 }
 
 CHROM_ABNORM = ["13", "18", "21", "X0", "XXX", "XXY", "XYY"]

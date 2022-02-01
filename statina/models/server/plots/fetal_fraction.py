@@ -26,35 +26,35 @@ class Suspected(FetalFractionSamples):
     """Color code for suspected sample"""
 
     color: Optional[str] = "#DBA901"
-    color_group: Optional[str] = "warning"
+    color_group: Optional[str] = "gold"
 
 
 class Probable(FetalFractionSamples):
     """Color code for probable sample"""
 
     color: Optional[str] = "#0000FF"
-    color_group: Optional[str] = "warning"
+    color_group: Optional[str] = "gold"
 
 
 class FalseNegative(FetalFractionSamples):
     """Color code for false negative sample"""
 
     color: Optional[str] = "#ff6699"
-    color_group: Optional[str] = "danger"
+    color_group: Optional[str] = "red"
 
 
 class Verified(FetalFractionSamples):
     """Color code for verified sample"""
 
     color: Optional[str] = "#00CC00"
-    color_group: Optional[str] = "danger"
+    color_group: Optional[str] = "red"
 
 
 class Other(FetalFractionSamples):
     """Color code for other sample"""
 
     color: Optional[str] = "#603116"
-    color_group: Optional[str] = "warning"
+    color_group: Optional[str] = "gold"
 
 
 class FalsePositive(FetalFractionSamples):
@@ -67,7 +67,7 @@ class FalsePositive(FetalFractionSamples):
 class Failed(FetalFractionSamples):
     """Color code for failed sample"""
 
-    color_group: Optional[str] = "danger"
+    color_group: Optional[str] = "red"
 
 
 class AbNormalityClasses(BaseModel):

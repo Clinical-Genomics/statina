@@ -194,18 +194,27 @@ class SampleValidator(DataBaseSample):
         hard_max = TRISOMI_TRESHOLDS["hard_max"]["Zscore"]
         soft_max = TRISOMI_TRESHOLDS["soft_max"]["Zscore"]
         hard_min = TRISOMI_TRESHOLDS["hard_min"]["Zscore"]
-        preface = FF_TRESHOLDS["fetal_fraction_preface"]
+        preface_threshold = FF_TRESHOLDS["fetal_fraction_preface"]
+        fetal_fraction_y_threshold = FF_TRESHOLDS["fetal_fraction_y_for_trisomy"]
 
         if fetal_fraction_pf is None or z_score is None or fetal_fraction_y is None:
             return "default"
         elif fetal_fraction_y == 0:
-            if fetal_fraction_pf >= preface and (z_score >= hard_max or z_score <= hard_min):
+            if fetal_fraction_pf >= preface_threshold and (
+                z_score >= hard_max or z_score <= hard_min
+            ):
                 return "danger"
-            elif fetal_fraction_pf < preface and (z_score >= soft_max or z_score <= hard_min):
+            elif fetal_fraction_pf < preface_threshold and (
+                z_score >= soft_max or z_score <= hard_min
+            ):
                 return "warning"
-        elif fetal_fraction_y >= 4 and (z_score >= hard_max or z_score <= hard_min):
+        elif fetal_fraction_y >= fetal_fraction_y_threshold and (
+            z_score >= hard_max or z_score <= hard_min
+        ):
             return "danger"
-        elif fetal_fraction_y < 4 and (z_score >= soft_max or z_score <= hard_min):
+        elif fetal_fraction_y < fetal_fraction_y_threshold and (
+            z_score >= soft_max or z_score <= hard_min
+        ):
             return "warning"
         return "default"
 

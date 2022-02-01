@@ -14,9 +14,7 @@ status_options = Literal[
 ]
 
 
-class DataBaseSample(BaseModel):
-    sample_id: str = Field(..., alias="SampleID")
-    batch_id: str = Field(..., alias="SampleProject")
+class DataBaseSampleOptionalFields(BaseModel):
     SampleType: Optional[str] = ""
     Description: Optional[str]
     Flowcell: Optional[str]
@@ -104,6 +102,14 @@ class DataBaseSample(BaseModel):
     status_change_XXX: Optional[str] = ""
     status_change_XXY: Optional[str] = ""
     status_change_XYY: Optional[str] = ""
+
+    class Config:
+        allow_population_by_field_name = True
+
+
+class DataBaseSample(DataBaseSampleOptionalFields):
+    sample_id: str = Field(..., alias="SampleID")
+    batch_id: str = Field(..., alias="SampleProject")
 
     class Config:
         allow_population_by_field_name = True

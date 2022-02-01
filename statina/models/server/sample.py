@@ -180,8 +180,7 @@ class SampleValidator(DataBaseSample):
     def set_sex(cls, v, values: dict) -> str:
         """Set sex based on fetal fraction Y thresholds"""
 
-        fetal_fraction_y = values.get("FFY")
-        return "XY" if fetal_fraction_y >= FF_TRESHOLDS["fetal_fraction_y_min"] else "XX"
+        return "XY" if values.get("FFY") >= FF_TRESHOLDS["fetal_fraction_y_min"] else "XX"
 
     @validator("included", always=True)
     def set_include(cls, v, values: dict) -> Optional[Include]:
@@ -201,11 +200,11 @@ class SampleValidator(DataBaseSample):
             return "default"
         elif fetal_fraction_y == 0:
             if fetal_fraction_pf >= preface and (z_score >= hard_max or z_score <= hard_min):
-                return "warning"
+                return "danger"
             elif fetal_fraction_pf < preface and (z_score >= soft_max or z_score <= hard_min):
                 return "warning"
         elif fetal_fraction_y >= 4 and (z_score >= hard_max or z_score <= hard_min):
-            return "warning"
+            return "danger"
         elif fetal_fraction_y < 4 and (z_score >= soft_max or z_score <= hard_min):
             return "warning"
         return "default"

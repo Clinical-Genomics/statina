@@ -169,7 +169,8 @@ class SampleValidator(DataBaseSample):
     @validator("text_warning", always=True)
     def set_text_warning(cls, v, values: dict) -> str:
         """Joining the warnings for a sample to a text string"""
-
+        if not values.get("warnings"):
+            return ""
         text_warnings = [
             abn for abn, warning in values["warnings"].dict().items() if warning == "danger"
         ]
@@ -191,7 +192,6 @@ class SampleValidator(DataBaseSample):
         cls, z_score: float, fetal_fraction_pf: float, fetal_fraction_y: float
     ) -> str:
         """Get automated trisomy warning, based on preset Zscore thresholds"""
-
         hard_max = TRISOMI_TRESHOLDS["hard_max"]["Zscore"]
         soft_max = TRISOMI_TRESHOLDS["soft_max"]["Zscore"]
         hard_min = TRISOMI_TRESHOLDS["hard_min"]["Zscore"]
@@ -208,8 +208,7 @@ class SampleValidator(DataBaseSample):
             return "warning"
         elif fetal_fraction_y < 4 and (z_score >= soft_max or z_score <= hard_min):
             return "warning"
-        else:
-            return "default"
+        return "default"
 
     @classmethod
     def get_ff_y_warning(cls, fetal_fraction_y: float) -> str:

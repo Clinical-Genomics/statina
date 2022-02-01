@@ -21,10 +21,10 @@ STATUS_COLORS = {
 }
 
 TRISOMI_TRESHOLDS = {
-    "soft_max": {"Zscore": 3, "color": "orange", "text": "Warning threshold = 2.5"},
+    "soft_max": {"Zscore": 3, "color": "orange", "text": "Warning threshold = 3"},
     "soft_min": {"Zscore": -4, "color": "orange", "text": "Warning threshold = -4"},
     "hard_max": {"Zscore": 4, "color": "red", "text": "Threshold = 4"},
-    "hard_min": {"Zscore": -8, "color": "red", "text": "Threshold = -5"},
+    "hard_min": {"Zscore": -8, "color": "red", "text": "Threshold = -8"},
 }
 
 FF_TRESHOLDS = {

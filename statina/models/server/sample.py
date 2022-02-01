@@ -108,13 +108,19 @@ class SampleValidator(DataBaseSample):
             fetal_fraction_y=fetal_fraction_y, fetal_fraction_x=fetal_fraction_x
         )
         sample_warnings["z_score_13"]: str = cls.get_tris_warning(
-            z_score=values.get("Zscore_13"), fetal_fraction=fetal_fraction_pf
+            z_score=values.get("Zscore_13"),
+            fetal_fraction_pf=fetal_fraction_pf,
+            fetal_fraction_y=fetal_fraction_y,
         )
         sample_warnings["z_score_18"]: str = cls.get_tris_warning(
-            z_score=values.get("Zscore_18"), fetal_fraction=fetal_fraction_pf
+            z_score=values.get("Zscore_18"),
+            fetal_fraction_pf=fetal_fraction_pf,
+            fetal_fraction_y=fetal_fraction_y,
         )
         sample_warnings["z_score_21"]: str = cls.get_tris_warning(
-            z_score=values.get("Zscore_21"), fetal_fraction=fetal_fraction_pf
+            z_score=values.get("Zscore_21"),
+            fetal_fraction_pf=fetal_fraction_pf,
+            fetal_fraction_y=fetal_fraction_y,
         )
         return SampleWarning(**sample_warnings)
 
@@ -163,7 +169,8 @@ class SampleValidator(DataBaseSample):
     @validator("text_warning", always=True)
     def set_text_warning(cls, v, values: dict) -> str:
         """Joining the warnings for a sample to a text string"""
-
+        if not values.get("warnings"):
+            return ""
         text_warnings = [
             abn for abn, warning in values["warnings"].dict().items() if warning == "danger"
         ]
@@ -173,45 +180,52 @@ class SampleValidator(DataBaseSample):
     def set_sex(cls, v, values: dict) -> str:
         """Set sex based on fetal fraction Y thresholds"""
 
-        fetal_fraction_y = values.get("FFY")
-        return "XY" if fetal_fraction_y >= FF_TRESHOLDS["fetal_fraction_y_min"] else "XX"
+        return "XY" if values.get("FFY") >= FF_TRESHOLDS["fetal_fraction_y_min"] else "XX"
 
     @validator("included", always=True)
     def set_include(cls, v, values: dict) -> Optional[Include]:
         return Include(include=values["include"], edited=values["change_include_date"])
 
     @classmethod
-    def get_tris_warning(cls, z_score: float, fetal_fraction: float) -> str:
+    def get_tris_warning(
+        cls, z_score: float, fetal_fraction_pf: float, fetal_fraction_y: float
+    ) -> str:
         """Get automated trisomy warning, based on preset Zscore thresholds"""
-
         hard_max = TRISOMI_TRESHOLDS["hard_max"]["Zscore"]
         soft_max = TRISOMI_TRESHOLDS["soft_max"]["Zscore"]
-        soft_min = TRISOMI_TRESHOLDS["soft_min"]["Zscore"]
         hard_min = TRISOMI_TRESHOLDS["hard_min"]["Zscore"]
-        preface = FF_TRESHOLDS["fetal_fraction_preface"]
+        preface_threshold = FF_TRESHOLDS["fetal_fraction_preface"]
+        fetal_fraction_y_threshold = FF_TRESHOLDS["fetal_fraction_y_for_trisomy"]
 
-        if fetal_fraction is None or z_score is None:
+        if fetal_fraction_pf is None or z_score is None or fetal_fraction_y is None:
             return "default"
-        elif fetal_fraction < preface and soft_max < z_score < hard_max:
-            return "warning"
-        elif hard_min < z_score <= soft_min:
-            return "warning"
-        elif z_score >= hard_max or z_score <= hard_min:
+        elif fetal_fraction_y == 0:
+            if fetal_fraction_pf >= preface_threshold and (
+                z_score >= hard_max or z_score <= hard_min
+            ):
+                return "danger"
+            elif fetal_fraction_pf < preface_threshold and (
+                z_score >= soft_max or z_score <= hard_min
+            ):
+                return "warning"
+        elif fetal_fraction_y >= fetal_fraction_y_threshold and (
+            z_score >= hard_max or z_score <= hard_min
+        ):
             return "danger"
-        else:
-            return "default"
+        elif fetal_fraction_y < fetal_fraction_y_threshold and (
+            z_score >= soft_max or z_score <= hard_min
+        ):
+            return "warning"
+        return "default"
 
     @classmethod
     def get_ff_y_warning(cls, fetal_fraction_y: float) -> str:
         """Get fetal fraction warning based on preset threshold"""
 
-        y_min = FF_TRESHOLDS["fetal_fraction_y_min"]
-        y_max = FF_TRESHOLDS["fetal_fraction_y_max"]
-
         if not isinstance(fetal_fraction_y, (float, int)):
             return "default"
 
-        if y_min <= fetal_fraction_y < y_max:
+        if fetal_fraction_y < FF_TRESHOLDS["fetal_fraction_y_max"] and fetal_fraction_y != 0:
             return "danger"
 
         return "default"
@@ -256,14 +270,9 @@ class SampleValidator(DataBaseSample):
     def get_ff_preface_warning(cls, fetal_fraction_pf: float, fetal_fraction_y: float) -> str:
         """Get fetal fraction preface warning based on preset threshold"""
 
-        if not (
-            isinstance(fetal_fraction_y, (float, int))
-            and isinstance(fetal_fraction_pf, (float, int))
-        ):
+        if not isinstance(fetal_fraction_pf, (float, int)):
             return "default"
-        y_min = FF_TRESHOLDS["fetal_fraction_y_min"]
-        pf_min = FF_TRESHOLDS["fetal_fraction_preface"]
-        if fetal_fraction_pf < pf_min and fetal_fraction_y < y_min:
+        if fetal_fraction_pf < FF_TRESHOLDS["fetal_fraction_preface"]:
             return "danger"
         return "default"
 
@@ -292,7 +301,7 @@ class SampleValidator(DataBaseSample):
 
         k_upper: float = FF_TRESHOLDS["k_upper"]
         m_upper: float = FF_TRESHOLDS["m_upper"]
-        x_treshold: float = FF_TRESHOLDS["fetal_fraction_X0"]
+        x_threshold: float = FF_TRESHOLDS["fetal_fraction_X0"]
 
         if not (
             isinstance(fetal_fraction_y, (float, int))
@@ -301,7 +310,7 @@ class SampleValidator(DataBaseSample):
             return "default"
 
         if fetal_fraction_y > x_get_y(x=fetal_fraction_x, k=k_upper, m=m_upper) and (
-            fetal_fraction_x <= x_treshold
+            fetal_fraction_x <= x_threshold
         ):
             return "danger"
         return "default"

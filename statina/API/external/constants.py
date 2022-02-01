@@ -21,16 +21,16 @@ STATUS_COLORS = {
 }
 
 TRISOMI_TRESHOLDS = {
-    "soft_max": {"Zscore": 2.5, "color": "orange", "text": "Warning threshold = 2.5"},
-    "soft_min": {"Zscore": -4, "color": "orange", "text": "Warning threshold = -4"},
+    "soft_max": {"Zscore": 3, "color": "orange", "text": "Warning threshold = 3"},
     "hard_max": {"Zscore": 4, "color": "red", "text": "Threshold = 4"},
-    "hard_min": {"Zscore": -5, "color": "red", "text": "Threshold = -5"},
+    "hard_min": {"Zscore": -8, "color": "red", "text": "Threshold = -8"},
 }
 
 FF_TRESHOLDS = {
     "fetal_fraction_preface": 4,
+    "fetal_fraction_y_for_trisomy": 4,
     "fetal_fraction_y_max": 3,
-    "fetal_fraction_y_min": 0.6,
+    "fetal_fraction_y_min": 0,
     "fetal_fraction_XXX": -1,
     "fetal_fraction_X0": 3.4,
     "y_axis_min": -1,

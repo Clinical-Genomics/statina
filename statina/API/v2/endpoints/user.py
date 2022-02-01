@@ -135,8 +135,7 @@ async def register_user(
     try:
         insert_user(adapter=adapter, user=user)
         confirmation_link = (
-            f"{email_settings.website_uri}/user/{user.username}/validate"
-            f"?verification_hex={user.verification_hex}"
+            f"{email_settings.website_uri}/{user.username}/" f"{user.verification_hex}"
         )
         email_form = FormDataRequest(
             sender_prefix=email_settings.sender_prefix,

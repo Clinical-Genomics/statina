@@ -301,7 +301,7 @@ class SampleValidator(DataBaseSample):
 
         k_upper: float = FF_TRESHOLDS["k_upper"]
         m_upper: float = FF_TRESHOLDS["m_upper"]
-        x_treshold: float = FF_TRESHOLDS["fetal_fraction_X0"]
+        x_threshold: float = FF_TRESHOLDS["fetal_fraction_X0"]
 
         if not (
             isinstance(fetal_fraction_y, (float, int))
@@ -310,7 +310,7 @@ class SampleValidator(DataBaseSample):
             return "default"
 
         if fetal_fraction_y > x_get_y(x=fetal_fraction_x, k=k_upper, m=m_upper) and (
-            fetal_fraction_x <= x_treshold
+            fetal_fraction_x <= x_threshold
         ):
             return "danger"
         return "default"

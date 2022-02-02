@@ -30,7 +30,7 @@ FF_TRESHOLDS = {
     "fetal_fraction_preface": 4,
     "fetal_fraction_y_for_trisomy": 4,
     "fetal_fraction_y_max": 3,
-    "fetal_fraction_y_min": 0,
+    "fetal_fraction_y_min": 0.6,
     "fetal_fraction_XXX": -1,
     "fetal_fraction_X0": 3.4,
     "y_axis_min": -1,

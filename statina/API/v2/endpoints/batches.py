@@ -38,7 +38,8 @@ from statina.models.server.plots.fetal_fraction import (
 )
 from statina.models.server.plots.fetal_fraction_sex import SexChromosomeThresholds
 from statina.models.server.sample import Sample, PaginatedSampleResponse, SampleValidator
-from statina.parse.batch import get_batch, get_samples, validate_file_path
+from statina.parse.batch import get_samples, validate_file_path
+from statina.parse.batch import get_batch as crud_get_batch
 
 router = APIRouter(prefix="/v2")
 
@@ -85,7 +86,7 @@ def load_batch(
     if not nipt_results.exists():
         return JSONResponse(content="Results file missing", status_code=422)
     samples: List[DataBaseSample] = get_samples(nipt_results)
-    batch: DatabaseBatch = get_batch(nipt_results)
+    batch: DatabaseBatch = crud_get_batch(nipt_results)
     if statina.crud.find.batches.batch(adapter=adapter, batch_id=batch.batch_id):
         return JSONResponse(content="Batch already in database!", status_code=422)
     insert_batch(adapter=adapter, batch=batch, batch_files=batch_files)

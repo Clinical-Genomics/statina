@@ -1,13 +1,14 @@
 from typing import Dict, List
 
 from fastapi import APIRouter, Depends, Request
+from starlette.responses import RedirectResponse
 
 import statina
 import statina.crud.find.plots.fetal_fraction_plot_data as get_fetal_fraction
 from statina.adapter import StatinaAdapter
 from statina.API.external.api.deps import get_current_user
 from statina.API.external.constants import TRISOMI_TRESHOLDS, COLORS
-from statina.config import get_nipt_adapter, templates
+from statina.config import get_nipt_adapter, templates, email_settings
 from statina.crud.find.plots.coverage_plot_data import (
     get_box_data_for_coverage_plot,
     get_scatter_data_for_coverage_plot,
@@ -29,26 +30,6 @@ from statina.models.server.sample import SampleValidator
 router = APIRouter()
 
 
-@router.post("/")
-def batches(
-    request: Request,
-    adapter: StatinaAdapter = Depends(get_nipt_adapter),
-    user: User = Depends(get_current_user),
-):
-    """List of all batches"""
-
-    all_batches: List[DatabaseBatch] = statina.crud.find.batches.batches(adapter=adapter)
-    return templates.TemplateResponse(
-        "batches.html",
-        context={
-            "request": request,
-            "batches": all_batches,
-            "current_user": user,
-            "page_id": "all_batches",
-        },
-    )
-
-
 @router.get("/")
 def batches(
     request: Request,
@@ -57,15 +38,7 @@ def batches(
 ):
     """List of all batches"""
     all_batches: List[DatabaseBatch] = statina.crud.find.batches.batches(adapter=adapter)
-    return templates.TemplateResponse(
-        "batches.html",
-        context={
-            "request": request,
-            "batches": all_batches,
-            "current_user": user,
-            "page_id": "all_batches",
-        },
-    )
+    return RedirectResponse(email_settings.website_uri)
 
 
 @router.post("/{batch_id}/")

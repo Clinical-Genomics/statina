@@ -172,7 +172,9 @@ class SampleValidator(DataBaseSample):
         if not values.get("warnings"):
             return ""
         text_warnings = [
-            abn for abn, warning in values["warnings"].dict().items() if warning == "danger"
+            abn
+            for abn, warning in values["warnings"].dict().items()
+            if warning in ["danger", "warning"]
         ]
         return ", ".join(text_warnings)
 
@@ -199,23 +201,15 @@ class SampleValidator(DataBaseSample):
 
         if fetal_fraction_pf is None or z_score is None or fetal_fraction_y is None:
             return "default"
-        elif fetal_fraction_y == 0:
-            if fetal_fraction_pf >= preface_threshold and (
-                z_score >= hard_max or z_score <= hard_min
-            ):
-                return "danger"
-            elif fetal_fraction_pf < preface_threshold and (
-                z_score >= soft_max or z_score <= hard_min
-            ):
-                return "warning"
-        elif fetal_fraction_y >= fetal_fraction_y_threshold and (
-            z_score >= hard_max or z_score <= hard_min
-        ):
+        if z_score >= hard_max:
             return "danger"
-        elif fetal_fraction_y < fetal_fraction_y_threshold and (
-            z_score >= soft_max or z_score <= hard_min
+        elif z_score >= soft_max and (
+            (fetal_fraction_y < fetal_fraction_y_threshold and fetal_fraction_y != 0)
+            or fetal_fraction_pf < preface_threshold
         ):
             return "warning"
+        elif z_score <= hard_min:
+            return "danger"
         return "default"
 
     @classmethod

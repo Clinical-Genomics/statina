@@ -27,17 +27,12 @@ def external(version: str) -> FastAPI:
         allow_headers=["*"],
     )
 
-    external_app.include_router(api.login.router, prefix="/login", tags=["login"])
     external_app.include_router(
         api.batches.router,
         prefix="/batches",
         tags=["batches"],
     )
     external_app.include_router(api.index.router, tags=["index"])
-    external_app.include_router(api.sample.router, tags=["sample"])
-    external_app.include_router(api.update.router, tags=["update"])
-    external_app.include_router(api.download.router, tags=["download"])
-    external_app.include_router(api.statistics.router, tags=["statistics"])
 
     external_app.include_router(external_api_v2.base.router, tags=["base_v2"])
     external_app.include_router(external_api_v2.batches.router, tags=["batches_v2"])

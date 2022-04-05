@@ -28,7 +28,7 @@ from statina.API.external.api.deps import (
     get_user_scopes,
 )
 from statina.config import email_settings, get_nipt_adapter, settings
-from statina.crud import delete, update
+from statina.crud import update
 from statina.crud.insert import insert_user
 from statina.exeptions import credentials_exception, forbidden_access_exception
 from statina.models.database import User
@@ -285,5 +285,6 @@ async def delete_user(
     adapter: StatinaAdapter = Depends(get_nipt_adapter),
     current_user: User = Security(get_current_active_user, scopes=["admin"]),
 ):
-    delete.delete_user(adapter=adapter, username=username)
+    adapter.user_collection.delete_one({"username": username})
+    LOG.info(f"Deleting user {username}")
     return JSONResponse(content=f"User {username} deleted", status_code=201)

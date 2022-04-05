@@ -6,7 +6,7 @@ from mongomock import MongoClient
 
 from statina.adapter.plugin import StatinaAdapter
 from statina.config import get_nipt_adapter
-from statina.main import internal_app as app
+from statina.main import external_app as app
 from statina.models.server.load import BatchRequestBody, UserRequestBody
 
 from .small_helpers import SmallHelpers

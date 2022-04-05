@@ -6,11 +6,9 @@ from fastapi.middleware.cors import CORSMiddleware
 from statina.exeptions import CredentialsError
 
 import statina.API.external.api.api_v1.endpoints as external_api_v1
-import statina.API.internal.api.api_v1.endpoints as internal_api_v1
 import statina.API.v2.endpoints as external_api_v2
 
 external_versions = {"v1": external_api_v1}
-internal_versions = {"v1": internal_api_v1}
 
 
 def external(version: str) -> FastAPI:
@@ -49,19 +47,4 @@ def external(version: str) -> FastAPI:
     return external_app
 
 
-def internal(version: str) -> FastAPI:
-    api = internal_versions[version]
-    internal_app = FastAPI()
-    internal_app.add_middleware(
-        CORSMiddleware,
-        allow_origins=["*"],
-        allow_credentials=True,
-        allow_methods=["*"],
-        allow_headers=["*"],
-    )
-    internal_app.include_router(api.insert.router, prefix="/insert", tags=["insert"])
-    return internal_app
-
-
 external_app = external("v1")
-internal_app = internal("v1")

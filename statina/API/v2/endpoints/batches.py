@@ -116,7 +116,7 @@ def get_batch(
     )
 
 
-@router.get("/batch/{batch_id}/samples", response_model=PaginatedSampleResponse)
+@router.get("/batch/{batch_id}/samples", response_model=PaginatedSampleResponse, deprecated=True)
 def batch_samples(
     sample_query: BatchSamplesQuery = Depends(BatchSamplesQuery),
     current_user: User = Security(get_current_active_user, scopes=["R"]),

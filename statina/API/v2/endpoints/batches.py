@@ -1,3 +1,4 @@
+import logging
 from datetime import datetime
 from pathlib import Path
 from typing import Dict, List, Literal, Optional
@@ -13,7 +14,6 @@ from statina.API.external.constants import TRISOMI_TRESHOLDS
 from statina.API.v2.endpoints.user import get_current_active_user
 from statina.config import get_nipt_adapter
 from statina.crud import update
-from statina.crud.delete import delete_batch
 from statina.crud.find.batches import query_batches, count_query_batches
 from statina.crud.find.plots.coverage_plot_data import (
     get_box_data_for_coverage_plot,
@@ -41,6 +41,7 @@ from statina.models.server.sample import Sample, PaginatedSampleResponse, Sample
 from statina.parse.batch import get_samples, validate_file_path
 from statina.parse.batch import get_batch as crud_get_batch
 
+LOG = logging.getLogger(__name__)
 router = APIRouter(prefix="/v2")
 
 
@@ -71,7 +72,10 @@ def batch_delete(
     adapter: StatinaAdapter = Depends(get_nipt_adapter),
     current_user: User = Security(get_current_active_user, scopes=["admin"]),
 ):
-    delete_batch(adapter=adapter, batch_id=batch_id)
+    adapter.sample_collection.delete_many({"batch_id": batch_id})
+    LOG.info(f"Deleting all samples in {batch_id}")
+    adapter.batch_collection.delete_one({"batch_id": batch_id})
+    LOG.info(f"Deleting batch {batch_id}")
     return JSONResponse(content=f"Deleted batch {batch_id}", status_code=200)
 
 
@@ -116,7 +120,7 @@ def get_batch(
     )
 
 
-@router.get("/batch/{batch_id}/samples", response_model=PaginatedSampleResponse)
+@router.get("/batch/{batch_id}/samples", response_model=PaginatedSampleResponse, deprecated=True)
 def batch_samples(
     sample_query: BatchSamplesQuery = Depends(BatchSamplesQuery),
     current_user: User = Security(get_current_active_user, scopes=["R"]),

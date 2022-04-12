@@ -44,7 +44,7 @@ def insert_samples(
         result: InsertManyResult = adapter.sample_collection.insert_many(sample_dicts)
         LOG.info("Added sample documents.")
     except:
-        raise InsertError(f"Sample keys already in database.")
+        raise InsertError("Sample keys already in database.")
     return result.inserted_ids
 
 

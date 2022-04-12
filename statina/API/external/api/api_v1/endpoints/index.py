@@ -1,12 +1,12 @@
-from fastapi import APIRouter, Request
+from fastapi import APIRouter
 from starlette.responses import RedirectResponse
 
-from statina.config import templates, email_settings
+from statina.config import email_settings
 
 router = APIRouter()
 
 
-@router.get("/")
-def index(request: Request):
+@router.get("/", deprecated=True)
+def index():
     """Log in view."""
     return RedirectResponse(email_settings.website_uri)

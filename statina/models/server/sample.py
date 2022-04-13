@@ -333,7 +333,7 @@ class SampleValidator(DataBaseSample):
         allow_population_by_field_name = True
 
 
-class Sample(BaseModel):
+class SampleResponse(BaseModel):
     sample_type: str
     qc_flag: str
     cnv_segment: Optional[str]
@@ -355,4 +355,4 @@ class Sample(BaseModel):
 
 class PaginatedSampleResponse(BaseModel):
     document_count: int
-    documents: List[Sample]
+    documents: List[SampleResponse]

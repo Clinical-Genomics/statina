@@ -18,7 +18,7 @@ from statina.models.database import DataBaseSample, User, DatabaseBatch
 from statina.models.query_params import SamplesQuery
 from statina.models.server.plots.ncv import Zscore131821, ZscoreSamples
 from statina.models.server.sample import (
-    Sample,
+    SampleResponse,
     PaginatedSampleResponse,
     SampleValidator,
 )
@@ -41,7 +41,9 @@ def samples(
     validated_samples: List[SampleValidator] = [
         SampleValidator(**sample.dict()) for sample in database_samples
     ]
-    samples: List[Sample] = [Sample(**sample.dict()) for sample in validated_samples]
+    samples: List[SampleResponse] = [
+        SampleResponse(**sample.dict()) for sample in validated_samples
+    ]
 
     document_count: int = find_samples.count_query_samples(
         adapter=adapter, batch_id=sample_query.batch_id, query_string=sample_query.query_string
@@ -53,7 +55,7 @@ def samples(
     )
 
 
-@router.get("/sample/{sample_id}", response_model=Sample)
+@router.get("/sample/{sample_id}", response_model=SampleResponse)
 def sample(
     sample_id: str,
     current_user: User = Security(get_current_active_user, scopes=["R"]),
@@ -68,7 +70,7 @@ def sample(
         return JSONResponse("Not found", status_code=404)
 
     validated_sample = SampleValidator(**database_sample.dict())
-    sample_view_data = Sample(
+    sample_view_data = SampleResponse(
         sequencing_date=batch.SequencingDate,
         **validated_sample.dict(exclude_none=True),
     )

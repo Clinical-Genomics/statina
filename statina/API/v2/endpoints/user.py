@@ -27,7 +27,7 @@ from statina.API.external.api.deps import (
     create_access_token,
     get_user_scopes,
 )
-from statina.config import email_settings, get_nipt_adapter, settings
+from statina.config import settings, get_nipt_adapter
 from statina.crud import update
 from statina.crud.insert import insert_user
 from statina.exeptions import credentials_exception, forbidden_access_exception
@@ -134,17 +134,15 @@ async def register_user(
     )
     try:
         insert_user(adapter=adapter, user=user)
-        confirmation_link = (
-            f"{email_settings.website_uri}/{user.username}/" f"{user.verification_hex}"
-        )
+        confirmation_link = f"{settings.website_uri}/{user.username}/" f"{user.verification_hex}"
         email_form = FormDataRequest(
-            sender_prefix=email_settings.sender_prefix,
-            email_server_alias=email_settings.email_server_alias,
-            request_uri=email_settings.mail_uri,
+            sender_prefix=settings.sender_prefix,
+            email_server_alias=settings.email_server_alias,
+            request_uri=settings.mail_uri,
             recipients=user.email,
             mail_title="Verify your email",
             mail_body=CONFIRMATION_MESSAGE_TEMPLATE.format(
-                website_uri=email_settings.website_uri,
+                website_uri=settings.website_uri,
                 confirmation_link=confirmation_link,
                 username=user.username,
             ),
@@ -152,7 +150,7 @@ async def register_user(
         background_tasks.add_task(send_email, email_form)
     except Exception as e:
         LOG.error(e)
-        return JSONResponse(f"Could not register user", status_code=500)
+        return JSONResponse("Could not register user", status_code=500)
 
     return JSONResponse(
         content=jsonable_encoder(
@@ -213,15 +211,15 @@ async def validate_user_email(
         update_user.role = "inactive"
         update.update_user(adapter=adapter, user=update_user)
         email_form = FormDataRequest(
-            sender_prefix=email_settings.sender_prefix,
-            email_server_alias=email_settings.email_server_alias,
-            request_uri=email_settings.mail_uri,
-            recipients=email_settings.admin_email,
+            sender_prefix=settings.sender_prefix,
+            email_server_alias=settings.email_server_alias,
+            request_uri=settings.mail_uri,
+            recipients=settings.admin_email,
             mail_title="New user request",
             mail_body=ADMIN_MESSAGE_TEMPLATE.format(
                 username=update_user.username,
                 user_email=update_user.email,
-                website_uri=email_settings.website_uri,
+                website_uri=settings.website_uri,
             ),
         )
         background_tasks.add_task(send_email, email_form)
@@ -251,13 +249,13 @@ async def update_user_role(
     update.update_user(adapter=adapter, user=update_user)
     if old_role in inactive_roles and role not in inactive_roles:
         email_form = FormDataRequest(
-            sender_prefix=email_settings.sender_prefix,
-            email_server_alias=email_settings.email_server_alias,
-            request_uri=email_settings.mail_uri,
+            sender_prefix=settings.sender_prefix,
+            email_server_alias=settings.email_server_alias,
+            request_uri=settings.mail_uri,
             recipients=update_user.email,
             mail_title="Your account has been activated",
             mail_body=ACTIVATION_MESSAGE_TEMPLATE.format(
-                website_uri=email_settings.website_uri, username=update_user.username
+                website_uri=settings.website_uri, username=update_user.username
             ),
         )
         background_tasks.add_task(send_email, email_form)

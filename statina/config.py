@@ -1,7 +1,6 @@
 from pathlib import Path
 from typing import Optional
 
-from fastapi.templating import Jinja2Templates
 from pydantic import BaseSettings
 from pymongo import MongoClient
 
@@ -10,7 +9,6 @@ from statina.adapter.plugin import StatinaAdapter
 NIPT_PACKAGE = Path(__file__).parent
 PACKAGE_ROOT: Path = NIPT_PACKAGE.parent
 ENV_FILE: Path = PACKAGE_ROOT / ".env"
-TEMPLATES_DIR: Path = NIPT_PACKAGE / "API" / "external" / "api" / "api_v1" / "templates"
 
 
 class Settings(BaseSettings):
@@ -23,14 +21,6 @@ class Settings(BaseSettings):
     host: str = "localhost"
     access_token_expire_minutes: int = 15
     port: int = 8000
-
-    class Config:
-        env_file = str(ENV_FILE)
-
-
-class EmailSettings(BaseSettings):
-    """Settings for sending email"""
-
     admin_email: Optional[str]
     sender_prefix: Optional[str]
     mail_uri: Optional[str]
@@ -41,9 +31,30 @@ class EmailSettings(BaseSettings):
         env_file = str(ENV_FILE)
 
 
+class BaseDatasetThresholds(BaseSettings):
+    fetal_fraction_preface: float = 4
+    fetal_fraction_y_for_trisomy: float = 4
+    fetal_fraction_y_max: float = 3
+    fetal_fraction_y_min: float = 0.6
+    fetal_fraction_XXX: float = -1
+    fetal_fraction_X0: float = 3.4
+    y_axis_min: float = -1
+    y_axis_max: float = 20
+    k_upper: float = 0.9809
+    k_lower: float = 0.9799
+    m_lower: float = -4.3987
+    m_upper: float = 6.5958
+
+    trisomy_soft_max: float = 3
+    trisomy_hard_max: float = 4
+    trisomy_hard_min: float = -8
+
+    class Config:
+        env_file = str(ENV_FILE)
+
+
 settings = Settings()
-email_settings = EmailSettings()
-templates = Jinja2Templates(directory=str(TEMPLATES_DIR))
+base_dataset_thresholds = BaseDatasetThresholds()
 
 
 def get_nipt_adapter():

@@ -24,11 +24,11 @@ from statina.crud.find.plots.zscore_plot_data import (
     get_tris_control_normal,
     get_tris_samples,
 )
-from statina.crud.find.samples import count_query_batch_samples, query_batch_samples
+from statina.crud.find.samples import count_query_batch_samples
 from statina.crud.insert import insert_batch, insert_samples
 from statina.crud.utils import zip_dir
 from statina.models.database import DatabaseBatch, DataBaseSample, User
-from statina.models.query_params import BatchesQuery, BatchSamplesQuery
+from statina.models.query_params import BatchesQuery
 from statina.models.server.batch import PaginatedBatchResponse, BatchValidator, Batch
 from statina.models.server.load import BatchRequestBody
 from statina.models.server.plots.coverage import CoveragePlotSampleData
@@ -37,7 +37,7 @@ from statina.models.server.plots.fetal_fraction import (
     FetalFractionSamples,
 )
 from statina.models.server.plots.fetal_fraction_sex import SexChromosomeThresholds
-from statina.models.server.sample import Sample, PaginatedSampleResponse, SampleValidator
+from statina.models.server.sample import SampleValidator
 from statina.parse.batch import get_samples, validate_file_path
 from statina.parse.batch import get_batch as crud_get_batch
 
@@ -116,35 +116,6 @@ def get_batch(
     batch_view_data = Batch(**validated_batch.dict())
     return JSONResponse(
         jsonable_encoder(batch_view_data, by_alias=True),
-        status_code=200,
-    )
-
-
-@router.get("/batch/{batch_id}/samples", response_model=PaginatedSampleResponse, deprecated=True)
-def batch_samples(
-    sample_query: BatchSamplesQuery = Depends(BatchSamplesQuery),
-    current_user: User = Security(get_current_active_user, scopes=["R"]),
-    adapter: StatinaAdapter = Depends(get_nipt_adapter),
-):
-    """Batch view with table of all samples in the batch."""
-
-    samples: List[DataBaseSample] = query_batch_samples(
-        **sample_query.dict(),
-        adapter=adapter,
-    )
-    validated_samples: List[SampleValidator] = [
-        SampleValidator(**sample_obj.dict()) for sample_obj in samples
-    ]
-    samples: List[Sample] = [Sample(**sample.dict()) for sample in validated_samples]
-
-    document_count: int = count_query_batch_samples(
-        adapter=adapter, batch_id=sample_query.batch_id, query_string=sample_query.query_string
-    )
-
-    return JSONResponse(
-        content=jsonable_encoder(
-            PaginatedSampleResponse(document_count=document_count, documents=samples), by_alias=True
-        ),
         status_code=200,
     )
 

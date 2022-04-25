@@ -1,8 +1,11 @@
+from typing import Optional
+
 from pydantic import BaseModel
 
 
 class Dataset(BaseModel):
     name: str
+    comment: Optional[str]
     fetal_fraction_preface: float
     fetal_fraction_y_for_trisomy: float
     fetal_fraction_y_max: float

@@ -32,6 +32,7 @@ class Settings(BaseSettings):
 
 
 class BaseDatasetThresholds(BaseSettings):
+    name: str = "default"
     fetal_fraction_preface: float = 4
     fetal_fraction_y_for_trisomy: float = 4
     fetal_fraction_y_max: float = 3

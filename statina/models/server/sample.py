@@ -76,7 +76,7 @@ class SampleValidator(DataBaseSample):
     qc_flag: str = Field(..., alias="QCFlag")
     cnv_segment: Optional[str] = Field(..., alias="CNVSegment")
     text_warning: Optional[str]
-    dataset: Optional[Any] = base_dataset_thresholds
+    dataset: Optional[Any]
 
     @validator("warnings", always=True)
     def set_warnings(cls, v, values: dict) -> SampleWarning:

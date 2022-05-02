@@ -43,8 +43,8 @@ def samples(
     for database_sample in database_samples:
         validated_samples.append(
             SampleValidator(
-                **database_sample.dict(),
                 dataset=get_dataset(adapter=adapter, batch_id=database_sample.batch_id),
+                **database_sample.dict(),
             )
         )
     samples: List[SampleResponse] = [

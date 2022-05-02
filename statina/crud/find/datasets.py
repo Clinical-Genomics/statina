@@ -14,7 +14,7 @@ def get_dataset(
     if batch_id:
         batch: dict = adapter.batch_collection.find_one({"batch_id": batch_id})
         if not batch:
-            return base_dataset_thresholds
+            return None
         if not batch.get("dataset"):
             return base_dataset_thresholds
         dataset = adapter.dataset_collection.find({"name": batch.get("dataset")})

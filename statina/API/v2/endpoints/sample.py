@@ -40,10 +40,11 @@ def samples(
         **sample_query.dict(), adapter=adapter
     )
     validated_samples: List[SampleValidator] = []
-    for sample in database_samples:
+    for database_sample in database_samples:
         validated_samples.append(
             SampleValidator(
-                **sample.dict(), dataset=get_dataset(adapter=adapter, batch_id=sample.batch_id)
+                **database_sample.dict(),
+                dataset=get_dataset(adapter=adapter, batch_id=database_sample.batch_id),
             )
         )
     samples: List[SampleResponse] = [

@@ -253,7 +253,9 @@ def coverage(
     )
 
     validated_samples: List[SampleValidator] = [
-        SampleValidator(**db_sample.dict(), dataset=get_dataset(adapter=adapter, batch_id=batch_id))
+        SampleValidator(
+            **db_sample.dict(), **{"dataset": get_dataset(adapter=adapter, batch_id=batch_id)}
+        )
         for db_sample in db_samples
     ]
 

@@ -1,13 +1,12 @@
-from typing import Literal, Optional, List
+from typing import Literal, Optional, List, Any
 
 from pydantic import BaseModel, validator, Field
 
 from statina.API.external.constants import (
     SEX_CHROM_ABNORM,
     TRIS_CHROM_ABNORM,
-    TRISOMI_TRESHOLDS,
-    FF_TRESHOLDS,
 )
+from statina.config import base_dataset_thresholds
 from statina.constants import sample_status_options
 from statina.models.database import DataBaseSample
 from statina.models.server.plots.fetal_fraction_sex import x_get_y
@@ -77,6 +76,7 @@ class SampleValidator(DataBaseSample):
     qc_flag: str = Field(..., alias="QCFlag")
     cnv_segment: Optional[str] = Field(..., alias="CNVSegment")
     text_warning: Optional[str]
+    dataset: Optional[Any] = base_dataset_thresholds
 
     @validator("warnings", always=True)
     def set_warnings(cls, v, values: dict) -> SampleWarning:
@@ -182,7 +182,7 @@ class SampleValidator(DataBaseSample):
     def set_sex(cls, v, values: dict) -> str:
         """Set sex based on fetal fraction Y thresholds"""
 
-        return "XY" if values.get("FFY") >= FF_TRESHOLDS["fetal_fraction_y_min"] else "XX"
+        return "XY" if values.get("FFY") >= values.get("dataset").fetal_fraction_y_min else "XX"
 
     @validator("included", always=True)
     def set_include(cls, v, values: dict) -> Optional[Include]:
@@ -190,14 +190,14 @@ class SampleValidator(DataBaseSample):
 
     @classmethod
     def get_tris_warning(
-        cls, z_score: float, fetal_fraction_pf: float, fetal_fraction_y: float
+        cls, z_score: float, fetal_fraction_pf: float, fetal_fraction_y: float, dataset: Any
     ) -> str:
         """Get automated trisomy warning, based on preset Zscore thresholds"""
-        hard_max = TRISOMI_TRESHOLDS["hard_max"]["Zscore"]
-        soft_max = TRISOMI_TRESHOLDS["soft_max"]["Zscore"]
-        hard_min = TRISOMI_TRESHOLDS["hard_min"]["Zscore"]
-        preface_threshold = FF_TRESHOLDS["fetal_fraction_preface"]
-        fetal_fraction_y_threshold = FF_TRESHOLDS["fetal_fraction_y_for_trisomy"]
+        hard_max = dataset.trisomy_hard_max
+        soft_max = dataset.trisomy_soft_max
+        hard_min = dataset.trisomy_hard_min
+        preface_threshold = dataset.fetal_fraction_preface
+        fetal_fraction_y_threshold = dataset.fetal_fraction_y_for_trisomy
 
         if fetal_fraction_pf is None or z_score is None or fetal_fraction_y is None:
             return "default"
@@ -213,23 +213,23 @@ class SampleValidator(DataBaseSample):
         return "default"
 
     @classmethod
-    def get_ff_y_warning(cls, fetal_fraction_y: float) -> str:
+    def get_ff_y_warning(cls, fetal_fraction_y: float, dataset: Any) -> str:
         """Get fetal fraction warning based on preset threshold"""
 
         if not isinstance(fetal_fraction_y, (float, int)):
             return "default"
 
-        if fetal_fraction_y < FF_TRESHOLDS["fetal_fraction_y_max"] and fetal_fraction_y != 0:
+        if fetal_fraction_y < dataset.fetal_fraction_y_max and fetal_fraction_y != 0:
             return "danger"
 
         return "default"
 
     @classmethod
-    def get_x0_warning(cls, fetal_fraction_y: float, fetal_fraction_x: float) -> str:
+    def get_x0_warning(cls, fetal_fraction_y: float, fetal_fraction_x: float, dataset: Any) -> str:
         """Get fetal fraction warning based on preset threshold"""
 
-        x_treshold = FF_TRESHOLDS["fetal_fraction_X0"]
-        y_treshold = FF_TRESHOLDS["fetal_fraction_y_min"]
+        x_treshold = dataset.fetal_fraction_X0
+        y_treshold = dataset.fetal_fraction_y_min
 
         if not (
             isinstance(fetal_fraction_y, (float, int))
@@ -243,11 +243,11 @@ class SampleValidator(DataBaseSample):
         return "default"
 
     @classmethod
-    def get_XXX_warning(cls, fetal_fraction_y: float, fetal_fraction_x: float) -> str:
+    def get_XXX_warning(cls, fetal_fraction_y: float, fetal_fraction_x: float, dataset: Any) -> str:
         """Get fetal fraction warning based on preset threshold"""
 
-        x_treshold = FF_TRESHOLDS["fetal_fraction_XXX"]
-        y_treshold = FF_TRESHOLDS["fetal_fraction_y_min"]
+        x_treshold = dataset.fetal_fraction_XXX
+        y_treshold = dataset.fetal_fraction_y_min
 
         if not (
             isinstance(fetal_fraction_y, (float, int))
@@ -261,22 +261,26 @@ class SampleValidator(DataBaseSample):
         return "default"
 
     @classmethod
-    def get_ff_preface_warning(cls, fetal_fraction_pf: float, fetal_fraction_y: float) -> str:
+    def get_ff_preface_warning(
+        cls, fetal_fraction_pf: float, fetal_fraction_y: float, dataset: Any
+    ) -> str:
         """Get fetal fraction preface warning based on preset threshold"""
 
         if not isinstance(fetal_fraction_pf, (float, int)):
             return "default"
-        if fetal_fraction_pf < FF_TRESHOLDS["fetal_fraction_preface"]:
+        if fetal_fraction_pf < dataset.fetal_fraction_preface:
             return "danger"
         return "default"
 
     @classmethod
-    def get_other_warning(cls, fetal_fraction_y: float, fetal_fraction_x: float) -> str:
+    def get_other_warning(
+        cls, fetal_fraction_y: float, fetal_fraction_x: float, dataset: Any
+    ) -> str:
         """Get fetal fraction warning based on preset threshold"""
 
-        k_lower: float = FF_TRESHOLDS["k_lower"]
-        m_lower: float = FF_TRESHOLDS["m_lower"]
-        y_treshold: float = FF_TRESHOLDS["fetal_fraction_y_min"]
+        k_lower: float = dataset.k_lower
+        m_lower: float = dataset.m_lower
+        y_treshold: float = dataset.fetal_fraction_y_min
 
         if not (
             isinstance(fetal_fraction_y, (float, int))
@@ -290,12 +294,12 @@ class SampleValidator(DataBaseSample):
         return "default"
 
     @classmethod
-    def get_XXY_warning(cls, fetal_fraction_y: float, fetal_fraction_x: float) -> str:
+    def get_XXY_warning(cls, fetal_fraction_y: float, fetal_fraction_x: float, dataset: Any) -> str:
         """Get fetal fraction warning based on preset threshold"""
 
-        k_upper: float = FF_TRESHOLDS["k_upper"]
-        m_upper: float = FF_TRESHOLDS["m_upper"]
-        x_threshold: float = FF_TRESHOLDS["fetal_fraction_X0"]
+        k_upper: float = dataset.k_upper
+        m_upper: float = dataset.m_upper
+        x_threshold: float = dataset.fetal_fraction_X0
 
         if not (
             isinstance(fetal_fraction_y, (float, int))
@@ -310,12 +314,12 @@ class SampleValidator(DataBaseSample):
         return "default"
 
     @classmethod
-    def get_XYY_warning(cls, fetal_fraction_y: float, fetal_fraction_x: float) -> str:
+    def get_XYY_warning(cls, fetal_fraction_y: float, fetal_fraction_x: float, dataset: Any) -> str:
         """Get fetal fraction warning based on preset threshold"""
 
-        k_upper: float = FF_TRESHOLDS["k_upper"]
-        m_upper: float = FF_TRESHOLDS["m_upper"]
-        x_treshold: float = FF_TRESHOLDS["fetal_fraction_X0"]
+        k_upper: float = dataset.k_upper
+        m_upper: float = dataset.m_upper
+        x_treshold: float = dataset.fetal_fraction_X0
 
         if not (
             isinstance(fetal_fraction_y, (float, int))

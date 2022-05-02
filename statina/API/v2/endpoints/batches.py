@@ -10,11 +10,11 @@ from fastapi.responses import FileResponse, JSONResponse, StreamingResponse
 import statina
 import statina.crud.find.plots.fetal_fraction_plot_data as get_fetal_fraction
 from statina.adapter import StatinaAdapter
-from statina.API.external.constants import TRISOMI_TRESHOLDS
 from statina.API.v2.endpoints.user import get_current_active_user
-from statina.config import get_nipt_adapter
+from statina.config import get_nipt_adapter, base_dataset_thresholds
 from statina.crud import update
 from statina.crud.find.batches import query_batches, count_query_batches
+from statina.crud.find.datasets import get_dataset
 from statina.crud.find.plots.coverage_plot_data import (
     get_box_data_for_coverage_plot,
     get_scatter_data_for_coverage_plot,
@@ -26,7 +26,7 @@ from statina.crud.find.plots.zscore_plot_data import (
 )
 from statina.crud.find.samples import count_query_batch_samples
 from statina.crud.insert import insert_batch, insert_samples
-from statina.crud.utils import zip_dir
+from statina.crud.utils import zip_dir, get_trisomy_metadata
 from statina.models.database import DatabaseBatch, DataBaseSample, User
 from statina.models.query_params import BatchesQuery
 from statina.models.server.batch import PaginatedBatchResponse, BatchValidator, Batch
@@ -157,10 +157,11 @@ def zscore_plot(
 ):
     """Batch view with with Zscore plot"""
 
+    dataset = get_dataset(adapter=adapter, batch_id=batch_id)
     return JSONResponse(
         content=jsonable_encoder(
             dict(
-                tris_thresholds=TRISOMI_TRESHOLDS,
+                tris_thresholds=get_trisomy_metadata(dataset=dataset),
                 chromosomes=[ncv],
                 ncv_chrom_data={ncv: get_tris_samples(adapter=adapter, chr=ncv, batch_id=batch_id)},
                 normal_data={ncv: get_tris_control_normal(adapter, ncv)},
@@ -250,8 +251,10 @@ def coverage(
     db_samples: List[DataBaseSample] = statina.crud.find.samples.batch_samples(
         batch_id=batch_id, adapter=adapter
     )
+
     validated_samples: List[SampleValidator] = [
-        SampleValidator(**db_sample.dict()) for db_sample in db_samples
+        SampleValidator(**db_sample.dict(), dataset=get_dataset(adapter=adapter, batch_id=batch_id))
+        for db_sample in db_samples
     ]
 
     scatter_data: Dict[str, CoveragePlotSampleData] = get_scatter_data_for_coverage_plot(

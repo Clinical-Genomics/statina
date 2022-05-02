@@ -13,6 +13,7 @@ from statina.constants import sample_status_options
 from statina.crud import update
 from statina.crud.find import samples as find_samples
 from statina.crud.find import batches as find_batches
+from statina.crud.find.datasets import get_dataset
 from statina.crud.find.plots import zscore_plot_data
 from statina.models.database import DataBaseSample, User, DatabaseBatch
 from statina.models.query_params import SamplesQuery
@@ -38,9 +39,13 @@ def samples(
     database_samples: List[DataBaseSample] = find_samples.query_samples(
         **sample_query.dict(), adapter=adapter
     )
-    validated_samples: List[SampleValidator] = [
-        SampleValidator(**sample.dict()) for sample in database_samples
-    ]
+    validated_samples: List[SampleValidator] = []
+    for sample in database_samples:
+        validated_samples.append(
+            SampleValidator(
+                **sample.dict(), dataset=get_dataset(adapter=adapter, batch_id=sample.batch_id)
+            )
+        )
     samples: List[SampleResponse] = [
         SampleResponse(**sample.dict()) for sample in validated_samples
     ]
@@ -69,7 +74,10 @@ def sample(
     if not database_sample:
         return JSONResponse("Not found", status_code=404)
 
-    validated_sample = SampleValidator(**database_sample.dict())
+    validated_sample = SampleValidator(
+        **database_sample.dict(),
+        dataset=get_dataset(adapter=adapter, batch_id=database_sample.batch_id),
+    )
     sample_view_data = SampleResponse(
         sequencing_date=batch.SequencingDate,
         **validated_sample.dict(exclude_none=True),

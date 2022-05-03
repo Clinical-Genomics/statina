@@ -21,7 +21,7 @@ class DatabaseBatch(BaseModel):
     Stdev_X: Optional[float]
     Stdev_Y: Optional[float]
     comment: Optional[str] = ""
-    dataset: Optional[str] = None
+    dataset: Optional[str] = "default"
 
     class Config:
         validate_assignment = True

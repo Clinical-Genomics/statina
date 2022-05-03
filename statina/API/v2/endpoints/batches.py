@@ -6,12 +6,13 @@ from typing import Dict, List, Literal, Optional
 from fastapi import APIRouter, Depends, Form, Query, Security
 from fastapi.encoders import jsonable_encoder
 from fastapi.responses import FileResponse, JSONResponse, StreamingResponse
+from starlette import status
 
 import statina
 import statina.crud.find.plots.fetal_fraction_plot_data as get_fetal_fraction
 from statina.adapter import StatinaAdapter
 from statina.API.v2.endpoints.user import get_current_active_user
-from statina.config import get_nipt_adapter, base_dataset_thresholds
+from statina.config import get_nipt_adapter
 from statina.crud import update
 from statina.crud.find.batches import query_batches, count_query_batches
 from statina.crud.find.datasets import get_dataset
@@ -198,7 +199,9 @@ def fetal_fraction_XY(
     x_max = max(control.FFX + cases.FFX) + 1
     x_min = min(control.FFX + cases.FFX) - 1
 
-    sex_thresholds = SexChromosomeThresholds(x_min=x_min, x_max=x_max)
+    sex_thresholds = SexChromosomeThresholds(
+        x_min=x_min, x_max=x_max, dataset=get_dataset(adapter=adapter, batch_id=batch_id)
+    )
     return JSONResponse(
         content=jsonable_encoder(
             dict(
@@ -252,12 +255,10 @@ def coverage(
         batch_id=batch_id, adapter=adapter
     )
 
-    validated_samples: List[SampleValidator] = [
-        SampleValidator(
-            **db_sample.dict(), **{"dataset": get_dataset(adapter=adapter, batch_id=batch_id)}
-        )
-        for db_sample in db_samples
-    ]
+    validated_samples: List[SampleValidator] = []
+    for db_sample in db_samples:
+        db_sample.dataset = get_dataset(adapter=adapter, batch_id=batch_id)
+        validated_samples.append(SampleValidator(**db_sample.dict()))
 
     scatter_data: Dict[str, CoveragePlotSampleData] = get_scatter_data_for_coverage_plot(
         validated_samples
@@ -289,6 +290,23 @@ async def batch_update_comment(
     update.update_batch(adapter=adapter, batch=batch)
 
     return JSONResponse(content="Batch comment updated", status_code=202)
+
+
+@router.put("/batch/{batch_id}/dataset")
+async def batch_update_dataset(
+    batch_id: str,
+    dataset: Optional[str] = Form(...),
+    adapter: StatinaAdapter = Depends(get_nipt_adapter),
+    current_user: User = Security(get_current_active_user, scopes=["RW"]),
+):
+    """Update batch dataset"""
+
+    batch: DatabaseBatch = statina.crud.find.batches.batch(batch_id=batch_id, adapter=adapter)
+    if adapter.dataset_collection.find_one({"name": dataset}):
+        batch.dataset = dataset
+        update.update_batch(adapter=adapter, batch=batch)
+        return JSONResponse(content="Batch dataset updated", status_code=202)
+    return JSONResponse(content="No such dataset", status_code=status.HTTP_400_BAD_REQUEST)
 
 
 @router.patch("/batch/{batch_id}/include_samples")

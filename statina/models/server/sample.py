@@ -6,7 +6,6 @@ from statina.API.external.constants import (
     SEX_CHROM_ABNORM,
     TRIS_CHROM_ABNORM,
 )
-from statina.config import base_dataset_thresholds
 from statina.constants import sample_status_options
 from statina.models.database import DataBaseSample
 from statina.models.server.plots.fetal_fraction_sex import x_get_y
@@ -76,7 +75,6 @@ class SampleValidator(DataBaseSample):
     qc_flag: str = Field(..., alias="QCFlag")
     cnv_segment: Optional[str] = Field(..., alias="CNVSegment")
     text_warning: Optional[str]
-    dataset: Optional[Any]
 
     @validator("warnings", always=True)
     def set_warnings(cls, v, values: dict) -> SampleWarning:
@@ -86,38 +84,42 @@ class SampleValidator(DataBaseSample):
         fetal_fraction_pf = values.get("FF_Formatted")
         fetal_fraction_y = values.get("FFY")
         fetal_fraction_x = values.get("FFX")
+        dataset = values.get("dataset")
         sample_warnings["fetal_fraction_preface"]: str = cls.get_ff_preface_warning(
-            fetal_fraction_pf=fetal_fraction_pf, fetal_fraction_y=fetal_fraction_y
+            fetal_fraction_pf=fetal_fraction_pf, fetal_fraction_y=fetal_fraction_y, dataset=dataset
         )
         sample_warnings["other"]: str = cls.get_other_warning(
-            fetal_fraction_y=fetal_fraction_y, fetal_fraction_x=fetal_fraction_x
+            fetal_fraction_y=fetal_fraction_y, fetal_fraction_x=fetal_fraction_x, dataset=dataset
         )
         sample_warnings["fetal_fraction_y"]: str = cls.get_ff_y_warning(
-            fetal_fraction_y=fetal_fraction_y
+            dataset=dataset, fetal_fraction_y=fetal_fraction_y
         )
         sample_warnings["x0"]: str = cls.get_x0_warning(
-            fetal_fraction_y=fetal_fraction_y, fetal_fraction_x=fetal_fraction_x
+            dataset=dataset, fetal_fraction_y=fetal_fraction_y, fetal_fraction_x=fetal_fraction_x
         )
         sample_warnings["xxx"]: str = cls.get_XXX_warning(
-            fetal_fraction_y=fetal_fraction_y, fetal_fraction_x=fetal_fraction_x
+            dataset=dataset, fetal_fraction_y=fetal_fraction_y, fetal_fraction_x=fetal_fraction_x
         )
         sample_warnings["xyy"]: str = cls.get_XYY_warning(
-            fetal_fraction_y=fetal_fraction_y, fetal_fraction_x=fetal_fraction_x
+            dataset=dataset, fetal_fraction_y=fetal_fraction_y, fetal_fraction_x=fetal_fraction_x
         )
         sample_warnings["xxy"]: str = cls.get_XXY_warning(
-            fetal_fraction_y=fetal_fraction_y, fetal_fraction_x=fetal_fraction_x
+            dataset=dataset, fetal_fraction_y=fetal_fraction_y, fetal_fraction_x=fetal_fraction_x
         )
         sample_warnings["z_score_13"]: str = cls.get_tris_warning(
+            dataset=dataset,
             z_score=values.get("Zscore_13"),
             fetal_fraction_pf=fetal_fraction_pf,
             fetal_fraction_y=fetal_fraction_y,
         )
         sample_warnings["z_score_18"]: str = cls.get_tris_warning(
+            dataset=dataset,
             z_score=values.get("Zscore_18"),
             fetal_fraction_pf=fetal_fraction_pf,
             fetal_fraction_y=fetal_fraction_y,
         )
         sample_warnings["z_score_21"]: str = cls.get_tris_warning(
+            dataset=dataset,
             z_score=values.get("Zscore_21"),
             fetal_fraction_pf=fetal_fraction_pf,
             fetal_fraction_y=fetal_fraction_y,

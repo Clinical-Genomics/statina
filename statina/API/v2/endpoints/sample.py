@@ -16,6 +16,7 @@ from statina.crud.find import batches as find_batches
 from statina.crud.find.datasets import get_dataset
 from statina.crud.find.plots import zscore_plot_data
 from statina.models.database import DataBaseSample, User, DatabaseBatch
+from statina.models.database.dataset import Dataset
 from statina.models.query_params import SamplesQuery
 from statina.models.server.plots.ncv import Zscore131821, ZscoreSamples
 from statina.models.server.sample import (
@@ -41,14 +42,12 @@ def samples(
     )
     validated_samples: List[SampleValidator] = []
     for database_sample in database_samples:
-        dataset = get_dataset(adapter=adapter, batch_id=database_sample.batch_id)
-        database_sample_dict = database_sample.dict()
-        database_sample_dict.update({"dataset": dataset})
-        validated_samples.append(
-            SampleValidator(
-                **database_sample_dict,
-            )
+        dataset: Dataset = get_dataset(adapter=adapter, batch_id=database_sample.batch_id)
+        database_sample.dataset = dataset
+        validated_sample = SampleValidator(
+            **database_sample.dict(),
         )
+        validated_samples.append(validated_sample)
     samples: List[SampleResponse] = [
         SampleResponse(**sample.dict()) for sample in validated_samples
     ]
@@ -77,10 +76,8 @@ def sample(
     if not database_sample:
         return JSONResponse("Not found", status_code=404)
 
-    validated_sample = SampleValidator(
-        **database_sample.dict(),
-        dataset=get_dataset(adapter=adapter, batch_id=database_sample.batch_id),
-    )
+    database_sample.dataset = get_dataset(adapter=adapter, batch_id=database_sample.batch_id)
+    validated_sample = SampleValidator(**database_sample.dict())
     sample_view_data = SampleResponse(
         sequencing_date=batch.SequencingDate,
         **validated_sample.dict(exclude_none=True),

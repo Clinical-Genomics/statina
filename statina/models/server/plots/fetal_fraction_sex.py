@@ -31,7 +31,7 @@ def y_get_x(y: float, k: float, m: float) -> float:
 class SexChromosomeThresholds:
     """Threshold lines for the Fetal Fraction XY plot"""
 
-    def __init__(self, x_min, x_max, dataset=config.base_dataset_thresholds):
+    def __init__(self, x_min, x_max, dataset):
         self.x_min: float = x_min
         self.x_max: float = x_max
         self.y_axis_min: float = dataset.y_axis_min

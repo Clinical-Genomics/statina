@@ -2,6 +2,8 @@ from typing import Literal, Optional
 
 from pydantic import BaseModel, Field
 
+from statina.models.database.dataset import Dataset
+
 status_options = Literal[
     "Probable",
     "Suspected",
@@ -104,6 +106,7 @@ class DataBaseSample(BaseModel):
     status_change_XXX: Optional[str] = ""
     status_change_XXY: Optional[str] = ""
     status_change_XYY: Optional[str] = ""
+    dataset: Optional[Dataset]
 
     class Config:
         allow_population_by_field_name = True

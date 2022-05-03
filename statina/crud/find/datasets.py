@@ -11,15 +11,15 @@ def get_dataset(
     adapter: StatinaAdapter, batch_id: Optional[str] = None, name: Optional[str] = None
 ) -> Optional[Dataset]:
     if name:
-        dataset = adapter.dataset_collection.find({"name": name})
+        dataset = adapter.dataset_collection.find_one({"name": name})
         return Dataset(**dict(dataset))
     if batch_id:
         batch: dict = adapter.batch_collection.find_one({"batch_id": batch_id})
         if not batch:
             return None
         if not batch.get("dataset"):
-            return adapter.dataset_collection.find({"name": "default"})
-        dataset = adapter.dataset_collection.find({"name": batch.get("dataset")})
+            return Dataset(**dict(adapter.dataset_collection.find_one({"name": "default"})))
+        dataset = adapter.dataset_collection.find_one({"name": batch.get("dataset")})
         if dataset:
             return Dataset(**dict(dataset))
 

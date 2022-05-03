@@ -10,7 +10,7 @@ from starlette.responses import JSONResponse
 from statina.API.v2.endpoints.user import get_current_active_user
 from statina.adapter import StatinaAdapter
 from statina.config import get_nipt_adapter
-from statina.crud.find.datasets import query_datasets, get_dataset, count_query_datasets
+from statina.crud.find.datasets import query_datasets, count_query_datasets
 from statina.models.database import User
 from statina.models.database.dataset import Dataset
 from statina.models.query_params import DatasetsQuery
@@ -54,14 +54,14 @@ def list_datasets(
 
 
 @router.get("/dataset/{name}", response_model=Dataset)
-def get_dataset(
+def get_dataset_by_name(
     name: str,
     adapter: StatinaAdapter = Depends(get_nipt_adapter),
     current_user: User = Security(get_current_active_user, scopes=["R"]),
 ):
     """Get dataset by name"""
 
-    return get_dataset(adapter=adapter, name=name)
+    return adapter.dataset_collection.find_one({"name": name})
 
 
 @router.post("/dataset/{name}", response_model=Dataset)
@@ -114,5 +114,5 @@ def update_dataset(
     current_user: User = Security(get_current_active_user, scopes=["RW"]),
 ):
     """Update dataset"""
-    adapter.dataset_collection.update_one({"name": name}, dataset_form.dict())
+    adapter.dataset_collection.update_one({"name": name}, {"$set": dataset_form.dict()})
     return adapter.dataset_collection.find_one({"name": name})

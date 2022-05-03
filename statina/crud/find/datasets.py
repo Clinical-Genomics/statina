@@ -52,3 +52,17 @@ def query_datasets(
         .limit(limit)
     )
     return parse_obj_as(List[Dataset], list(datasets))
+
+
+def count_query_datasets(
+    adapter: StatinaAdapter,
+    query_string: Optional[str] = "",
+) -> int:
+    """
+    Query batches from the batch collection.
+    Pagination can be enabled with <page_size> and <page_num> options.
+    No pagination enabled by default.
+    """
+    return adapter.dataset_collection.count_documents(
+        filter=get_datasets_text_query(query_string=query_string)
+    )

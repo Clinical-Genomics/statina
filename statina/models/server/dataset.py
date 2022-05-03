@@ -1,8 +1,10 @@
 import inspect
-from typing import Dict, Type, TypeVar, Protocol, Generic, NewType, Optional
+from typing import Dict, Type, TypeVar, Protocol, Generic, NewType, Optional, List
 
 from fastapi import Depends, FastAPI, File, Form
-from pydantic import BaseModel, validator, BaseSettings, Json
+from pydantic import BaseModel, validator, BaseSettings, Json, Extra
+
+from statina.models.database.dataset import Dataset
 
 app = FastAPI()
 
@@ -35,7 +37,6 @@ def as_form(cls: Type[BaseModel]):
 
 @as_form
 class DatasetForm(BaseModel):
-    name: str
     comment: Optional[str] = ""
     fetal_fraction_preface: float
     fetal_fraction_y_for_trisomy: float
@@ -52,3 +53,11 @@ class DatasetForm(BaseModel):
     trisomy_soft_max: float
     trisomy_hard_max: float
     trisomy_hard_min: float
+
+    class Config:
+        extra = Extra.allow
+
+
+class PaginatedDatasetResponse(BaseModel):
+    document_count: int
+    documents: List[Dataset]

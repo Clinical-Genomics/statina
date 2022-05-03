@@ -20,7 +20,7 @@ LOG = logging.getLogger(__name__)
 router = APIRouter(prefix="/v2")
 
 
-@router.get("/datasets", response_model=List[Dataset])
+@router.get("/datasets", response_model=List[PaginatedDatasetResponse])
 def get_datasets(
     query: DatasetsQuery = Depends(DatasetsQuery),
     adapter: StatinaAdapter = Depends(get_nipt_adapter),

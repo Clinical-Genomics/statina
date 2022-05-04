@@ -36,6 +36,7 @@ def external(version: str) -> FastAPI:
 
     external_app.include_router(external_api_v2.base.router, tags=["base_v2"])
     external_app.include_router(external_api_v2.batches.router, tags=["batches_v2"])
+    external_app.include_router(external_api_v2.datasets.router, tags=["datasets_v2"])
     external_app.include_router(external_api_v2.sample.router, tags=["sample_v2"])
     external_app.include_router(external_api_v2.statistics.router, tags=["statistics_v2"])
     external_app.include_router(external_api_v2.user.router, tags=["user_v2"])

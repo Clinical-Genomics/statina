@@ -64,6 +64,7 @@ class Batch(BaseModel):
     comment: Optional[str]
     median: Median
     stdev: Stdev
+    dataset: Optional[str]
 
     class Config:
         validate_assignment = True

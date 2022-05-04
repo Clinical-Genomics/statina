@@ -35,15 +35,17 @@ def get_scatter_data_for_coverage_plot(
     return data
 
 
-def get_box_data_for_coverage_plot(samples: List[DataBaseSample]) -> Dict[int, List[float]]:
+def get_box_data_for_coverage_plot(
+    validated_samples: List[DataBaseSample],
+) -> Dict[int, List[float]]:
     """Coverage Ratio data for Coverage Plot."""
 
-    data = {}
+    box_data = {}
     for chromosome in range(1, 23):
-        data[chromosome] = []
-        for sample in samples:
+        box_data[chromosome] = []
+        for sample in validated_samples:
             ratio = sample.dict().get(f"Chr{chromosome}_Ratio")
             if ratio is None:
                 continue
-            data[chromosome].append(ratio)
-    return data
+            box_data[chromosome].append(ratio)
+    return box_data

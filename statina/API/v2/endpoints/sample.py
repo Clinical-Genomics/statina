@@ -13,12 +13,14 @@ from statina.constants import sample_status_options
 from statina.crud import update
 from statina.crud.find import samples as find_samples
 from statina.crud.find import batches as find_batches
+from statina.crud.find.datasets import get_dataset
 from statina.crud.find.plots import zscore_plot_data
 from statina.models.database import DataBaseSample, User, DatabaseBatch
+from statina.models.database.dataset import Dataset
 from statina.models.query_params import SamplesQuery
 from statina.models.server.plots.ncv import Zscore131821, ZscoreSamples
 from statina.models.server.sample import (
-    Sample,
+    SampleResponse,
     PaginatedSampleResponse,
     SampleValidator,
 )
@@ -38,10 +40,17 @@ def samples(
     database_samples: List[DataBaseSample] = find_samples.query_samples(
         **sample_query.dict(), adapter=adapter
     )
-    validated_samples: List[SampleValidator] = [
-        SampleValidator(**sample.dict()) for sample in database_samples
+    validated_samples: List[SampleValidator] = []
+    for database_sample in database_samples:
+        dataset: Dataset = get_dataset(adapter=adapter, batch_id=database_sample.batch_id)
+        database_sample.dataset = dataset
+        validated_sample = SampleValidator(
+            **database_sample.dict(),
+        )
+        validated_samples.append(validated_sample)
+    samples: List[SampleResponse] = [
+        SampleResponse(**sample.dict()) for sample in validated_samples
     ]
-    samples: List[Sample] = [Sample(**sample.dict()) for sample in validated_samples]
 
     document_count: int = find_samples.count_query_samples(
         adapter=adapter, batch_id=sample_query.batch_id, query_string=sample_query.query_string
@@ -53,7 +62,7 @@ def samples(
     )
 
 
-@router.get("/sample/{sample_id}", response_model=Sample)
+@router.get("/sample/{sample_id}", response_model=SampleResponse)
 def sample(
     sample_id: str,
     current_user: User = Security(get_current_active_user, scopes=["R"]),
@@ -67,8 +76,9 @@ def sample(
     if not database_sample:
         return JSONResponse("Not found", status_code=404)
 
+    database_sample.dataset = get_dataset(adapter=adapter, batch_id=database_sample.batch_id)
     validated_sample = SampleValidator(**database_sample.dict())
-    sample_view_data = Sample(
+    sample_view_data = SampleResponse(
         sequencing_date=batch.SequencingDate,
         **validated_sample.dict(exclude_none=True),
     )

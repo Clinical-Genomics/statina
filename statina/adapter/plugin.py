@@ -18,5 +18,6 @@ class StatinaAdapter(MongoAdapter):
         self.sample_collection: Collection = self.db.sample
         self.batch_collection: Collection = self.db.batch
         self.user_collection: Collection = self.db.user
+        self.dataset_collection: Collection = self.db.dataset
 
         LOG.info("Use database %s.", db_name)

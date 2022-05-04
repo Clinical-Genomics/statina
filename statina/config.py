@@ -1,7 +1,6 @@
 from pathlib import Path
 from typing import Optional
 
-from fastapi.templating import Jinja2Templates
 from pydantic import BaseSettings
 from pymongo import MongoClient
 
@@ -10,7 +9,6 @@ from statina.adapter.plugin import StatinaAdapter
 NIPT_PACKAGE = Path(__file__).parent
 PACKAGE_ROOT: Path = NIPT_PACKAGE.parent
 ENV_FILE: Path = PACKAGE_ROOT / ".env"
-TEMPLATES_DIR: Path = NIPT_PACKAGE / "API" / "external" / "api" / "api_v1" / "templates"
 
 
 class Settings(BaseSettings):
@@ -23,14 +21,6 @@ class Settings(BaseSettings):
     host: str = "localhost"
     access_token_expire_minutes: int = 15
     port: int = 8000
-
-    class Config:
-        env_file = str(ENV_FILE)
-
-
-class EmailSettings(BaseSettings):
-    """Settings for sending email"""
-
     admin_email: Optional[str]
     sender_prefix: Optional[str]
     mail_uri: Optional[str]
@@ -42,8 +32,6 @@ class EmailSettings(BaseSettings):
 
 
 settings = Settings()
-email_settings = EmailSettings()
-templates = Jinja2Templates(directory=str(TEMPLATES_DIR))
 
 
 def get_nipt_adapter():

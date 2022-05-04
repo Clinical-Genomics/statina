@@ -1,6 +1,6 @@
 import io
 from pathlib import Path
-from typing import Tuple, Union
+from typing import Tuple, Union, Any
 from zipfile import ZipFile, ZIP_DEFLATED
 
 
@@ -25,3 +25,23 @@ def zip_dir(source_dir: Union[str, Path]) -> io.BytesIO:
             zf.write(filename=file.as_posix(), arcname=file.as_posix()[len_src_path:])
     file_obj.seek(0)
     return file_obj
+
+
+def get_trisomy_metadata(dataset: Any) -> dict:
+    return {
+        "soft_max": {
+            "Zscore": dataset.trisomy_soft_max,
+            "color": "orange",
+            "text": f"Warning threshold = {dataset.trisomy_soft_max}",
+        },
+        "hard_max": {
+            "Zscore": dataset.trisomy_hard_max,
+            "color": "red",
+            "text": f"Threshold = {dataset.trisomy_hard_max}",
+        },
+        "hard_min": {
+            "Zscore": dataset.trisomy_hard_min,
+            "color": "red",
+            "text": f"Threshold = {dataset.trisomy_hard_min}",
+        },
+    }

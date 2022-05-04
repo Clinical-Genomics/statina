@@ -1,10 +1,9 @@
-from dataclasses import dataclass
 from typing import List, Optional
 
 import numpy as np
 from pydantic import BaseModel, validator
 
-from statina.API.external.constants import FF_TRESHOLDS
+from statina import config
 
 
 class ThresholdLine(BaseModel):
@@ -32,19 +31,18 @@ def y_get_x(y: float, k: float, m: float) -> float:
 class SexChromosomeThresholds:
     """Threshold lines for the Fetal Fraction XY plot"""
 
-    y_axis_min: float = FF_TRESHOLDS["y_axis_min"]
-    y_axis_max: float = FF_TRESHOLDS["y_axis_max"]
-    xx_lower: float = FF_TRESHOLDS["fetal_fraction_XXX"]
-    xx_upper: float = FF_TRESHOLDS["fetal_fraction_X0"]
-    xy_lowest: float = FF_TRESHOLDS["fetal_fraction_y_min"]
-    k_upper: float = FF_TRESHOLDS["k_upper"]
-    k_lower: float = FF_TRESHOLDS["k_lower"]
-    m_lower: float = FF_TRESHOLDS["m_lower"]
-    m_upper: float = FF_TRESHOLDS["m_upper"]
-
-    def __init__(self, x_min, x_max):
+    def __init__(self, x_min, x_max, dataset):
         self.x_min: float = x_min
         self.x_max: float = x_max
+        self.y_axis_min: float = dataset.y_axis_min
+        self.y_axis_max: float = dataset.y_axis_max
+        self.xx_lower: float = dataset.fetal_fraction_XXX
+        self.xx_upper: float = dataset.fetal_fraction_X0
+        self.xy_lowest: float = dataset.fetal_fraction_y_min
+        self.k_upper: float = dataset.k_upper
+        self.k_lower: float = dataset.k_lower
+        self.m_lower: float = dataset.m_lower
+        self.m_upper: float = dataset.m_upper
 
     def XXY(self) -> ThresholdLine:
         """Returning a threshold line to separate XYY from XXY"""

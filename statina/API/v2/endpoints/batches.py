@@ -6,15 +6,16 @@ from typing import Dict, List, Literal, Optional
 from fastapi import APIRouter, Depends, Form, Query, Security
 from fastapi.encoders import jsonable_encoder
 from fastapi.responses import FileResponse, JSONResponse, StreamingResponse
+from starlette import status
 
 import statina
 import statina.crud.find.plots.fetal_fraction_plot_data as get_fetal_fraction
 from statina.adapter import StatinaAdapter
-from statina.API.external.constants import TRISOMI_TRESHOLDS
 from statina.API.v2.endpoints.user import get_current_active_user
 from statina.config import get_nipt_adapter
 from statina.crud import update
 from statina.crud.find.batches import query_batches, count_query_batches
+from statina.crud.find.datasets import get_dataset
 from statina.crud.find.plots.coverage_plot_data import (
     get_box_data_for_coverage_plot,
     get_scatter_data_for_coverage_plot,
@@ -24,11 +25,11 @@ from statina.crud.find.plots.zscore_plot_data import (
     get_tris_control_normal,
     get_tris_samples,
 )
-from statina.crud.find.samples import count_query_batch_samples, query_batch_samples
+from statina.crud.find.samples import count_query_batch_samples
 from statina.crud.insert import insert_batch, insert_samples
-from statina.crud.utils import zip_dir
+from statina.crud.utils import zip_dir, get_trisomy_metadata
 from statina.models.database import DatabaseBatch, DataBaseSample, User
-from statina.models.query_params import BatchesQuery, BatchSamplesQuery
+from statina.models.query_params import BatchesQuery
 from statina.models.server.batch import PaginatedBatchResponse, BatchValidator, Batch
 from statina.models.server.load import BatchRequestBody
 from statina.models.server.plots.coverage import CoveragePlotSampleData
@@ -37,7 +38,7 @@ from statina.models.server.plots.fetal_fraction import (
     FetalFractionSamples,
 )
 from statina.models.server.plots.fetal_fraction_sex import SexChromosomeThresholds
-from statina.models.server.sample import Sample, PaginatedSampleResponse, SampleValidator
+from statina.models.server.sample import SampleValidator
 from statina.parse.batch import get_samples, validate_file_path
 from statina.parse.batch import get_batch as crud_get_batch
 
@@ -120,35 +121,6 @@ def get_batch(
     )
 
 
-@router.get("/batch/{batch_id}/samples", response_model=PaginatedSampleResponse, deprecated=True)
-def batch_samples(
-    sample_query: BatchSamplesQuery = Depends(BatchSamplesQuery),
-    current_user: User = Security(get_current_active_user, scopes=["R"]),
-    adapter: StatinaAdapter = Depends(get_nipt_adapter),
-):
-    """Batch view with table of all samples in the batch."""
-
-    samples: List[DataBaseSample] = query_batch_samples(
-        **sample_query.dict(),
-        adapter=adapter,
-    )
-    validated_samples: List[SampleValidator] = [
-        SampleValidator(**sample_obj.dict()) for sample_obj in samples
-    ]
-    samples: List[Sample] = [Sample(**sample.dict()) for sample in validated_samples]
-
-    document_count: int = count_query_batch_samples(
-        adapter=adapter, batch_id=sample_query.batch_id, query_string=sample_query.query_string
-    )
-
-    return JSONResponse(
-        content=jsonable_encoder(
-            PaginatedSampleResponse(document_count=document_count, documents=samples), by_alias=True
-        ),
-        status_code=200,
-    )
-
-
 @router.get("/batch/{batch_id}/download/{file_id}")
 def batch_download(
     batch_id: str,
@@ -186,10 +158,11 @@ def zscore_plot(
 ):
     """Batch view with with Zscore plot"""
 
+    dataset = get_dataset(adapter=adapter, batch_id=batch_id)
     return JSONResponse(
         content=jsonable_encoder(
             dict(
-                tris_thresholds=TRISOMI_TRESHOLDS,
+                tris_thresholds=get_trisomy_metadata(dataset=dataset),
                 chromosomes=[ncv],
                 ncv_chrom_data={ncv: get_tris_samples(adapter=adapter, chr=ncv, batch_id=batch_id)},
                 normal_data={ncv: get_tris_control_normal(adapter, ncv)},
@@ -226,7 +199,9 @@ def fetal_fraction_XY(
     x_max = max(control.FFX + cases.FFX) + 1
     x_min = min(control.FFX + cases.FFX) - 1
 
-    sex_thresholds = SexChromosomeThresholds(x_min=x_min, x_max=x_max)
+    sex_thresholds = SexChromosomeThresholds(
+        x_min=x_min, x_max=x_max, dataset=get_dataset(adapter=adapter, batch_id=batch_id)
+    )
     return JSONResponse(
         content=jsonable_encoder(
             dict(
@@ -279,9 +254,11 @@ def coverage(
     db_samples: List[DataBaseSample] = statina.crud.find.samples.batch_samples(
         batch_id=batch_id, adapter=adapter
     )
-    validated_samples: List[SampleValidator] = [
-        SampleValidator(**db_sample.dict()) for db_sample in db_samples
-    ]
+
+    validated_samples: List[SampleValidator] = []
+    for db_sample in db_samples:
+        db_sample.dataset = get_dataset(adapter=adapter, batch_id=batch_id)
+        validated_samples.append(SampleValidator(**db_sample.dict()))
 
     scatter_data: Dict[str, CoveragePlotSampleData] = get_scatter_data_for_coverage_plot(
         validated_samples
@@ -313,6 +290,23 @@ async def batch_update_comment(
     update.update_batch(adapter=adapter, batch=batch)
 
     return JSONResponse(content="Batch comment updated", status_code=202)
+
+
+@router.put("/batch/{batch_id}/dataset")
+async def batch_update_dataset(
+    batch_id: str,
+    dataset: Optional[str] = Form(...),
+    adapter: StatinaAdapter = Depends(get_nipt_adapter),
+    current_user: User = Security(get_current_active_user, scopes=["RW"]),
+):
+    """Update batch dataset"""
+
+    batch: DatabaseBatch = statina.crud.find.batches.batch(batch_id=batch_id, adapter=adapter)
+    if adapter.dataset_collection.find_one({"name": dataset}):
+        batch.dataset = dataset
+        update.update_batch(adapter=adapter, batch=batch)
+        return JSONResponse(content="Batch dataset updated", status_code=202)
+    return JSONResponse(content="No such dataset", status_code=status.HTTP_400_BAD_REQUEST)
 
 
 @router.patch("/batch/{batch_id}/include_samples")

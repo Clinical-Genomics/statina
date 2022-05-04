@@ -27,3 +27,9 @@ class BatchSamplesQuery(ListQuery):
 class SamplesQuery(ListQuery):
     batch_id: Optional[str] = None
     sort_key: Optional[sample_sort_keys] = "sample_id"
+
+
+class DatasetsQuery(BaseModel):
+    page_size: Optional[int] = 5
+    page_num: Optional[int] = 0
+    query_string: Optional[str] = ""

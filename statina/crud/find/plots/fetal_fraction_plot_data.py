@@ -15,6 +15,21 @@ def samples(
 ) -> FetalFractionSamples:
     """Samples for fetal fraction plot"""
 
+    if batch_id:
+        batch: dict = adapter.batch_collection.find_one({"batch_id": batch_id})
+        dataset = batch.get("dataset")
+        batches_exclude_list = [
+            batch_id,
+            *(
+                batch.get("batch_id")
+                for batch in list(
+                    adapter.batch_collection.find(
+                        {"dataset": {"$ne": dataset}}, {"batch_id": 1, "_id": 0}
+                    )
+                )
+            ),
+        ]
+
     match = {
         "$match": {
             "FF_Formatted": {"$ne": "None", "$exists": True},
@@ -34,7 +49,7 @@ def samples(
     }
 
     if control_samples:
-        match["$match"]["batch_id"] = {"$ne": batch_id}
+        match["$match"]["batch_id"] = {"$nin": batches_exclude_list}
         match["$match"]["include"] = {"$eq": True}
         for abn in SEX_CHROM_ABNORM:
             match["$match"][f"status_{abn}"] = {"$eq": "Normal"}

@@ -59,7 +59,7 @@ def samples(
         statina.crud.find.samples.sample_aggregate(pipe=[match, group], adapter=adapter)
     )
     if relevant_aggregation_data:
-        return FetalFractionSamples(**relevant_aggregation_data)
+        return FetalFractionSamples(**relevant_aggregation_data[0])
     return []
 
 

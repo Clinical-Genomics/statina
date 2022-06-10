@@ -181,7 +181,7 @@ def fetal_fraction_XY(
 ):
     """Batch view with fetal fraction (X against Y) plot"""
 
-    cases = get_fetal_fraction.samples(adapter=adapter, batch_id=batch_id)
+    cases: FetalFractionSamples = get_fetal_fraction.samples(adapter=adapter, batch_id=batch_id)
     control: FetalFractionSamples = get_fetal_fraction.samples(
         batch_id=batch_id, adapter=adapter, control_samples=True
     )

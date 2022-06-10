@@ -11,24 +11,23 @@ from statina.models.server.plots.fetal_fraction import (
 
 
 def samples(
-    adapter: StatinaAdapter, batch_id: Optional[str] = None, control_samples: Optional[bool] = False
+    adapter: StatinaAdapter, batch_id: str, control_samples: Optional[bool] = False
 ) -> FetalFractionSamples:
     """Samples for fetal fraction plot"""
 
-    if batch_id:
-        batch: dict = adapter.batch_collection.find_one({"batch_id": batch_id})
-        dataset = batch.get("dataset")
-        batches_exclude_list = [
-            batch_id,
-            *(
-                batch.get("batch_id")
-                for batch in list(
-                    adapter.batch_collection.find(
-                        {"dataset": {"$ne": dataset}}, {"batch_id": 1, "_id": 0}
-                    )
+    batch: dict = adapter.batch_collection.find_one({"batch_id": batch_id})
+    dataset = batch.get("dataset")
+    batches_exclude_list = [
+        batch_id,
+        *(
+            batch.get("batch_id")
+            for batch in list(
+                adapter.batch_collection.find(
+                    {"dataset": {"$ne": dataset}}, {"batch_id": 1, "_id": 0}
                 )
-            ),
-        ]
+            )
+        ),
+    ]
 
     match = {
         "$match": {

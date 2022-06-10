@@ -57,8 +57,10 @@ def samples(
 
     relevant_aggregation_data = list(
         statina.crud.find.samples.sample_aggregate(pipe=[match, group], adapter=adapter)
-    )[0]
-    return FetalFractionSamples(**relevant_aggregation_data)
+    )
+    if relevant_aggregation_data:
+        return FetalFractionSamples(**relevant_aggregation_data[0])
+    return FetalFractionSamples(FFY=[], FFX=[], FF=[], names=[], count=0)
 
 
 def control_abnormal(adapter: StatinaAdapter) -> FetalFractionControlAbNormal:

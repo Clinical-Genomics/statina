@@ -19,7 +19,6 @@ class ZscoreSamples(BaseModel):
 
     @validator("ncv_values")
     def check_list_lengths(cls, v, values: dict) -> List[int]:
-
         if len(v) != len(values["names"]):
             raise ValueError("Axis lengths do not match 1")
 

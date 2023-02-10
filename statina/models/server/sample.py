@@ -128,7 +128,6 @@ class SampleValidator(DataBaseSample):
 
     @validator("fetal_fraction", always=True)
     def set_fetal_fraction(cls, v, values: dict) -> FetalFraction:
-
         return FetalFraction(
             x=round(values["FFX"], 2),
             y=round(values["FFY"], 2),
@@ -137,7 +136,6 @@ class SampleValidator(DataBaseSample):
 
     @validator("z_score", always=True)
     def set_z_score(cls, v, values: dict) -> ZScore:
-
         return ZScore(
             z_score_13=round(values["Zscore_13"], 2),
             z_score_18=round(values["Zscore_18"], 2),
@@ -147,7 +145,6 @@ class SampleValidator(DataBaseSample):
 
     @validator("status_string", always=True)
     def set_status_string(cls, v, values: dict) -> str:
-
         status_list = []
         for key in TRIS_CHROM_ABNORM + SEX_CHROM_ABNORM:
             status = values.get(f"status_{key}")
@@ -157,7 +154,6 @@ class SampleValidator(DataBaseSample):
 
     @validator("status", always=True)
     def set_status(cls, v, values: dict) -> Statuses:
-
         statuses_dict = {
             f"status_{key.lower()}": Status(
                 status=values.get(f"status_{key}"),
@@ -221,7 +217,7 @@ class SampleValidator(DataBaseSample):
         if not isinstance(fetal_fraction_y, (float, int)):
             return "default"
 
-        if fetal_fraction_y < dataset.fetal_fraction_y_max and fetal_fraction_y != 0:
+        if fetal_fraction_y <= dataset.fetal_fraction_y_max and fetal_fraction_y != 0:
             return "danger"
 
         return "default"
@@ -239,7 +235,7 @@ class SampleValidator(DataBaseSample):
         ):
             return "default"
 
-        if fetal_fraction_y < y_treshold and fetal_fraction_x > x_treshold:
+        if fetal_fraction_y <= y_treshold and fetal_fraction_x >= x_treshold:
             return "danger"
 
         return "default"
@@ -257,7 +253,7 @@ class SampleValidator(DataBaseSample):
         ):
             return "default"
 
-        if fetal_fraction_y < y_treshold and fetal_fraction_x < x_treshold:
+        if fetal_fraction_y <= y_treshold and fetal_fraction_x <= x_treshold:
             return "danger"
 
         return "default"
@@ -270,7 +266,7 @@ class SampleValidator(DataBaseSample):
 
         if not isinstance(fetal_fraction_pf, (float, int)):
             return "default"
-        if fetal_fraction_pf < dataset.fetal_fraction_preface:
+        if fetal_fraction_pf <= dataset.fetal_fraction_preface:
             return "danger"
         return "default"
 
@@ -290,7 +286,7 @@ class SampleValidator(DataBaseSample):
         ):
             return "default"
 
-        if y_treshold < fetal_fraction_y <= x_get_y(x=fetal_fraction_x, k=k_lower, m=m_lower):
+        if y_treshold <= fetal_fraction_y <= x_get_y(x=fetal_fraction_x, k=k_lower, m=m_lower):
             return "danger"
 
         return "default"
@@ -309,7 +305,7 @@ class SampleValidator(DataBaseSample):
         ):
             return "default"
 
-        if fetal_fraction_y > x_get_y(x=fetal_fraction_x, k=k_upper, m=m_upper) and (
+        if fetal_fraction_y >= x_get_y(x=fetal_fraction_x, k=k_upper, m=m_upper) and (
             fetal_fraction_x <= x_threshold
         ):
             return "danger"
@@ -329,8 +325,8 @@ class SampleValidator(DataBaseSample):
         ):
             return "default"
 
-        if fetal_fraction_y > x_get_y(x=fetal_fraction_x, k=k_upper, m=m_upper) and (
-            fetal_fraction_x > x_treshold
+        if fetal_fraction_y >= x_get_y(x=fetal_fraction_x, k=k_upper, m=m_upper) and (
+            fetal_fraction_x >= x_treshold
         ):
             return "danger"
         return "default"

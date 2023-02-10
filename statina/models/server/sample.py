@@ -221,7 +221,7 @@ class SampleValidator(DataBaseSample):
         if not isinstance(fetal_fraction_y, (float, int)):
             return "default"
 
-        if fetal_fraction_y < dataset.fetal_fraction_y_max and fetal_fraction_y != 0:
+        if fetal_fraction_y <= dataset.fetal_fraction_y_max and fetal_fraction_y != 0:
             return "danger"
 
         return "default"
@@ -239,7 +239,7 @@ class SampleValidator(DataBaseSample):
         ):
             return "default"
 
-        if fetal_fraction_y < y_treshold and fetal_fraction_x > x_treshold:
+        if fetal_fraction_y <= y_treshold and fetal_fraction_x >= x_treshold:
             return "danger"
 
         return "default"
@@ -257,7 +257,7 @@ class SampleValidator(DataBaseSample):
         ):
             return "default"
 
-        if fetal_fraction_y < y_treshold and fetal_fraction_x < x_treshold:
+        if fetal_fraction_y <= y_treshold and fetal_fraction_x <= x_treshold:
             return "danger"
 
         return "default"
@@ -270,7 +270,7 @@ class SampleValidator(DataBaseSample):
 
         if not isinstance(fetal_fraction_pf, (float, int)):
             return "default"
-        if fetal_fraction_pf < dataset.fetal_fraction_preface:
+        if fetal_fraction_pf <= dataset.fetal_fraction_preface:
             return "danger"
         return "default"
 
@@ -290,7 +290,7 @@ class SampleValidator(DataBaseSample):
         ):
             return "default"
 
-        if y_treshold < fetal_fraction_y <= x_get_y(x=fetal_fraction_x, k=k_lower, m=m_lower):
+        if y_treshold <= fetal_fraction_y <= x_get_y(x=fetal_fraction_x, k=k_lower, m=m_lower):
             return "danger"
 
         return "default"
@@ -309,7 +309,7 @@ class SampleValidator(DataBaseSample):
         ):
             return "default"
 
-        if fetal_fraction_y > x_get_y(x=fetal_fraction_x, k=k_upper, m=m_upper) and (
+        if fetal_fraction_y >= x_get_y(x=fetal_fraction_x, k=k_upper, m=m_upper) and (
             fetal_fraction_x <= x_threshold
         ):
             return "danger"
@@ -329,8 +329,8 @@ class SampleValidator(DataBaseSample):
         ):
             return "default"
 
-        if fetal_fraction_y > x_get_y(x=fetal_fraction_x, k=k_upper, m=m_upper) and (
-            fetal_fraction_x > x_treshold
+        if fetal_fraction_y >= x_get_y(x=fetal_fraction_x, k=k_upper, m=m_upper) and (
+            fetal_fraction_x >= x_treshold
         ):
             return "danger"
         return "default"

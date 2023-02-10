@@ -117,7 +117,6 @@ async def register_user(
     password: str = Form(...),
     adapter: StatinaAdapter = Depends(get_nipt_adapter),
 ):
-
     if statina.crud.find.users.user(user_name=username, adapter=adapter):
         return JSONResponse(f"Username {username} already taken!", status_code=409)
     elif statina.crud.find.users.user(email=email, adapter=adapter):

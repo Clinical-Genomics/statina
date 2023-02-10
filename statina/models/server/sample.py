@@ -128,7 +128,6 @@ class SampleValidator(DataBaseSample):
 
     @validator("fetal_fraction", always=True)
     def set_fetal_fraction(cls, v, values: dict) -> FetalFraction:
-
         return FetalFraction(
             x=round(values["FFX"], 2),
             y=round(values["FFY"], 2),
@@ -137,7 +136,6 @@ class SampleValidator(DataBaseSample):
 
     @validator("z_score", always=True)
     def set_z_score(cls, v, values: dict) -> ZScore:
-
         return ZScore(
             z_score_13=round(values["Zscore_13"], 2),
             z_score_18=round(values["Zscore_18"], 2),
@@ -147,7 +145,6 @@ class SampleValidator(DataBaseSample):
 
     @validator("status_string", always=True)
     def set_status_string(cls, v, values: dict) -> str:
-
         status_list = []
         for key in TRIS_CHROM_ABNORM + SEX_CHROM_ABNORM:
             status = values.get(f"status_{key}")
@@ -157,7 +154,6 @@ class SampleValidator(DataBaseSample):
 
     @validator("status", always=True)
     def set_status(cls, v, values: dict) -> Statuses:
-
         statuses_dict = {
             f"status_{key.lower()}": Status(
                 status=values.get(f"status_{key}"),

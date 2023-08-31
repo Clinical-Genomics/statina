@@ -1,4 +1,4 @@
-FROM python:3.8-slim
+FROM python:3.8-slim-bullseye
 
 LABEL base_image="python:3.8-slim"
 LABEL about.home="https://github.com/Clinical-Genomics/statina"

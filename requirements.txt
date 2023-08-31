@@ -3,6 +3,7 @@ bump2version
 pymongo
 mongo_adapter
 coloredlogs
+pydantic<2.0.0
 pyyaml
 
 cerberus

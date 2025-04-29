@@ -14,9 +14,9 @@ class ListQuery(BaseModel):
 
 
 class BatchesQuery(ListQuery):
-    sort_key: Optional[
-        Literal["batch_id", "SequencingDate", "Flowcell", "comment"]
-    ] = "SequencingDate"
+    sort_key: Optional[Literal["batch_id", "SequencingDate", "Flowcell", "comment"]] = (
+        "SequencingDate"
+    )
 
 
 class BatchSamplesQuery(ListQuery):

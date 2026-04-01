@@ -1,6 +1,5 @@
 from setuptools import find_packages, setup
 
-
 try:
     with open("requirements.txt", "r") as f:
         install_requires = [x.strip() for x in f.readlines()]

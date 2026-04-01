@@ -149,6 +149,7 @@ def batch_download(
     return response
 
 
+# TODO: add a ratio_plot here
 @router.get("/batch/{batch_id}/zscore_plot")
 def zscore_plot(
     batch_id: str,

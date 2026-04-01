@@ -2,6 +2,8 @@ from typing import List, Optional
 
 from pydantic import BaseModel, Field, validator
 
+# TODO: Assume we also need RatioSamples
+
 
 class ZscoreSamples(BaseModel):
     """Data points for Zscore plots.
@@ -31,6 +33,9 @@ class ZscoreSamples(BaseModel):
 
     class Config:
         validate_assignment = True
+
+
+# TODO: This also seems nice the have - Ratio131821 (but we only have a similar model)
 
 
 class Zscore131821(BaseModel):

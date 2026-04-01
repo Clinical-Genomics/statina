@@ -29,6 +29,15 @@ class Status(BaseModel):
     edited: str
 
 
+class Ratio(BaseModel):
+    chr13_ratio: str = Field(..., alias="R13")
+    chr18_ratio: str = Field(..., alias="R18")
+    chr21_ratio: str = Field(..., alias="R21")
+
+    class Config:
+        allow_population_by_field_name = True
+
+
 class ZScore(BaseModel):
     z_score_13: str = Field(..., alias="13")
     z_score_18: str = Field(..., alias="18")
@@ -69,6 +78,7 @@ class SampleValidator(DataBaseSample):
     status: Optional[Statuses]
     fetal_fraction: Optional[FetalFraction]
     z_score: Optional[ZScore]
+    ratio: Optional[Ratio]
     included: Optional[Include]
     sex: Optional[Literal["XX", "XY"]]
     sample_type: str = Field(..., alias="SampleType")
@@ -132,6 +142,14 @@ class SampleValidator(DataBaseSample):
             x=round(values["FFX"], 2),
             y=round(values["FFY"], 2),
             preface=round(values["FF_Formatted"], 2),
+        )
+
+    @validator("ratio", always=True)
+    def set_ratio(cls, v, values: dict) -> Ratio:
+        return Ratio(
+            chr13_ratio=round(values["Chr13_Ratio"], 5),
+            chr18_ratio=round(values["Chr18_Ratio"], 5),
+            chr21_ratio=round(values["Chr21_Ratio"], 5),
         )
 
     @validator("z_score", always=True)
@@ -349,6 +367,7 @@ class SampleResponse(BaseModel):
     status: Statuses
     included: Include
     z_score: ZScore
+    ratio: Ratio
     fetal_fraction: FetalFraction
 
     class Config:

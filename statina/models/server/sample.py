@@ -28,7 +28,7 @@ class Status(BaseModel):
     status: sample_status_options
     edited: str
 
-
+# TODO: Adda Ratio model here
 class ZScore(BaseModel):
     z_score_13: str = Field(..., alias="13")
     z_score_18: str = Field(..., alias="18")
@@ -68,7 +68,7 @@ class SampleValidator(DataBaseSample):
     status_string: Optional[str]
     status: Optional[Statuses]
     fetal_fraction: Optional[FetalFraction]
-    z_score: Optional[ZScore]
+    z_score: Optional[ZScore] # TODO: include ratio
     included: Optional[Include]
     sex: Optional[Literal["XX", "XY"]]
     sample_type: str = Field(..., alias="SampleType")
@@ -142,6 +142,8 @@ class SampleValidator(DataBaseSample):
             z_score_21=round(values["Zscore_21"], 2),
             z_score_x=round(values["Zscore_X"], 2),
         )
+
+    # TODO: Add a set_ratio validator
 
     @validator("status_string", always=True)
     def set_status_string(cls, v, values: dict) -> str:
@@ -348,7 +350,7 @@ class SampleResponse(BaseModel):
     sequencing_date: Optional[str]
     status: Statuses
     included: Include
-    z_score: ZScore
+    z_score: ZScore # TODO: this is probably a good place to add Ratio
     fetal_fraction: FetalFraction
 
     class Config:

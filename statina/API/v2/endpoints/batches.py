@@ -20,7 +20,7 @@ from statina.crud.find.plots.coverage_plot_data import (
     get_box_data_for_coverage_plot,
     get_scatter_data_for_coverage_plot,
 )
-from statina.crud.find.plots.zscore_plot_data import (
+from statina.crud.find.plots.ratio_plot_data import (
     get_tris_control_abnormal,
     get_tris_control_normal,
     get_tris_samples,
@@ -157,7 +157,7 @@ def zscore_plot(
     current_user: User = Security(get_current_active_user, scopes=["R"]),
     adapter: StatinaAdapter = Depends(get_nipt_adapter),
 ):
-    """Batch view with with Zscore plot"""
+    """Batch view with with Ratio plot"""
 
     dataset = get_dataset(adapter=adapter, batch_id=batch_id)
     return JSONResponse(

@@ -13,14 +13,14 @@ email-validator
 jinja2
 
 # server stuff
-passlib
+passlib==1.7.4 # Compatible with bcrypt
 fastapi
 uvicorn
 uvloop
 httptools
 gunicorn
 python-jose[cryptography]
-bcrypt
+bcrypt==4.0.1 # Compatible with passlib
 numpy
 aiofiles
 sendmail-container

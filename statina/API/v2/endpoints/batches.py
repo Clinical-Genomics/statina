@@ -149,9 +149,8 @@ def batch_download(
     return response
 
 
-# TODO: Change name to ratio_plot
-@router.get("/batch/{batch_id}/zscore_plot")
-def zscore_plot(
+@router.get("/batch/{batch_id}/ratio_plot")
+def ratio_plot(
     batch_id: str,
     ncv: Literal["13", "18", "21"] = Query(...),
     current_user: User = Security(get_current_active_user, scopes=["R"]),

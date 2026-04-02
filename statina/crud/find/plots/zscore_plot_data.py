@@ -7,7 +7,6 @@ from statina.models.database import DataBaseSample
 from statina.models.server.plots.ncv import Zscore131821, ZscoreSamples
 
 
-# TODO: Ratio for abnormal data?
 def get_tris_control_abnormal(adapter: StatinaAdapter, chr, x_axis) -> Dict[str, ZscoreSamples]:
     """Abnormal Control Samples for trisomi plots"""
 
@@ -23,7 +22,7 @@ def get_tris_control_abnormal(adapter: StatinaAdapter, chr, x_axis) -> Dict[str,
         {
             "$group": {
                 "_id": {f"status_{chr}": f"$status_{chr}"},
-                "ncv_values": {"$push": f"$Zscore_{chr}"},
+                "ncv_values": {"$push": f"$Chr{chr}_Ratio"},
                 "names": {"$push": "$sample_id"},
                 "count": {"$sum": 1},
             }
@@ -64,7 +63,6 @@ def get_abn_for_samp_tris_plot(adapter: StatinaAdapter) -> Dict[str, ZscoreSampl
     return plot_data
 
 
-# TODO: Ratio for control samples?
 def get_tris_control_normal(
     adapter: StatinaAdapter, chr: str, x_axis: Optional[int] = None
 ) -> ZscoreSamples:
@@ -75,7 +73,7 @@ def get_tris_control_normal(
         {
             "$group": {
                 "_id": {f"status_{chr}": f"$status_{chr}"},
-                "ncv_values": {"$push": f"$Zscore_{chr}"},
+                "ncv_values": {"$push": f"$Chr{chr}_Ratio"},
                 "names": {"$push": "$sample_id"},
                 "count": {"$sum": 1},
             }
@@ -118,9 +116,6 @@ def get_samples_for_samp_tris_plot(adapter: StatinaAdapter, batch_id: str) -> Zs
     )
 
 
-# TODO: Assume we need a get_ratio_samples?
-
-
 def get_tris_samples(adapter: StatinaAdapter, chr, batch_id: str) -> ZscoreSamples:
     """Cases for trisomi plots."""
 
@@ -129,7 +124,7 @@ def get_tris_samples(adapter: StatinaAdapter, chr, batch_id: str) -> ZscoreSampl
         {
             "$group": {
                 "_id": {"batch": "$batch_id"},
-                "ncv_values": {"$push": f"$Zscore_{chr}"},
+                "ncv_values": {"$push": f"$Chr{chr}_Ratio"},
                 "names": {"$push": "$sample_id"},
                 "count": {"$sum": 1},
             }

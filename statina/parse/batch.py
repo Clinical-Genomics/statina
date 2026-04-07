@@ -63,7 +63,7 @@ def get_batch(data_set: str, nipt_results_path: Path) -> DatabaseBatch:
     """Parse NIPT result file and create a batch from the first sample info and the data set."""
 
     sample_data: List[dict] = parse_csv(nipt_results_path)
+    sample_data[0]["dataset"] = data_set
 
     batch = DatabaseBatch.parse_obj(sample_data[0])
-    batch.dataset = data_set
     return batch

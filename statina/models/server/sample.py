@@ -14,9 +14,9 @@ from statina.models.server.plots.fetal_fraction_sex import x_get_y
 class SampleWarning(BaseModel):
     fetal_fraction_preface: Literal["danger", "default", "warning"]
     fetal_fraction_y: Literal["danger", "default", "warning"]
-    z_score_13: Literal["danger", "default", "warning"]
-    z_score_18: Literal["danger", "default", "warning"]
-    z_score_21: Literal["danger", "default", "warning"]
+    chr13_ratio: Literal["danger", "default", "warning"]
+    chr18_ratio: Literal["danger", "default", "warning"]
+    chr21_ratio: Literal["danger", "default", "warning"]
     x0: Literal["danger", "default", "warning"]
     xxx: Literal["danger", "default", "warning"]
     other: Literal["danger", "default", "warning"]

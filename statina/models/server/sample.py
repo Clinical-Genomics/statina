@@ -116,21 +116,21 @@ class SampleValidator(DataBaseSample):
         sample_warnings["xxy"]: str = cls.get_XXY_warning(
             dataset=dataset, fetal_fraction_y=fetal_fraction_y, fetal_fraction_x=fetal_fraction_x
         )
-        sample_warnings["z_score_13"]: str = cls.get_tris_warning(
+        sample_warnings["chr13_ratio"]: str = cls.get_tris_warning(
             dataset=dataset,
-            z_score=values.get("Zscore_13"),
+            z_score=values.get("Chr13_Ratio"),
             fetal_fraction_pf=fetal_fraction_pf,
             fetal_fraction_y=fetal_fraction_y,
         )
-        sample_warnings["z_score_18"]: str = cls.get_tris_warning(
+        sample_warnings["chr18_ratio"]: str = cls.get_tris_warning(
             dataset=dataset,
-            z_score=values.get("Zscore_18"),
+            z_score=values.get("Chr18_Ratio"),
             fetal_fraction_pf=fetal_fraction_pf,
             fetal_fraction_y=fetal_fraction_y,
         )
-        sample_warnings["z_score_21"]: str = cls.get_tris_warning(
+        sample_warnings["chr21_ratio"]: str = cls.get_tris_warning(
             dataset=dataset,
-            z_score=values.get("Zscore_21"),
+            z_score=values.get("Chr21_Ratio"),
             fetal_fraction_pf=fetal_fraction_pf,
             fetal_fraction_y=fetal_fraction_y,
         )

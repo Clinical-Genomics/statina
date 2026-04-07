@@ -91,7 +91,9 @@ def load_batch(
     if not nipt_results.exists():
         return JSONResponse(content="Results file missing", status_code=422)
     samples: List[DataBaseSample] = get_samples(nipt_results)
-    batch: DatabaseBatch = crud_get_batch(data_set=batch_files.data_set, nipt_results_path=nipt_results)
+    batch: DatabaseBatch = crud_get_batch(
+        data_set=batch_files.data_set, nipt_results_path=nipt_results
+    )
     if statina.crud.find.batches.batch(adapter=adapter, batch_id=batch.batch_id):
         return JSONResponse(content="Batch already in database!", status_code=422)
     insert_batch(adapter=adapter, batch=batch, batch_files=batch_files)

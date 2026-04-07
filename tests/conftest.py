@@ -69,7 +69,10 @@ def valid_load_user():
 @pytest.fixture(scope="function")
 def valid_load_batch(multiqc_report, segmental_calls, valid_csv):
     batch_files = BatchRequestBody(
-        data_set="data_set", multiqc_report=multiqc_report, segmental_calls=segmental_calls, result_file=valid_csv
+        data_set="data_set",
+        multiqc_report=multiqc_report,
+        segmental_calls=segmental_calls,
+        result_file=valid_csv,
     )
     return batch_files
 

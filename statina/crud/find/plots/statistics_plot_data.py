@@ -48,7 +48,18 @@ def get_statistics_for_box_plot(adapter: StatinaAdapter, batches: list, fields: 
     }
 
     for field in fields:
-        group["$group"][field] = {"$push": f"${field}"}
+        if field == "FFY":
+            group["$group"]["FFY"] = {
+                "$push": {
+                    "$cond": [
+                        {"$gt": ["$FFY", 0.0]},
+                        "$FFY",
+                        None
+                    ]
+                }
+            }
+        else:
+            group["$group"][field] = {"$push": f"${field}"}
 
     pipe = [match, lookup, unwind, group]
     # maybe add a fina sort to the pipe

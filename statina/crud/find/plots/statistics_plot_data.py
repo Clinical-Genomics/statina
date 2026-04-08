@@ -49,15 +49,7 @@ def get_statistics_for_box_plot(adapter: StatinaAdapter, batches: list, fields: 
 
     for field in fields:
         if field == "FFY":
-            group["$group"]["FFY"] = {
-                "$push": {
-                    "$cond": [
-                        {"$gt": ["$FFY", 0.0]},
-                        "$FFY",
-                        None
-                    ]
-                }
-            }
+            group["$group"]["FFY"] = {"$push": {"$cond": [{"$gt": ["$FFY", 0.0]}, "$FFY", None]}}
         else:
             group["$group"][field] = {"$push": f"${field}"}
 

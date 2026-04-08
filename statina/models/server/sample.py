@@ -208,7 +208,7 @@ class SampleValidator(DataBaseSample):
     def get_tris_warning(
         cls, ratio: float, fetal_fraction_pf: float, fetal_fraction_y: float, dataset: Any
     ) -> str:
-        """Get automated trisomy warning, based on preset Zscore thresholds"""
+        """Get automated trisomy warning, based on preset ratio thresholds"""
         hard_max = dataset.trisomy_hard_max
         soft_max = dataset.trisomy_soft_max
         hard_min = dataset.trisomy_hard_min

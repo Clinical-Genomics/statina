@@ -84,10 +84,13 @@ def test_get_batch(valid_csv: Path):
     # GIVEN a valid csv file
 
     # WHEN running get_samples
-    results: DatabaseBatch = get_batch(valid_csv)
+    results: DatabaseBatch = get_batch(data_set="data_set", nipt_results_path=valid_csv)
 
     # THEN assert that the objects are samples
     assert isinstance(results, DatabaseBatch)
+
+    # THEN the data set should have been set
+    assert results.dataset == "data_set"
 
 
 def test_get_batch_with_missing_sample_project_in_csv(csv_with_missing_sample_project):
@@ -96,4 +99,4 @@ def test_get_batch_with_missing_sample_project_in_csv(csv_with_missing_sample_pr
     # WHEN running get_samples
     # THEN pydantic ValidationError is being raised
     with pytest.raises(ValidationError):
-        get_batch(csv_with_missing_sample_project)
+        get_batch(data_set="data_set", nipt_results_path=csv_with_missing_sample_project)

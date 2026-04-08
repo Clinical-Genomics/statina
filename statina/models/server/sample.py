@@ -118,19 +118,19 @@ class SampleValidator(DataBaseSample):
         )
         sample_warnings["chr13_ratio"]: str = cls.get_tris_warning(
             dataset=dataset,
-            z_score=values.get("Chr13_Ratio"),
+            ratio=values.get("Chr13_Ratio"),
             fetal_fraction_pf=fetal_fraction_pf,
             fetal_fraction_y=fetal_fraction_y,
         )
         sample_warnings["chr18_ratio"]: str = cls.get_tris_warning(
             dataset=dataset,
-            z_score=values.get("Chr18_Ratio"),
+            ratio=values.get("Chr18_Ratio"),
             fetal_fraction_pf=fetal_fraction_pf,
             fetal_fraction_y=fetal_fraction_y,
         )
         sample_warnings["chr21_ratio"]: str = cls.get_tris_warning(
             dataset=dataset,
-            z_score=values.get("Chr21_Ratio"),
+            ratio=values.get("Chr21_Ratio"),
             fetal_fraction_pf=fetal_fraction_pf,
             fetal_fraction_y=fetal_fraction_y,
         )
@@ -206,7 +206,7 @@ class SampleValidator(DataBaseSample):
 
     @classmethod
     def get_tris_warning(
-        cls, z_score: float, fetal_fraction_pf: float, fetal_fraction_y: float, dataset: Any
+        cls, ratio: float, fetal_fraction_pf: float, fetal_fraction_y: float, dataset: Any
     ) -> str:
         """Get automated trisomy warning, based on preset Zscore thresholds"""
         hard_max = dataset.trisomy_hard_max
@@ -215,16 +215,16 @@ class SampleValidator(DataBaseSample):
         preface_threshold = dataset.fetal_fraction_preface
         fetal_fraction_y_threshold = dataset.fetal_fraction_y_for_trisomy
 
-        if fetal_fraction_pf is None or z_score is None or fetal_fraction_y is None:
+        if fetal_fraction_pf is None or ratio is None or fetal_fraction_y is None:
             return "default"
-        if z_score >= hard_max:
+        if ratio >= hard_max:
             return "danger"
-        elif z_score >= soft_max and (
+        elif ratio >= soft_max and (
             (fetal_fraction_y < fetal_fraction_y_threshold and fetal_fraction_y != 0)
             or fetal_fraction_pf < preface_threshold
         ):
             return "warning"
-        elif z_score <= hard_min:
+        elif ratio <= hard_min:
             return "danger"
         return "default"
 

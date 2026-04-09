@@ -30,17 +30,17 @@ def zip_dir(source_dir: Union[str, Path]) -> io.BytesIO:
 def get_trisomy_metadata(dataset: Any) -> dict:
     return {
         "soft_max": {
-            "Zscore": dataset.trisomy_soft_max,
+            "ratio": dataset.trisomy_soft_max,
             "color": "orange",
             "text": f"Warning threshold = {dataset.trisomy_soft_max}",
         },
         "hard_max": {
-            "Zscore": dataset.trisomy_hard_max,
+            "ratio": dataset.trisomy_hard_max,
             "color": "red",
             "text": f"Threshold = {dataset.trisomy_hard_max}",
         },
         "hard_min": {
-            "Zscore": dataset.trisomy_hard_min,
+            "ratio": dataset.trisomy_hard_min,
             "color": "red",
             "text": f"Threshold = {dataset.trisomy_hard_min}",
         },

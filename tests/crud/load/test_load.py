@@ -1,5 +1,10 @@
+from pathlib import Path
+
+from pymongo.database import Database
+
 from statina.adapter.plugin import StatinaAdapter
 from statina.crud.insert import insert_batch, insert_user
+from statina.models.server.load import BatchRequestBody
 from statina.parse.batch import get_batch, get_samples
 
 
@@ -14,15 +19,15 @@ def test_load_user(database, valid_load_user):
     assert nipt_adapter.user_collection.estimated_document_count() == 1
 
 
-def test_batch_valid_files(database, valid_csv, valid_load_batch):
+def test_batch_valid_files(database: Database, valid_csv: Path, valid_load_batch: BatchRequestBody):
     # GIVEN the following request data:
     #   a valid csv file with three samples
     #   segmental_calls and multiqc_report files with random content, but that do exist.
     nipt_adapter = StatinaAdapter(database.client, db_name="test")
-    batch = get_batch(valid_csv)
+    batch = get_batch(data_set="data_set", nipt_results_path=valid_csv)
 
     # WHEN running insert_batch
-    insert_batch(nipt_adapter, batch, valid_load_batch)
+    insert_batch(adapter=nipt_adapter, batch=batch, batch_files=valid_load_batch)
 
     # THEN the batch should be added to the batch collection
     assert nipt_adapter.batch_collection.estimated_document_count() == 1

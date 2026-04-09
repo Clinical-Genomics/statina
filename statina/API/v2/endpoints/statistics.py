@@ -34,6 +34,7 @@ def statistics(
         "Chr18_Ratio_uncorrected",
         "Chr21_Ratio_uncorrected",
         "FF_Formatted",
+        "FFY",
         "DuplicationRate",
         "MappedReads",
         "GC_Dropout",

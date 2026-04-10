@@ -87,7 +87,7 @@ def get_tris_control_normal(
                 ],
             }
         },
-        {"$match": {"batch": {"$ne": []}}},
+        {"$unwind": {"path": "$batch"}},
         {
             "$group": {
                 "_id": {f"status_{chr}": f"$status_{chr}"},

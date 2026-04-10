@@ -83,7 +83,7 @@ def get_tris_control_normal(
                 "as": "batch",
                 "pipeline": [
                     {"$match": {"dataset": dataset_name}},
-                    {"$project": {"_id": 0, "batch_id": 1, "dataset": 1}}
+                    {"$project": {"_id": 0, "batch_id": 1, "dataset": 1}},
                 ],
             }
         },

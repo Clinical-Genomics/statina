@@ -26,7 +26,7 @@ def get_tris_control_abnormal(adapter: StatinaAdapter, chr, x_axis) -> Dict[str,
                 "names": {"$push": "$sample_id"},
                 "count": {"$sum": 1},
             }
-        },
+        }
     ]
 
     for status_dict in statina.crud.find.samples.sample_aggregate(pipe=pipe, adapter=adapter):
@@ -64,7 +64,7 @@ def get_abn_for_samp_tris_plot(adapter: StatinaAdapter) -> Dict[str, RatioSample
 
 
 def get_tris_control_normal(
-    adapter: StatinaAdapter, chr: str, x_axis: Optional[int] = None
+    adapter: StatinaAdapter, chr: str, dataset_name: str, x_axis: Optional[int] = None
 ) -> RatioSamples:
     """Normal Control Samples for trisomi plots"""
 
@@ -78,6 +78,19 @@ def get_tris_control_normal(
                 "count": {"$sum": 1},
             }
         },
+        {
+            "$lookup": {
+                "from": "batch",
+                "localField": "batch_id",
+                "foreignField": "batch_id",
+                "as": "batch"
+            }
+        },
+        {
+            "$match": {
+                "batch.dataset": {"$eq": dataset_name}
+            }
+        }
     ]
     if not list(statina.crud.find.samples.sample_aggregate(pipe=pipe, adapter=adapter)):
         return {}
@@ -88,13 +101,13 @@ def get_tris_control_normal(
     return RatioSamples(**data)
 
 
-def get_normal_for_samp_tris_plot(adapter: StatinaAdapter) -> Ratio131821:
+def get_normal_for_samp_tris_plot(adapter: StatinaAdapter, dataset_name: str) -> Ratio131821:
     """Format normal Control Samples for Sample trisomi plot"""
 
     return Ratio131821(
-        chr_13=get_tris_control_normal(adapter=adapter, chr="13", x_axis=1),
-        chr_18=get_tris_control_normal(adapter=adapter, chr="18", x_axis=2),
-        chr_21=get_tris_control_normal(adapter=adapter, chr="21", x_axis=3),
+        chr_13=get_tris_control_normal(adapter=adapter, chr="13", dataset_name=dataset_name, x_axis=1),
+        chr_18=get_tris_control_normal(adapter=adapter, chr="18", dataset_name=dataset_name, x_axis=2),
+        chr_21=get_tris_control_normal(adapter=adapter, chr="21", dataset_name=dataset_name, x_axis=3),
     )
 
 

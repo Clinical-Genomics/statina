@@ -100,10 +100,12 @@ def sample_tris(
     """Sample view with trisomi plot."""
 
     database_sample: DataBaseSample = find_samples.sample(sample_id=sample_id, adapter=adapter)
+    dataset = get_dataset(adapter=adapter, batch_id=database_sample.batch_id)
     abnormal_data: Dict[str, RatioSamples] = ratio_plot_data.get_abn_for_samp_tris_plot(
         adapter=adapter
     )
-    normal_data: Ratio131821 = ratio_plot_data.get_normal_for_samp_tris_plot(adapter=adapter)
+
+    normal_data: Ratio131821 = ratio_plot_data.get_normal_for_samp_tris_plot(adapter=adapter, dataset_name=dataset.name)
     sample_data: RatioSamples = ratio_plot_data.get_sample_for_samp_tris_plot(database_sample)
 
     return JSONResponse(

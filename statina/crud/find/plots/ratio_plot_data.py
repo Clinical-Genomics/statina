@@ -69,27 +69,32 @@ def get_tris_control_normal(
     """Normal Control Samples for trisomi plots"""
 
     pipe = [
-        {"$match": {f"status_{chr}": {"$eq": "Normal"}, "include": {"$eq": True}}},
+        {
+            "$match": {
+                f"status_{chr}": {"$eq": "Normal"},
+                "include": {"$eq": True},
+            }
+        },
         {
             "$lookup": {
                 "from": "batch",
                 "localField": "batch_id",
                 "foreignField": "batch_id",
                 "as": "batch",
+                "pipeline": [
+                    {"$match": {"dataset": dataset_name}},
+                    {"$project": {"_id": 0, "batch_id": 1, "dataset": 1}}
+                ],
             }
         },
-        {
-            "$unwind": {"path": "$batch"},
-        },
-        {"$match": {"batch.dataset": dataset_name}},
+        {"$match": {"batch": {"$ne": []}}},
         {
             "$group": {
                 "_id": {f"status_{chr}": f"$status_{chr}"},
                 "ncv_values": {"$push": f"$Chr{chr}_Ratio"},
                 "names": {"$push": "$sample_id"},
                 "count": {"$sum": 1},
-                "batch": {"$push": "$batch"},
-            },
+            }
         },
     ]
     if not list(statina.crud.find.samples.sample_aggregate(pipe=pipe, adapter=adapter)):

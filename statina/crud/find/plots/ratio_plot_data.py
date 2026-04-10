@@ -7,16 +7,24 @@ from statina.models.database import DataBaseSample
 from statina.models.server.plots.ncv import Ratio131821, RatioSamples
 
 
-def get_tris_control_abnormal(adapter: StatinaAdapter, chr, x_axis) -> Dict[str, RatioSamples]:
+def get_tris_control_abnormal(
+    adapter: StatinaAdapter, chr, dataset_name: str, x_axis
+) -> Dict[str, RatioSamples]:
     """Abnormal Control Samples for trisomi plots"""
 
     plot_data = {}
+
+    batch_ids = [
+        doc["batch_id"]
+        for doc in adapter.batch_collection.find({"dataset": dataset_name}, {"batch_id": 1})
+    ]
 
     pipe = [
         {
             "$match": {
                 f"status_{chr}": {"$ne": "Normal", "$exists": "True"},
                 "include": {"$eq": True},
+                "batch_id": {"$in": batch_ids},
             }
         },
         {
@@ -41,14 +49,16 @@ def get_tris_control_abnormal(adapter: StatinaAdapter, chr, x_axis) -> Dict[str,
     return plot_data
 
 
-def get_abn_for_samp_tris_plot(adapter: StatinaAdapter) -> Dict[str, RatioSamples]:
+def get_abn_for_samp_tris_plot(
+    adapter: StatinaAdapter, dataset_name: str
+) -> Dict[str, RatioSamples]:
     """Format abnormal Control Samples for Sample trisomi plot"""
 
     plot_data = {}
 
     for x_axis, abn in enumerate(["13", "18", "21"], start=1):
         tris_control_abnormal: Dict[str, RatioSamples] = get_tris_control_abnormal(
-            adapter, abn, x_axis
+            adapter=adapter, chr=abn, dataset_name=dataset_name, x_axis=x_axis
         )
         for status, data in tris_control_abnormal.items():
             if status not in plot_data:
@@ -113,16 +123,6 @@ def get_normal_for_samp_tris_plot(adapter: StatinaAdapter, dataset_name: str) ->
             adapter=adapter, chr="21", dataset_name=dataset_name, x_axis=3
         ),
     )
-
-
-def get_abnormal_for_samp_tris_plot(adapter: StatinaAdapter) -> dict:
-    """Format normal Control Samples for Sample trisomi plot"""
-
-    return {
-        "13": get_tris_control_abnormal(adapter=adapter, chr="13", x_axis=0),
-        "18": get_tris_control_abnormal(adapter=adapter, chr="18", x_axis=0),
-        "21": get_tris_control_abnormal(adapter=adapter, chr="21", x_axis=0),
-    }
 
 
 def get_samples_for_samp_tris_plot(adapter: StatinaAdapter, batch_id: str) -> Ratio131821:

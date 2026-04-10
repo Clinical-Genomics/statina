@@ -172,7 +172,11 @@ def ratio_plot(
                         adapter=adapter, chr=ncv, dataset_name=dataset.name
                     )
                 },
-                abnormal_data={ncv: get_tris_control_abnormal(adapter=adapter, chr=ncv, x_axis=0)},
+                abnormal_data={
+                    ncv: get_tris_control_abnormal(
+                        adapter=adapter, chr=ncv, dataset_name=dataset.name, x_axis=0
+                    )
+                },
             ),
             by_alias=False,
         ),

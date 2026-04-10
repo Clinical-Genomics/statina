@@ -102,7 +102,7 @@ def sample_tris(
     database_sample: DataBaseSample = find_samples.sample(sample_id=sample_id, adapter=adapter)
     dataset = get_dataset(adapter=adapter, batch_id=database_sample.batch_id)
     abnormal_data: Dict[str, RatioSamples] = ratio_plot_data.get_abn_for_samp_tris_plot(
-        adapter=adapter
+        adapter=adapter, dataset_name=dataset.name
     )
 
     normal_data: Ratio131821 = ratio_plot_data.get_normal_for_samp_tris_plot(

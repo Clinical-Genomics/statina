@@ -68,26 +68,19 @@ def get_tris_control_normal(
 ) -> RatioSamples:
     """Normal Control Samples for trisomi plots"""
 
+    batch_ids = [
+        doc["batch_id"]
+        for doc in adapter.batch_collection.find({"dataset": dataset_name}, {"batch_id": 1})
+    ]
+
     pipe = [
         {
             "$match": {
                 f"status_{chr}": {"$eq": "Normal"},
                 "include": {"$eq": True},
+                "batch_id": {"$in": batch_ids},
             }
         },
-        {
-            "$lookup": {
-                "from": "batch",
-                "localField": "batch_id",
-                "foreignField": "batch_id",
-                "as": "batch",
-                "pipeline": [
-                    {"$match": {"dataset": dataset_name}},
-                    {"$project": {"_id": 0, "batch_id": 1, "dataset": 1}},
-                ],
-            }
-        },
-        {"$unwind": {"path": "$batch"}},
         {
             "$group": {
                 "_id": {f"status_{chr}": f"$status_{chr}"},

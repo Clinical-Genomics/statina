@@ -105,7 +105,9 @@ def sample_tris(
         adapter=adapter
     )
 
-    normal_data: Ratio131821 = ratio_plot_data.get_normal_for_samp_tris_plot(adapter=adapter, dataset_name=dataset.name)
+    normal_data: Ratio131821 = ratio_plot_data.get_normal_for_samp_tris_plot(
+        adapter=adapter, dataset_name=dataset.name
+    )
     sample_data: RatioSamples = ratio_plot_data.get_sample_for_samp_tris_plot(database_sample)
 
     return JSONResponse(

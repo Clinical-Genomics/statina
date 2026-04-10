@@ -167,7 +167,11 @@ def ratio_plot(
                 tris_thresholds=get_trisomy_metadata(dataset=dataset),
                 chromosomes=[ncv],
                 ncv_chrom_data={ncv: get_tris_samples(adapter=adapter, chr=ncv, batch_id=batch_id)},
-                normal_data={ncv: get_tris_control_normal(adapter=adapter, chr=ncv, dataset_name=dataset.name)},
+                normal_data={
+                    ncv: get_tris_control_normal(
+                        adapter=adapter, chr=ncv, dataset_name=dataset.name
+                    )
+                },
                 abnormal_data={ncv: get_tris_control_abnormal(adapter=adapter, chr=ncv, x_axis=0)},
             ),
             by_alias=False,

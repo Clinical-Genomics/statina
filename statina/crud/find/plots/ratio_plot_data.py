@@ -71,14 +71,6 @@ def get_tris_control_normal(
     pipe = [
         {"$match": {f"status_{chr}": {"$eq": "Normal"}, "include": {"$eq": True}}},
         {
-            "$group": {
-                "_id": {f"status_{chr}": f"$status_{chr}"},
-                "ncv_values": {"$push": f"$Chr{chr}_Ratio"},
-                "names": {"$push": "$sample_id"},
-                "count": {"$sum": 1},
-            }
-        },
-        {
             "$lookup": {
                 "from": "batch",
                 "localField": "batch_id",
@@ -86,7 +78,19 @@ def get_tris_control_normal(
                 "as": "batch",
             }
         },
-        {"$match": {"batch.dataset": {"$eq": dataset_name}}},
+        {
+            "$group": {
+                "_id": {f"status_{chr}": f"$status_{chr}"},
+                "ncv_values": {"$push": f"$Chr{chr}_Ratio"},
+                "names": {"$push": "$sample_id"},
+                "count": {"$sum": 1},
+                "batch": {"$push": "$batch"},
+            },
+        },
+        {
+            "$unwind": {"path": "$batch"},
+        },
+        {"$match": {"batch.dataset": dataset_name}},
     ]
     if not list(statina.crud.find.samples.sample_aggregate(pipe=pipe, adapter=adapter)):
         return {}

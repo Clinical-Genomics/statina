@@ -3,6 +3,7 @@ from typing import Dict, Optional
 
 import statina
 from statina.adapter import StatinaAdapter
+from statina.crud.find.batches import get_batch_ids_by_dataset
 from statina.models.database import DataBaseSample
 from statina.models.server.plots.ncv import Ratio131821, RatioSamples
 
@@ -14,15 +15,12 @@ def get_tris_control_abnormal(
 
     plot_data = {}
 
-    batch_ids = [
-        doc["batch_id"]
-        for doc in adapter.batch_collection.find({"dataset": dataset_name}, {"batch_id": 1})
-    ]
+    batch_ids = get_batch_ids_by_dataset(adapter=adapter, dataset_name=dataset_name)
 
     pipe = [
         {
             "$match": {
-                f"status_{chr}": {"$ne": "Normal", "$exists": "True"},
+                f"status_{chr}": {"$ne": "Normal", "$exists": True},
                 "include": {"$eq": True},
                 "batch_id": {"$in": batch_ids},
             }
@@ -78,10 +76,7 @@ def get_tris_control_normal(
 ) -> RatioSamples:
     """Normal Control Samples for trisomi plots"""
 
-    batch_ids = [
-        doc["batch_id"]
-        for doc in adapter.batch_collection.find({"dataset": dataset_name}, {"batch_id": 1})
-    ]
+    batch_ids = get_batch_ids_by_dataset(adapter=adapter, dataset_name=dataset_name)
 
     pipe = [
         {

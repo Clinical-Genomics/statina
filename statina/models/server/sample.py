@@ -139,17 +139,17 @@ class SampleValidator(DataBaseSample):
     @validator("fetal_fraction", always=True)
     def set_fetal_fraction(cls, v, values: dict) -> FetalFraction:
         return FetalFraction(
-            x=round(values["FFX"], 2),
-            y=round(values["FFY"], 2),
-            preface=round(values["FF_Formatted"], 2),
+            x=round(values["FFX"], 1),
+            y=round(values["FFY"], 1),
+            preface=round(values["FF_Formatted"], 1),
         )
 
     @validator("ratio", always=True)
     def set_ratio(cls, v, values: dict) -> Ratio:
         return Ratio(
-            chr13_ratio=round(values["Chr13_Ratio"], 5),
-            chr18_ratio=round(values["Chr18_Ratio"], 5),
-            chr21_ratio=round(values["Chr21_Ratio"], 5),
+            chr13_ratio=round(values["Chr13_Ratio"], 4),
+            chr18_ratio=round(values["Chr18_Ratio"], 4),
+            chr21_ratio=round(values["Chr21_Ratio"], 4),
         )
 
     @validator("z_score", always=True)

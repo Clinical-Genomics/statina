@@ -1,4 +1,4 @@
-from typing import Iterable, List, Optional, Literal
+from typing import Iterable, List, Optional, Literal, Any
 
 from pydantic import parse_obj_as
 
@@ -6,10 +6,11 @@ from statina.adapter import StatinaAdapter
 from statina.constants import sort_table
 from statina.crud.utils import paginate
 from statina.models.database import DatabaseBatch
+from typing import List
 
 
 def get_batches_text_query(query_string: str) -> dict:
-    """Text search with regex, case insensitive"""
+    """Text search with regex, case-insensitive"""
     return {
         "$or": [
             {"batch_id": {"$regex": query_string, "$options": "i"}},
@@ -66,3 +67,11 @@ def count_query_batches(adapter: StatinaAdapter, query_string: Optional[str] = "
     return adapter.batch_collection.count_documents(
         filter=get_batches_text_query(query_string=query_string)
     )
+
+
+def get_batch_ids_by_dataset(adapter: StatinaAdapter, dataset_name: str) -> List[Any]:
+    batch_ids = [
+        doc["batch_id"]
+        for doc in adapter.batch_collection.find({"dataset": dataset_name}, {"batch_id": 1})
+    ]
+    return batch_ids

@@ -15,12 +15,12 @@ def get_scatter_data_for_coverage_plot(
     data = {}
     for sample in samples:
         sample_warnings: SampleWarning = sample.warnings
-        zscore_warnings = [
-            sample_warnings.z_score_13,
-            sample_warnings.z_score_18,
-            sample_warnings.z_score_21,
+        ratio_warnings = [
+            sample_warnings.chr13_ratio,
+            sample_warnings.chr18_ratio,
+            sample_warnings.chr21_ratio,
         ]
-        if set(zscore_warnings) == {"default"}:
+        if set(ratio_warnings) == {"default"}:
             continue
 
         x = []

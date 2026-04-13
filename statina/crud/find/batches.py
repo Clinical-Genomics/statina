@@ -6,6 +6,7 @@ from statina.adapter import StatinaAdapter
 from statina.constants import sort_table
 from statina.crud.utils import paginate
 from statina.models.database import DatabaseBatch
+from typing import List
 
 
 def get_batches_text_query(query_string: str) -> dict:
@@ -68,7 +69,7 @@ def count_query_batches(adapter: StatinaAdapter, query_string: Optional[str] = "
     )
 
 
-def get_batch_ids_by_dataset(adapter: StatinaAdapter, dataset_name: str) -> list[Any]:
+def get_batch_ids_by_dataset(adapter: StatinaAdapter, dataset_name: str) -> List[Any]:
     batch_ids = [
         doc["batch_id"]
         for doc in adapter.batch_collection.find({"dataset": dataset_name}, {"batch_id": 1})

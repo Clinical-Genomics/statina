@@ -16,7 +16,6 @@ def get_tris_control_abnormal(
     plot_data = {}
 
     batch_ids = get_batch_ids_by_dataset(adapter=adapter, dataset_name=dataset_name)
-
     pipe = [
         {
             "$match": {

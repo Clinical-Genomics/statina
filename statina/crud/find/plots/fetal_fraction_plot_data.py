@@ -4,6 +4,7 @@ import statina
 from statina.adapter import StatinaAdapter
 from statina.API.external.constants import CHROM_ABNORM, SEX_CHROM_ABNORM
 from statina.crud.find.batches import get_batch_ids_by_dataset
+from statina.crud.find.samples import sample_aggregate
 from statina.models.server.plots.fetal_fraction import (
     AbNormalityClasses,
     FetalFractionControlAbNormal,

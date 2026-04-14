@@ -29,14 +29,13 @@ sample_status_options = Literal[
 sample_sort_keys = Literal[
     "sample_id",
     "batch_id",
-    "Zscore_13",
-    "Zscore_18",
-    "Zscore_21",
-    "Zscore_X",
     "FF_Formatted",
     "CNVSegment",
     "FFY",
     "FFX",
     "comment",
     "QCFlag",
+    "Chr13_Ratio",
+    "Chr18_Ratio",
+    "Chr21_Ratio",
 ]

@@ -64,7 +64,7 @@ def samples(
     return FetalFractionSamples(FFY=[], FFX=[], FF=[], names=[], count=0)
 
 
-def control_abnormal(adapter: StatinaAdapter, dataset_name:str) -> FetalFractionControlAbNormal:
+def control_abnormal(adapter: StatinaAdapter, dataset_name: str) -> FetalFractionControlAbNormal:
     """Abnormal Control Samples for fetal_fraction_XY plot"""
 
     plot_data = {}

@@ -196,7 +196,9 @@ def fetal_fraction_XY(
         batch_id=batch_id, adapter=adapter, control_samples=True
     )
     dataset = get_dataset(adapter=adapter, batch_id=batch_id)
-    abnormal: FetalFractionControlAbNormal = get_fetal_fraction.control_abnormal(adapter=adapter, dataset_name=dataset.name)
+    abnormal: FetalFractionControlAbNormal = get_fetal_fraction.control_abnormal(
+        adapter=adapter, dataset_name=dataset.name
+    )
     abnormal_dict = abnormal.dict(
         exclude_none=True,
         exclude={

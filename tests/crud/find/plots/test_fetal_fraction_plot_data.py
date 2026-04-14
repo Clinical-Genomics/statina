@@ -16,6 +16,7 @@ def make_sample(sample_id, batch_id):
         "status_XYY": "Normal",
     }
 
+
 def make_abnormal_sample(sample_id, batch_id, status_X0="Normal", FFX=10.0, FFY=0.0):
     return {
         "sample_id": sample_id,
@@ -31,7 +32,6 @@ def make_abnormal_sample(sample_id, batch_id, status_X0="Normal", FFX=10.0, FFY=
         "status_18": "Normal",
         "status_21": "Normal",
     }
-
 
 
 def test_control_samples_filtered_by_dataset(database):

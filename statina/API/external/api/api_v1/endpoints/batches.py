@@ -4,7 +4,6 @@ from starlette.responses import RedirectResponse
 
 from statina.config import settings
 
-
 router = APIRouter()
 
 

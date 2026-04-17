@@ -18,8 +18,8 @@ pip install -r requirements.txt -e .
 **The CLI is intended for development/testing purpose only. To run in a production setting please refer to documentation
 for suggestions how.**
 
-Once installed, you can set up Statina by running a few commands using the included command line interface. 
-Given you have a MongoDB server listening on the default port (27017), this is how you would set up a fully working 
+Once installed, you can set up Statina by running a few commands using the included command line interface.
+Given you have a MongoDB server listening on the default port (27017), this is how you would set up a fully working
 Statina demo:
 
 ```bash
@@ -36,7 +36,7 @@ statina serve --reload
 
 ### Docker image
 
-Statina can also run as a container. The image is available [on Docker Hub][docker-hub] or can be build using the 
+Statina can also run as a container. The image is available [on Docker Hub][docker-hub] or can be build using the
 Dockerfile provided in this repository.
 
 To build a new image from the Dockerfile use the commands: `docker build -t statina .`
@@ -57,10 +57,10 @@ Statina is using github flow release model as described in our development manua
 4) Write a change log comment.
 5) Merge.
 
-	
+
 ### Deploying to staging
 
-Opening pull requests in Statina repository will enable a Github Action to build containers and publish to 
+Opening pull requests in Statina repository will enable a Github Action to build containers and publish to
 [statina-stage dockerhub](https://hub.docker.com/repository/docker/clinicalgenomics/statina-stage) with each commit.
 
 Two tags will be published: one with the name of the branch and another tagged "latest".
@@ -73,16 +73,16 @@ Steps to test current branch on staging:
 `sudo -iu hiseq.clinical`
 
 `ssh localhost`
-  
-If you made changes to internal app : `systemctl --user restart statina.target` 
 
-Your branch should be deployed to staging at https://statina-stage.scilifelab.se 
+If you made changes to internal app : `systemctl --user restart statina.target`
+
+Your branch should be deployed to staging at https://statina-stage.scilifelab.se
 
 If for some reason you cannot access the application at given address, check status of the container: `systemctl --user status statinaApp.service`
 
 ### Deploying to production
 
-Use `update-statina.sh` script to update production both on Hasta and CGVS. 
+Use `update-statina.sh` script to update production both on Hasta and CGVS.
 **Please follow the development guide and `servers` repo when doing so. It is also important to keep those involved informed.**
 
 ## Back End

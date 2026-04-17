@@ -14,9 +14,9 @@ from statina.models.server.plots.fetal_fraction_sex import x_get_y
 class SampleWarning(BaseModel):
     fetal_fraction_preface: Literal["danger", "default", "warning"]
     fetal_fraction_y: Literal["danger", "default", "warning"]
-    z_score_13: Literal["danger", "default", "warning"]
-    z_score_18: Literal["danger", "default", "warning"]
-    z_score_21: Literal["danger", "default", "warning"]
+    chr13_ratio: Literal["danger", "default", "warning"]
+    chr18_ratio: Literal["danger", "default", "warning"]
+    chr21_ratio: Literal["danger", "default", "warning"]
     x0: Literal["danger", "default", "warning"]
     xxx: Literal["danger", "default", "warning"]
     other: Literal["danger", "default", "warning"]
@@ -29,11 +29,10 @@ class Status(BaseModel):
     edited: str
 
 
-class ZScore(BaseModel):
-    z_score_13: str = Field(..., alias="13")
-    z_score_18: str = Field(..., alias="18")
-    z_score_21: str = Field(..., alias="21")
-    z_score_x: str = Field(..., alias="x")
+class Ratio(BaseModel):
+    chr13_ratio: str = Field(..., alias="R13")
+    chr18_ratio: str = Field(..., alias="R18")
+    chr21_ratio: str = Field(..., alias="R21")
 
     class Config:
         allow_population_by_field_name = True
@@ -68,7 +67,7 @@ class SampleValidator(DataBaseSample):
     status_string: Optional[str]
     status: Optional[Statuses]
     fetal_fraction: Optional[FetalFraction]
-    z_score: Optional[ZScore]
+    ratio: Optional[Ratio]
     included: Optional[Include]
     sex: Optional[Literal["XX", "XY"]]
     sample_type: str = Field(..., alias="SampleType")
@@ -106,21 +105,21 @@ class SampleValidator(DataBaseSample):
         sample_warnings["xxy"]: str = cls.get_XXY_warning(
             dataset=dataset, fetal_fraction_y=fetal_fraction_y, fetal_fraction_x=fetal_fraction_x
         )
-        sample_warnings["z_score_13"]: str = cls.get_tris_warning(
+        sample_warnings["chr13_ratio"]: str = cls.get_tris_warning(
             dataset=dataset,
-            z_score=values.get("Zscore_13"),
+            ratio=values.get("Chr13_Ratio"),
             fetal_fraction_pf=fetal_fraction_pf,
             fetal_fraction_y=fetal_fraction_y,
         )
-        sample_warnings["z_score_18"]: str = cls.get_tris_warning(
+        sample_warnings["chr18_ratio"]: str = cls.get_tris_warning(
             dataset=dataset,
-            z_score=values.get("Zscore_18"),
+            ratio=values.get("Chr18_Ratio"),
             fetal_fraction_pf=fetal_fraction_pf,
             fetal_fraction_y=fetal_fraction_y,
         )
-        sample_warnings["z_score_21"]: str = cls.get_tris_warning(
+        sample_warnings["chr21_ratio"]: str = cls.get_tris_warning(
             dataset=dataset,
-            z_score=values.get("Zscore_21"),
+            ratio=values.get("Chr21_Ratio"),
             fetal_fraction_pf=fetal_fraction_pf,
             fetal_fraction_y=fetal_fraction_y,
         )
@@ -129,18 +128,17 @@ class SampleValidator(DataBaseSample):
     @validator("fetal_fraction", always=True)
     def set_fetal_fraction(cls, v, values: dict) -> FetalFraction:
         return FetalFraction(
-            x=round(values["FFX"], 2),
-            y=round(values["FFY"], 2),
-            preface=round(values["FF_Formatted"], 2),
+            x=round(values["FFX"], 1),
+            y=round(values["FFY"], 1),
+            preface=round(values["FF_Formatted"], 1),
         )
 
-    @validator("z_score", always=True)
-    def set_z_score(cls, v, values: dict) -> ZScore:
-        return ZScore(
-            z_score_13=round(values["Zscore_13"], 2),
-            z_score_18=round(values["Zscore_18"], 2),
-            z_score_21=round(values["Zscore_21"], 2),
-            z_score_x=round(values["Zscore_X"], 2),
+    @validator("ratio", always=True)
+    def set_ratio(cls, v, values: dict) -> Ratio:
+        return Ratio(
+            chr13_ratio=round(values["Chr13_Ratio"], 4),
+            chr18_ratio=round(values["Chr18_Ratio"], 4),
+            chr21_ratio=round(values["Chr21_Ratio"], 4),
         )
 
     @validator("status_string", always=True)
@@ -188,25 +186,25 @@ class SampleValidator(DataBaseSample):
 
     @classmethod
     def get_tris_warning(
-        cls, z_score: float, fetal_fraction_pf: float, fetal_fraction_y: float, dataset: Any
+        cls, ratio: float, fetal_fraction_pf: float, fetal_fraction_y: float, dataset: Any
     ) -> str:
-        """Get automated trisomy warning, based on preset Zscore thresholds"""
+        """Get automated trisomy warning, based on preset ratio thresholds"""
         hard_max = dataset.trisomy_hard_max
         soft_max = dataset.trisomy_soft_max
         hard_min = dataset.trisomy_hard_min
         preface_threshold = dataset.fetal_fraction_preface
         fetal_fraction_y_threshold = dataset.fetal_fraction_y_for_trisomy
 
-        if fetal_fraction_pf is None or z_score is None or fetal_fraction_y is None:
+        if fetal_fraction_pf is None or ratio is None or fetal_fraction_y is None:
             return "default"
-        if z_score >= hard_max:
+        if ratio >= hard_max:
             return "danger"
-        elif z_score >= soft_max and (
+        elif ratio >= soft_max and (
             (fetal_fraction_y < fetal_fraction_y_threshold and fetal_fraction_y != 0)
             or fetal_fraction_pf < preface_threshold
         ):
             return "warning"
-        elif z_score <= hard_min:
+        elif ratio <= hard_min:
             return "danger"
         return "default"
 
@@ -348,7 +346,7 @@ class SampleResponse(BaseModel):
     sequencing_date: Optional[str]
     status: Statuses
     included: Include
-    z_score: ZScore
+    ratio: Ratio
     fetal_fraction: FetalFraction
 
     class Config:

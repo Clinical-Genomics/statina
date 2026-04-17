@@ -3,6 +3,8 @@ from typing import Optional
 import statina
 from statina.adapter import StatinaAdapter
 from statina.API.external.constants import CHROM_ABNORM, SEX_CHROM_ABNORM
+from statina.crud.find.batches import get_batch_ids_by_dataset
+from statina.crud.find.samples import sample_aggregate
 from statina.models.server.plots.fetal_fraction import (
     AbNormalityClasses,
     FetalFractionControlAbNormal,
@@ -63,10 +65,12 @@ def samples(
     return FetalFractionSamples(FFY=[], FFX=[], FF=[], names=[], count=0)
 
 
-def control_abnormal(adapter: StatinaAdapter) -> FetalFractionControlAbNormal:
+def control_abnormal(adapter: StatinaAdapter, dataset_name: str) -> FetalFractionControlAbNormal:
     """Abnormal Control Samples for fetal_fraction_XY plot"""
 
     plot_data = {}
+
+    batch_ids = get_batch_ids_by_dataset(adapter=adapter, dataset_name=dataset_name)
     for abn in CHROM_ABNORM:
         plot_data[abn] = {}
         pipe = [
@@ -74,6 +78,7 @@ def control_abnormal(adapter: StatinaAdapter) -> FetalFractionControlAbNormal:
                 "$match": {
                     f"status_{abn}": {"$ne": "Normal", "$exists": True},
                     "include": {"$eq": True},
+                    "batch_id": {"$in": batch_ids},
                 }
             },
             {

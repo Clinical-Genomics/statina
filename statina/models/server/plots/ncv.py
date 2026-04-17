@@ -3,14 +3,14 @@ from typing import List, Optional
 from pydantic import BaseModel, Field, validator
 
 
-class ZscoreSamples(BaseModel):
-    """Data points for Zscore plots.
+class RatioSamples(BaseModel):
+    """Data points for Ratio plots.
 
     Samples within this model will be part of the same series in a plot.
 
     The x-axis is of type int because:
-        Zscore plots for a batch have samples on the x-axis.
-        Zscore plot for a sample have chromosome abnormalities (13 18 21)"""
+        Ratio plots for a batch have samples on the x-axis.
+        Ratio plot for a sample have chromosome abnormalities (13 18 21)"""
 
     count: Optional[int]
     x_axis: Optional[List[int]]
@@ -33,14 +33,14 @@ class ZscoreSamples(BaseModel):
         validate_assignment = True
 
 
-class Zscore131821(BaseModel):
+class Ratio131821(BaseModel):
     """Model for samples classified as normal chromosome 13, 18, 21.
 
     Samples are grouped by chromosome."""
 
-    chr_13: ZscoreSamples = Field(..., alias="13")
-    chr_18: ZscoreSamples = Field(..., alias="18")
-    chr_21: ZscoreSamples = Field(..., alias="21")
+    chr_13: RatioSamples = Field(..., alias="13")
+    chr_18: RatioSamples = Field(..., alias="18")
+    chr_21: RatioSamples = Field(..., alias="21")
 
     class Config:
         allow_population_by_field_name = True

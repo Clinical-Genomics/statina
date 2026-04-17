@@ -20,7 +20,7 @@ from statina.crud.find.plots.coverage_plot_data import (
     get_box_data_for_coverage_plot,
     get_scatter_data_for_coverage_plot,
 )
-from statina.crud.find.plots.zscore_plot_data import (
+from statina.crud.find.plots.ratio_plot_data import (
     get_tris_control_abnormal,
     get_tris_control_normal,
     get_tris_samples,
@@ -91,7 +91,9 @@ def load_batch(
     if not nipt_results.exists():
         return JSONResponse(content="Results file missing", status_code=422)
     samples: List[DataBaseSample] = get_samples(nipt_results)
-    batch: DatabaseBatch = crud_get_batch(nipt_results)
+    batch: DatabaseBatch = crud_get_batch(
+        data_set=batch_files.data_set, nipt_results_path=nipt_results
+    )
     if statina.crud.find.batches.batch(adapter=adapter, batch_id=batch.batch_id):
         return JSONResponse(content="Batch already in database!", status_code=422)
     insert_batch(adapter=adapter, batch=batch, batch_files=batch_files)
@@ -149,14 +151,14 @@ def batch_download(
     return response
 
 
-@router.get("/batch/{batch_id}/zscore_plot")
-def zscore_plot(
+@router.get("/batch/{batch_id}/ratio_plot")
+def ratio_plot(
     batch_id: str,
     ncv: Literal["13", "18", "21"] = Query(...),
     current_user: User = Security(get_current_active_user, scopes=["R"]),
     adapter: StatinaAdapter = Depends(get_nipt_adapter),
 ):
-    """Batch view with with Zscore plot"""
+    """Batch view with with Ratio plot"""
 
     dataset = get_dataset(adapter=adapter, batch_id=batch_id)
     return JSONResponse(
@@ -165,8 +167,16 @@ def zscore_plot(
                 tris_thresholds=get_trisomy_metadata(dataset=dataset),
                 chromosomes=[ncv],
                 ncv_chrom_data={ncv: get_tris_samples(adapter=adapter, chr=ncv, batch_id=batch_id)},
-                normal_data={ncv: get_tris_control_normal(adapter, ncv)},
-                abnormal_data={ncv: get_tris_control_abnormal(adapter, ncv, 0)},
+                normal_data={
+                    ncv: get_tris_control_normal(
+                        adapter=adapter, chr=ncv, dataset_name=dataset.name
+                    )
+                },
+                abnormal_data={
+                    ncv: get_tris_control_abnormal(
+                        adapter=adapter, chr=ncv, dataset_name=dataset.name, x_axis=0
+                    )
+                },
             ),
             by_alias=False,
         ),
@@ -185,7 +195,10 @@ def fetal_fraction_XY(
     control: FetalFractionSamples = get_fetal_fraction.samples(
         batch_id=batch_id, adapter=adapter, control_samples=True
     )
-    abnormal: FetalFractionControlAbNormal = get_fetal_fraction.control_abnormal(adapter)
+    dataset = get_dataset(adapter=adapter, batch_id=batch_id)
+    abnormal: FetalFractionControlAbNormal = get_fetal_fraction.control_abnormal(
+        adapter=adapter, dataset_name=dataset.name
+    )
     abnormal_dict = abnormal.dict(
         exclude_none=True,
         exclude={

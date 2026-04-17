@@ -14,11 +14,11 @@ from statina.crud import update
 from statina.crud.find import samples as find_samples
 from statina.crud.find import batches as find_batches
 from statina.crud.find.datasets import get_dataset
-from statina.crud.find.plots import zscore_plot_data
+from statina.crud.find.plots import ratio_plot_data
 from statina.models.database import DataBaseSample, User, DatabaseBatch
 from statina.models.database.dataset import Dataset
 from statina.models.query_params import SamplesQuery
-from statina.models.server.plots.ncv import Zscore131821, ZscoreSamples
+from statina.models.server.plots.ncv import Ratio131821, RatioSamples
 from statina.models.server.sample import (
     SampleResponse,
     PaginatedSampleResponse,
@@ -100,11 +100,15 @@ def sample_tris(
     """Sample view with trisomi plot."""
 
     database_sample: DataBaseSample = find_samples.sample(sample_id=sample_id, adapter=adapter)
-    abnormal_data: Dict[str, ZscoreSamples] = zscore_plot_data.get_abn_for_samp_tris_plot(
-        adapter=adapter
+    dataset = get_dataset(adapter=adapter, batch_id=database_sample.batch_id)
+    abnormal_data: Dict[str, RatioSamples] = ratio_plot_data.get_abn_for_samp_tris_plot(
+        adapter=adapter, dataset_name=dataset.name
     )
-    normal_data: Zscore131821 = zscore_plot_data.get_normal_for_samp_tris_plot(adapter=adapter)
-    sample_data: ZscoreSamples = zscore_plot_data.get_sample_for_samp_tris_plot(database_sample)
+
+    normal_data: Ratio131821 = ratio_plot_data.get_normal_for_samp_tris_plot(
+        adapter=adapter, dataset_name=dataset.name
+    )
+    sample_data: RatioSamples = ratio_plot_data.get_sample_for_samp_tris_plot(database_sample)
 
     return JSONResponse(
         content=jsonable_encoder(

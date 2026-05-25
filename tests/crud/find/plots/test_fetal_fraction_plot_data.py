@@ -55,9 +55,9 @@ def test_control_samples_filtered_by_dataset(database):
     # WHEN fetching control samples for batch_to_search_with
     result = samples(adapter=nipt_adapter, batch_id="batch_to_search_with", control_samples=True)
 
-    # THEN only control_same_dataset from the same dataset should be returned
-    assert result.count == 1
-    assert result.names == ["control_same_dataset"]
+    # THEN only the control samples in the same batch and in the same dataset should be returned
+    assert result.count == 2
+    assert result.names == ["control_in_search_batch", "control_same_dataset"]
 
 
 def test_control_abnormal_returns_samples_grouped_by_status(database):

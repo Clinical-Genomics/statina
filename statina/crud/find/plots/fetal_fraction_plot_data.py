@@ -20,7 +20,7 @@ def samples(
     batch: dict = adapter.batch_collection.find_one({"batch_id": batch_id})
     dataset = batch.get("dataset")
     batches_exclude_list = [
-        batch_id,
+        #batch_id,
         *(
             batch.get("batch_id")
             for batch in list(

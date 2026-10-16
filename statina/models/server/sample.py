@@ -106,22 +106,13 @@ class SampleValidator(DataBaseSample):
             dataset=dataset, fetal_fraction_y=fetal_fraction_y, fetal_fraction_x=fetal_fraction_x
         )
         sample_warnings["chr13_ratio"]: str = cls.get_tris_warning(
-            dataset=dataset,
-            ratio=values.get("Chr13_Ratio"),
-            fetal_fraction_pf=fetal_fraction_pf,
-            fetal_fraction_y=fetal_fraction_y,
+            dataset=dataset, ratio=values.get("Chr13_Ratio")
         )
         sample_warnings["chr18_ratio"]: str = cls.get_tris_warning(
-            dataset=dataset,
-            ratio=values.get("Chr18_Ratio"),
-            fetal_fraction_pf=fetal_fraction_pf,
-            fetal_fraction_y=fetal_fraction_y,
+            dataset=dataset, ratio=values.get("Chr18_Ratio")
         )
         sample_warnings["chr21_ratio"]: str = cls.get_tris_warning(
-            dataset=dataset,
-            ratio=values.get("Chr21_Ratio"),
-            fetal_fraction_pf=fetal_fraction_pf,
-            fetal_fraction_y=fetal_fraction_y,
+            dataset=dataset, ratio=values.get("Chr21_Ratio")
         )
         return SampleWarning(**sample_warnings)
 
@@ -185,27 +176,19 @@ class SampleValidator(DataBaseSample):
         return Include(include=values["include"], edited=values["change_include_date"])
 
     @classmethod
-    def get_tris_warning(
-        cls, ratio: float, fetal_fraction_pf: float, fetal_fraction_y: float, dataset: Any
-    ) -> str:
-        """Get automated trisomy warning, based on preset ratio thresholds"""
+    def get_tris_warning(cls, ratio: float, dataset: Any) -> str:
+        """Get automated trisomy warning, based on preset ratio thresholds.
+        The warning is independent of the fetal fraction estimates."""
         hard_max = dataset.trisomy_hard_max
         soft_max = dataset.trisomy_soft_max
         hard_min = dataset.trisomy_hard_min
-        preface_threshold = dataset.fetal_fraction_preface
-        fetal_fraction_y_threshold = dataset.fetal_fraction_y_for_trisomy
 
-        if fetal_fraction_pf is None or ratio is None or fetal_fraction_y is None:
+        if ratio is None:
             return "default"
-        if ratio >= hard_max:
+        if ratio >= hard_max or ratio <= hard_min:
             return "danger"
-        elif ratio >= soft_max and (
-            (fetal_fraction_y < fetal_fraction_y_threshold and fetal_fraction_y != 0)
-            or fetal_fraction_pf < preface_threshold
-        ):
+        if ratio >= soft_max:
             return "warning"
-        elif ratio <= hard_min:
-            return "danger"
         return "default"
 
     @classmethod
